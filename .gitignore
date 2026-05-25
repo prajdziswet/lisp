@@ -1,0 +1,13 @@
+# AutoCAD temporary and backup files
+*.bak
+*.dwl
+*.dwl2
+*.err
+*.log
+*.tmp
+*.recovery
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

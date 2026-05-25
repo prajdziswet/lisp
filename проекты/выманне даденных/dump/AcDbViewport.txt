@@ -1,0 +1,74 @@
+﻿дамп по объекту [AcDbViewport]
+========================================
+; IAcadPViewport: Интерфейс AutoCAD для работы с видовыми экранами.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   ArcSmoothness = 1000
+;   Center = (-111.487 -321.114 0.0)
+;   Clipped (RO) = 0
+;   CustomScale = 1.0
+;   Direction = (0.0 0.0 1.0)
+;   DisplayLocked = 0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   GridOn = 0
+;   Handle (RO) = "9B901"
+;   HasExtensionDictionary (RO) = -1
+;   HasSheetView (RO) = 0
+;   Height = 342.352
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3ed18>
+;   LabelBlockId = 0
+;   Layer = "0"
+;   LayerPropertyOverrides (RO) = 0
+;   LensLength = 50.0
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   ModelView = nil
+;   ObjectID (RO) = 551
+;   ObjectName (RO) = "AcDbViewport"
+;   OwnerID (RO) = 561
+;   PlotStyleName = "ByLayer"
+;   ShadePlot = 0
+;   SheetView = nil
+;   SnapBasePoint = (0.0 0.0)
+;   SnapOn = 0
+;   SnapRotationAngle = 0.0
+;   StandardScale = 2
+;   StandardScale2 = 3
+;   Target = (0.0 0.0 0.0)
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3dd50>
+;   TwistAngle = 0.0
+;   UCSIconAtOrigin = 0
+;   UCSIconOn = -1
+;   UCSPerViewport = -1
+;   ViewportOn = -1
+;   Visible = -1
+;   VisualStyle = 1
+;   Width = 618.897
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   Display (1)
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetGridSpacing (2)
+;   GetSnapSpacing (2)
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetGridSpacing (2)
+;   SetSnapSpacing (2)
+;   SetXData (2)
+;   SyncModelView ()
+;   TransformBy (1)
+;   Update ()

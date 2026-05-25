@@ -1,0 +1,54 @@
+﻿дамп по объекту [AcDbMText]
+========================================
+; IAcadMText: Интерфейс AutoCAD для работы с многострочным текстом.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   AttachmentPoint = 1
+;   BackgroundFill = -1
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   DrawingDirection = 5
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "9C1D"
+;   HasExtensionDictionary (RO) = -1
+;   Height = 1.0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000023740efb678>
+;   InsertionPoint = (415612.0 114526.0 0.0)
+;   Layer = "ОФ_ТЕКСТ_название объектов ранее проектир."
+;   LineSpacingDistance = 1.66667
+;   LineSpacingFactor = 1.0
+;   LineSpacingStyle = 1
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 545
+;   ObjectName (RO) = "AcDbMText"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "ByLayer"
+;   Rotation = 0.582163
+;   StyleName = "GOST 2.304_09"
+;   TextString = "объект \"Тех. перевооружение ПС 330кВ \\PДербент замена выключателей 110кВ\" 1этап"
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000023740efb850>
+;   Visible = -1
+;   Width = 25.6833
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   FieldCode ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

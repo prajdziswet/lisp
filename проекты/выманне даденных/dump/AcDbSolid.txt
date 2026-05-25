@@ -1,0 +1,44 @@
+﻿дамп по объекту [AcDbSolid]
+========================================
+; IAcadSolid: Интерфейс AutoCAD для работы с фигурами.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Coordinate = ...Индексированное содержимое не выводится...
+;   Coordinates = (36.9764 -22.7531 0.0 37.767 -23.0166 0.0 ... )
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоБлоку"
+;   Handle (RO) = "2D2"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000029a8643f5e8>
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 52
+;   ObjectName (RO) = "AcDbSolid"
+;   OwnerID (RO) = 53
+;   PlotStyleName = "ByBlock"
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029a8643f520>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

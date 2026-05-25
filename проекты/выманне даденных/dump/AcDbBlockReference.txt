@@ -1,0 +1,62 @@
+﻿дамп по объекту [AcDbBlockReference]
+========================================
+; IAcadBlockReference: Интерфейс AutoCAD для работы с вхождениями блоков.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EffectiveName (RO) = "A$C506C104B"
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "2A53"
+;   HasAttributes (RO) = 0
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000023740efac58>
+;   InsertionPoint = (415610.0 114517.0 -43.789)
+;   InsUnits (RO) = "Безразмерные"
+;   InsUnitsFactor (RO) = 1.0
+;   IsDynamicBlock (RO) = 0
+;   Layer = "ЗАМЕНА ВЫКЛЮЧАТЕЛЕЙ 1этап_ОБОРУДОВАНИЕ_ ЭТО"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Name = "A$C506C104B"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 554
+;   ObjectName (RO) = "AcDbBlockReference"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "ByLayer"
+;   Rotation = 5.29545
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000023740efa830>
+;   Visible = -1
+;   XEffectiveScaleFactor = 0.001
+;   XScaleFactor = 0.001
+;   YEffectiveScaleFactor = 0.001
+;   YScaleFactor = 0.001
+;   ZEffectiveScaleFactor = 0.001
+;   ZScaleFactor = 0.001
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   ConvertToAnonymousBlock ()
+;   ConvertToStaticBlock (1)
+;   Copy ()
+;   Delete ()
+;   Explode ()
+;   GetAttributes ()
+;   GetBoundingBox (2)
+;   GetConstantAttributes ()
+;   GetDynamicBlockProperties ()
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   ResetBlock ()
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

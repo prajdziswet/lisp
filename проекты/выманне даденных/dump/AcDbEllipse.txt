@@ -1,0 +1,55 @@
+﻿дамп по объекту [AcDbEllipse]
+========================================
+; IAcadEllipse: Интерфейс AutoCAD для работы с эллипсами.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Area (RO) = 4.11937e-06
+;   Center = (51557.9 31999.4 0.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EndAngle = 6.28319
+;   EndParameter = 6.28319
+;   EndPoint (RO) = (51557.9 31999.4 0.0)
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "592CE"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3eb38>
+;   Layer = "ЗАМЕНА ВЫКЛЮЧАТЕЛЕЙ 3этап_ОБОРУДОВАНИЕ_ЭТО"
+;   Linetype = "Continuous"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   MajorAxis = (-4.48247e-14 0.005 0.0)
+;   MajorRadius = 0.005
+;   Material = "ByLayer"
+;   MinorAxis (RO) = (0.00288675 2.58796e-14 0.0)
+;   MinorRadius = 0.00288675
+;   Normal = (0.0 0.0 -1.0)
+;   ObjectID (RO) = 567
+;   ObjectName (RO) = "AcDbEllipse"
+;   OwnerID (RO) = 553
+;   PlotStyleName = "ByLayer"
+;   RadiusRatio = 0.57735
+;   StartAngle = 4.71239
+;   StartParameter = 4.71239
+;   StartPoint (RO) = (51557.9 31999.4 0.0)
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3e470>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

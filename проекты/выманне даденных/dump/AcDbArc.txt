@@ -1,0 +1,52 @@
+﻿дамп по объекту [AcDbArc]
+========================================
+; IAcadArc: Интерфейс AutoCAD для работы с дугами.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   ArcLength (RO) = 0.548556
+;   Area (RO) = 0.00843425
+;   Center = (-187.621 337.953 0.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EndAngle = 5.57426
+;   EndPoint (RO) = (-186.39 336.898 0.0)
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "2BEA"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3ea78>
+;   Layer = "0"
+;   Linetype = "Continuous"
+;   LinetypeScale = 1.0
+;   Lineweight = 20
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 569
+;   ObjectName (RO) = "AcDbArc"
+;   OwnerID (RO) = 566
+;   PlotStyleName = "ByLayer"
+;   Radius = 1.62162
+;   StartAngle = 5.23599
+;   StartPoint (RO) = (-186.81 336.549 0.0)
+;   Thickness = 0.0
+;   TotalAngle (RO) = 0.338276
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3e3b0>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

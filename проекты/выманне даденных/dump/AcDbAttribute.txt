@@ -1,0 +1,63 @@
+=== ДАМП ОБЪЕКТА AcDbAttribute ===
+; IAcadAttributeReference: Интерфейс AutoCAD для работы с вхождениями атрибутов.
+; Значения свойств:
+;   Alignment = 0
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Backward = 0
+;   Constant (RO) = 0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   FieldLength = 0
+;   Handle (RO) = "576"
+;   HasExtensionDictionary (RO) = 0
+;   Height = 2.5
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 00000292b35c5208>
+;   InsertionPoint = (86.2828 17.9323 0.0)
+;   Invisible = 0
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   LockPosition (RO) = -1
+;   Material = "ByLayer"
+;   MTextAttribute = 0
+;   MTextAttributeContent = ""
+;   MTextBoundaryWidth = 0.0
+;   MTextDrawingDirection = 5
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 65
+;   ObjectName (RO) = "AcDbAttribute"
+;   ObliqueAngle = 0.0
+;   OwnerID (RO) = 62
+;   PlotStyleName = "ByLayer"
+;   Rotation = 0.0
+;   ScaleFactor = 1.0
+;   StyleName = "Standard"
+;   TagString = "ИМЯ"
+;   TextAlignmentPoint = (0.0 0.0 0.0)
+;   TextGenerationFlag = 0
+;   TextString = "имя1"
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 00000292b37b97a0>
+;   UpsideDown = 0
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()
+;   UpdateMTextAttribute ()

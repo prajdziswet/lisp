@@ -1,0 +1,55 @@
+﻿дамп по объекту [AcDb3dSolid]
+========================================
+; IAcad3DSolid: Интерфейс AutoCAD для работы с 3d телами.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Centroid (RO) = (25.0 -55.0 5.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "2FF"
+;   HasExtensionDictionary (RO) = 0
+;   History = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000029a8643ef28>
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   MomentOfInertia (RO) = (2.40692e+06 521963.0 2.87652e+06)
+;   ObjectID (RO) = 50
+;   ObjectName (RO) = "AcDb3dSolid"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   Position = (25.0 -55.0 0.0)
+;   PrincipalDirections (RO) = (1.0 0.0 0.0 0.0 1.0 0.0 ... )
+;   PrincipalMoments (RO) = (11453.7 11453.7 9817.48)
+;   ProductOfInertia (RO) = (1.07992e+06 215984.0 -98174.8)
+;   RadiiOfGyration (RO) = (55.3587 25.7795 60.5186)
+;   ShowHistory = 0
+;   SolidType (RO) = "Цилиндр"
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029a8643e5c0>
+;   Visible = -1
+;   Volume (RO) = 785.398
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Boolean (2)
+;   CheckInterference (3)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SectionSolid (3)
+;   SetXData (2)
+;   SliceSolid (4)
+;   TransformBy (1)
+;   Update ()

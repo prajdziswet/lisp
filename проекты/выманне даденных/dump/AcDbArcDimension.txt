@@ -1,0 +1,138 @@
+﻿дамп по объекту [AcDbArcDimension]
+========================================
+; IAcadDimArcLength: Интерфейс IAcadDimArcLength
+; Значения свойств:
+;   AltRoundDistance = 0.0
+;   AltSubUnitsFactor = 100.0
+;   AltSubUnitsSuffix = ""
+;   AltSuppressLeadingZeros = 0
+;   AltSuppressTrailingZeros = 0
+;   AltSuppressZeroFeet = -1
+;   AltSuppressZeroInches = -1
+;   AltTextPrefix = ""
+;   AltTextSuffix = ""
+;   AltTolerancePrecision = 3
+;   AltToleranceSuppressLeadingZeros = 0
+;   AltToleranceSuppressTrailingZeros = 0
+;   AltToleranceSuppressZeroFeet = -1
+;   AltToleranceSuppressZeroInches = -1
+;   AltUnits = 0
+;   AltUnitsFormat = 2
+;   AltUnitsPrecision = 3
+;   AltUnitsScale = 0.0393701
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   ArcEndParam = 3.14159
+;   ArcPoint = (42.5 -17.0096 0.0)
+;   ArcStartParam = 0.0
+;   Arrowhead1Block = ""
+;   Arrowhead1Type = 0
+;   Arrowhead2Block = ""
+;   Arrowhead2Type = 0
+;   ArrowheadSize = 2.5
+;   CenterPoint = (35.0 -30.0 0.0)
+;   DecimalSeparator = ","
+;   DimensionLineColor = 0
+;   DimensionLineExtend = 0.0
+;   DimensionLinetype = "ПоБлоку"
+;   DimensionLineWeight = -2
+;   DimLine1Suppress = 0
+;   DimLine2Suppress = 0
+;   DimLineInside = 0
+;   DimTxtDirection = 0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   ExtensionLineColor = 0
+;   ExtensionLineExtend = 1.25
+;   ExtensionLineOffset = 0.625
+;   ExtensionLineWeight = -2
+;   ExtLine1Linetype = "ПоБлоку"
+;   ExtLine1Point = (40.0 -30.0 0.0)
+;   ExtLine1Suppress = 0
+;   ExtLine2Linetype = "ПоБлоку"
+;   ExtLine2Point = (30.0 -30.0 0.0)
+;   ExtLine2Suppress = 0
+;   ExtLineFixedLen = 1.0
+;   ExtLineFixedLenSuppress = 0
+;   Fit = 3
+;   ForceLineInside = -1
+;   FractionFormat = 0
+;   Handle (RO) = "2D6"
+;   HasExtensionDictionary (RO) = -1
+;   HasLeader = 0
+;   HorizontalTextPosition = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000029a8643dea8>
+;   IsPartial = 0
+;   Layer = "0"
+;   Leader1Point = (40.0 -30.0 0.0)
+;   Leader2Point = (30.0 -30.0 0.0)
+;   LinearScaleFactor = 1.0
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Measurement (RO) = 15.708
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 48
+;   ObjectName (RO) = "AcDbArcDimension"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   PrimaryUnitsPrecision = 2
+;   Rotation = 0.0
+;   RoundDistance = 0.0
+;   ScaleFactor = 1.0
+;   StyleName = "ISO-25"
+;   SubUnitsFactor = 100.0
+;   SubUnitsSuffix = ""
+;   SuppressLeadingZeros = 0
+;   SuppressTrailingZeros = -1
+;   SuppressZeroFeet = -1
+;   SuppressZeroInches = -1
+;   SymbolPosition = 0
+;   TextColor = 0
+;   TextFill = 0
+;   TextFillColor = 0
+;   TextGap = 0.625
+;   TextHeight = 2.5
+;   TextInside = 0
+;   TextInsideAlign = 0
+;   TextMovement = 0
+;   TextOutsideAlign = 0
+;   TextOverride = ""
+;   TextPosition = (35.0 -12.8726 0.0)
+;   TextPrefix = ""
+;   TextRotation = 0.0
+;   TextStyle = "Standard"
+;   TextSuffix = ""
+;   ToleranceDisplay = 0
+;   ToleranceHeightScale = 1.0
+;   ToleranceJustification = 0
+;   ToleranceLowerLimit = 0.0
+;   TolerancePrecision = 2
+;   ToleranceSuppressLeadingZeros = 0
+;   ToleranceSuppressTrailingZeros = -1
+;   ToleranceSuppressZeroFeet = -1
+;   ToleranceSuppressZeroInches = -1
+;   ToleranceUpperLimit = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029a8643e4a0>
+;   UnitsFormat = 2
+;   VerticalTextPosition = 1
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

@@ -1,0 +1,135 @@
+﻿дамп по объекту [AcDbAlignedDimension]
+========================================
+; IAcadDimAligned: Интерфейс AutoCAD для работы с параллельными размерами.
+; Значения свойств:
+;   AltRoundDistance = 0.0
+;   AltSubUnitsFactor = 100.0
+;   AltSubUnitsSuffix = ""
+;   AltSuppressLeadingZeros = 0
+;   AltSuppressTrailingZeros = 0
+;   AltSuppressZeroFeet = -1
+;   AltSuppressZeroInches = -1
+;   AltTextPrefix = ""
+;   AltTextSuffix = ""
+;   AltTolerancePrecision = 2
+;   AltToleranceSuppressLeadingZeros = 0
+;   AltToleranceSuppressTrailingZeros = 0
+;   AltToleranceSuppressZeroFeet = -1
+;   AltToleranceSuppressZeroInches = -1
+;   AltUnits = 0
+;   AltUnitsFormat = 2
+;   AltUnitsPrecision = 2
+;   AltUnitsScale = 25.4
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Arrowhead1Block = "ArchTick"
+;   Arrowhead1Type = 4
+;   Arrowhead2Block = "ArchTick"
+;   Arrowhead2Type = 4
+;   ArrowheadSize = 0.5
+;   DecimalSeparator = ","
+;   DimConstrDesc = Ошибка
+;   DimConstrExpression = Ошибка
+;   DimConstrForm = 0
+;   DimConstrName = Ошибка
+;   DimConstrReference = 0
+;   DimConstrValue = Ошибка
+;   DimensionLineColor = 256
+;   DimensionLineExtend = 1.0
+;   DimensionLinetype = "ByLayer"
+;   DimensionLineWeight = 20
+;   DimLine1Suppress = 0
+;   DimLine2Suppress = 0
+;   DimLineInside = 0
+;   DimTxtDirection = 0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   ExtensionLineColor = 256
+;   ExtensionLineExtend = 0.5
+;   ExtensionLineOffset = 0.0
+;   ExtensionLineWeight = 20
+;   ExtLine1Linetype = "ByLayer"
+;   ExtLine1Point = (415604.0 114516.0 0.0)
+;   ExtLine1Suppress = 0
+;   ExtLine2Linetype = "ByLayer"
+;   ExtLine2Point = (415609.0 114510.0 0.0)
+;   ExtLine2Suppress = 0
+;   ExtLineFixedLen = 1.0
+;   ExtLineFixedLenSuppress = 0
+;   Fit = 3
+;   ForceLineInside = 0
+;   FractionFormat = 0
+;   Handle (RO) = "1C64B"
+;   HasExtensionDictionary (RO) = -1
+;   HorizontalTextPosition = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3ceb8>
+;   Layer = "ОФ_привязка адаптация к этой съемке"
+;   LinearScaleFactor = 1.0
+;   Linetype = "ByLayer"
+;   LinetypeScale = 0.5
+;   Lineweight = 5
+;   Material = "ByLayer"
+;   Measurement (RO) = 8.26415
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 560
+;   ObjectName (RO) = "AcDbAlignedDimension"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "ByLayer"
+;   PrimaryUnitsPrecision = 3
+;   Rotation = 0.0
+;   RoundDistance = 0.0
+;   ScaleFactor = 1.0
+;   StyleName = "Копия(2) ГОСТ 500 Лена"
+;   SubUnitsFactor = 100.0
+;   SubUnitsSuffix = ""
+;   SuppressLeadingZeros = 0
+;   SuppressTrailingZeros = 0
+;   SuppressZeroFeet = -1
+;   SuppressZeroInches = -1
+;   TextColor = 256
+;   TextFill = 0
+;   TextFillColor = 0
+;   TextGap = 0.15
+;   TextHeight = 1.25
+;   TextInside = 0
+;   TextInsideAlign = 0
+;   TextMovement = 1
+;   TextOutsideAlign = 0
+;   TextOverride = ""
+;   TextPosition = (415603.0 114511.0 0.0)
+;   TextPrefix = ""
+;   TextRotation = 0.0
+;   TextStyle = "GOST 2.304_09"
+;   TextSuffix = ""
+;   ToleranceDisplay = 0
+;   ToleranceHeightScale = 1.0
+;   ToleranceJustification = 1
+;   ToleranceLowerLimit = 0.0
+;   TolerancePrecision = 3
+;   ToleranceSuppressLeadingZeros = 0
+;   ToleranceSuppressTrailingZeros = 0
+;   ToleranceSuppressZeroFeet = -1
+;   ToleranceSuppressZeroInches = -1
+;   ToleranceUpperLimit = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3d630>
+;   UnitsFormat = 2
+;   VerticalTextPosition = 1
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

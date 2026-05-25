@@ -1,0 +1,57 @@
+﻿дамп по объекту [AcDbRasterImage]
+========================================
+; IAcadRasterImage: Интерфейс AutoCAD для работы с растровыми изображениями.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Brightness = 50
+;   ClippingEnabled = -1
+;   Contrast = 50
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   Fade = 0
+;   Handle (RO) = "42B"
+;   HasExtensionDictionary (RO) = 0
+;   Height (RO) = 1280.0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 00000292b39fa068>
+;   ImageFile = "C:\\Users\\praj\\Downloads\\1.jpg"
+;   ImageHeight = 451.556
+;   ImageVisibility = -1
+;   ImageWidth = 338.667
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Name = "1"
+;   ObjectID (RO) = 55
+;   ObjectName (RO) = "AcDbRasterImage"
+;   Origin = (217.67 -4.83791 0.0)
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   Rotation = 0.0
+;   ScaleFactor = 1.0
+;   ShowRotation = -1
+;   transparency = 0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 00000292b39f9d00>
+;   Visible = -1
+;   Width (RO) = 960.0
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   ClipBoundary (1)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

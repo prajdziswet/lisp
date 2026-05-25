@@ -1,0 +1,67 @@
+﻿дамп по объекту [AcDbHatch]
+========================================
+; IAcadHatch: Интерфейс AutoCAD для работы с штриховкой.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Area (RO) = AutoCAD.Application: Неприменимо
+;   AssociativeHatch = 0
+;   BackgroundColor = #<VLA-OBJECT IAcadAcCmColor 0000023740efa110>
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   Elevation = 0.0
+;   EntityTransparency = "ПоСлою"
+;   GradientAngle = 0.0
+;   GradientCentered = -1
+;   GradientColor1 = #<VLA-OBJECT IAcadAcCmColor 0000023740efa350>
+;   GradientColor2 = #<VLA-OBJECT IAcadAcCmColor 0000023740efaa70>
+;   GradientName = "LINEAR"
+;   Handle (RO) = "EB4D"
+;   HasExtensionDictionary (RO) = 0
+;   HatchObjectType = 0
+;   HatchStyle = 1
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000023740efad18>
+;   ISOPenWidth = 100
+;   Layer = "ОБ-ЯЧЕЙКА124_ГРАНИЦА_проектных работ"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   NumberOfLoops (RO) = 1
+;   ObjectID (RO) = 562
+;   ObjectName (RO) = "AcDbHatch"
+;   Origin = (0.0 0.0)
+;   OwnerID (RO) = 544
+;   PatternAngle = 0.0
+;   PatternDouble = 0
+;   PatternName (RO) = "ANSI31"
+;   PatternScale = 1.0
+;   PatternSpace = 1.0
+;   PatternType (RO) = 1
+;   PlotStyleName = "ByLayer"
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3c430>
+;   Visible = -1
+; Поддерживаемые методы:
+;   AppendInnerLoop (1)
+;   AppendOuterLoop (1)
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   Evaluate ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetLoopAt (2)
+;   GetXData (3)
+;   Highlight (1)
+;   InsertLoopAt (3)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetPattern (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

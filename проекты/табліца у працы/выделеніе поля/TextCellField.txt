@@ -1,0 +1,683 @@
+;;--------------------------------------------------------
+;;Команда cоздает поле (field), ссылающееся на текстовое значение ячейки таблицы.
+;; Работает в связке с командой UpdateTextCellFields (см.ниже) 
+;; Подробности на http://forum.dwg.ru/showthread.php?p=1130077#post1130077
+;; Описание используемых функций
+;; get_cell_by_pick
+;; get_cell_value
+;; _dwgru-dwgprops-get-all-prop
+;; _dwgru-dwgprops-get-custom-prop
+;; _dwgru-dwgprops-set-custom-prop
+;; _dwgru-assoc-multi
+;; _dwgru-assoc
+;; _dwgru-string-some-part
+;; _dwgru-str->list
+;; dwgru-string-to-list
+;; dwgru-string-right-part
+;; dwgru-string-left-part
+;; LM:UnFormat
+;; Number2Alpha
+;; Alpha2Number
+(defun C:TCF nil (C:TextCellField))
+(defun C:TextCellField ( / *error* adoc oldOSMODE pt pt2 str TextHeight ColumnWidth txtobj tblobj tblset lst row col TargetObj)
+(vl-load-com)
+	(defun *error* (msg)
+		(if oldOSMODE (setvar "OSMODE" oldOSMODE))
+		(vla-EndUndomark adoc)
+		(princ)
+	) ;defun *error*
+	(vla-StartUndomark (setq adoc (vla-get-activedocument (vlax-get-acad-object))))
+	(setq oldOSMODE (getvar "OSMODE"))
+	(while (null row)
+		(setvar "OSMODE" 0)
+		(if (null pt)(setq pt (getpoint "\nВыберите ячейку таблицы <Отмена>:")))
+		(setvar "OSMODE" oldOSMODE)
+		(if (null pt) (progn (princ "\nОтменено пользователем") (exit)))
+		(if (get_cell_by_pick pt)
+			(progn
+				(setvar "OSMODE" 0)
+				(if (null pt2) (setq pt2 (getpoint "\nУкажите точку, ячейку или текстовый объект для вставки поля <Отмена> : ")))
+				(setvar "OSMODE" oldOSMODE)
+				(if (null pt2) (progn (princ "\nОтменено пользователем") (exit)))
+				(_dwgru-dwgprops-set-custom-prop 
+					(strcat "Table" 
+							(vla-get-Handle tblobj)
+							"_" 
+							(vl-princ-to-string (Number2Alpha (1+ col)))
+							(vl-princ-to-string (1+ row))
+					) ;_ end of strcat
+					(LM:UnFormat (vla-GetText tblobj row col) nil)
+					nil
+				);_ end of (_dwgru-dwgprops-set-custom-prop)
+				(setq str
+					(strcat "%<\\AcVar CustomDP.Table" 
+							(vl-princ-to-string (vla-get-Handle tblobj))
+							"_"
+							(vl-princ-to-string (Number2Alpha (1+ col)))
+							(vl-princ-to-string (1+ row))
+							">%"
+					) ;_ end of strcat
+				) ;_ end of setq str
+				(setq TextHeight (vla-GetCellTextHeight tblobj row col))
+				(setq ColumnWidth (vla-GetColumnWidth tblobj col))
+				(cond
+					(	(get_cell_by_pick pt2) ;_cond #1
+						(if (eq (vla-IsContentEditable tblobj row col) :vlax-true)
+							(progn
+								(vla-SetText tblobj row col str)
+								(vla-SetCellTextHeight tblobj row col TextHeight)
+							) ;_ end of progn
+							(progn
+								(princ "\nСодержимое ячейки заблокировано")
+							) ;_ end of progn
+						) ;_ end of if
+					) ;_end of cond #1
+					(	(null (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "*TEXT,ATTRIB,ATTDEF,MULTILEADER")))) ;_cond #2
+						(progn
+							(setq txtobj
+								(vla-addMtext
+									(vla-get-ModelSpace adoc) 
+									(vlax-3d-point (trans pt2 1 0))
+									ColumnWidth
+									str
+								) ;_ end of vla-addtext
+							) ;_ end of setq txtobj
+							(vla-put-Height txtobj TextHeight)
+						) ;_ end of progn
+					) ;_end of cond #2
+					(	(setq ss (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "TEXT")))) ;_cond #3
+						(progn
+							(setq TargetObj (vlax-ename->vla-object (ssname ss 0)))
+							(vla-put-TextString TargetObj str)
+						) ;_ end of progn
+					) ;_end of cond #3
+					(	(setq ss (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "MTEXT")))) ;_cond #4
+						(progn
+							(setq TargetObj (vlax-ename->vla-object (ssname ss 0)))
+							(vla-put-TextString TargetObj "-")
+							(vla-put-TextString TargetObj str)
+						) ;_ end of progn
+					) ;_end of cond #4
+					(	(setq ss (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "MULTILEADER")))) ;_cond #5
+						(progn
+							(setq TargetObj (vlax-ename->vla-object (ssname ss 0)))
+							(vla-put-TextString TargetObj (strcat "\\pxse0.76;" str))
+							(command "_.UPDATEFIELD" ss "")
+							(setq jstf (vla-get-TextJustify TargetObj))
+							(vla-put-TextJustify TargetObj 1)
+							(vla-put-TextJustify TargetObj jstf)
+						) ;_ end of progn
+					) ;_end of cond #5
+				) ;_ end of cond
+			) ;_ end of progn
+			(progn
+				(setvar "OSMODE" 0)
+				(setq pt (getpoint "\nЭто не таблица!\nВыберите ячейку таблицы <Отмена>:"))
+				(setvar "OSMODE" oldOSMODE)
+				(setq row nil)
+				(if (null pt) (progn (princ "\nОтменено пользователем") (exit)))
+			) ;_ end of progn
+		) ;_ end of if
+	) ;_ end of while
+	(vla-EndUndomark adoc)
+	(princ)
+) ;_ end of defun C:TextCellField
+
+
+;;--------------------------------------------------------
+;; Команда обновляет свойства чертежа (dvgprops) и поля, созданные 
+;; командой TextCellField (см. выше) в соответствии с содержимым ячейки таблицы
+(defun C:UTCF nil (C:UpdateTextCellFields))
+(defun C:UpdateTextCellFields ( / adoc DWGPROP n tblobj ExcellColumn row col)
+	(setq adoc (vla-get-activedocument (vlax-get-acad-object)))
+	(setq DWGPROP (_dwgru-dwgprops-get-all-prop nil))
+	(setq n 0)
+	(foreach item DWGPROP
+		(cond 
+		  (	(and 
+				(wcmatch (car item) "Table*")
+				(handent (substr (dwgru-string-left-part (car item) "_") 6))
+			)
+			(setq tblobj (vlax-ename->vla-object (handent (substr (dwgru-string-left-part (car item) "_") 6))))
+			(setq ExcellColumn (dwgru-string-right-part (car item) "_"))
+			(setq row (cadr (_dwgru-str->list ExcellColumn)))
+			(setq col (Alpha2Number (car (_dwgru-str->list ExcellColumn))))
+			(if (and tblobj (>= (vla-get-columns tblobj) col) (>= (vla-get-rows tblobj) row))
+				(progn
+					(_dwgru-dwgprops-set-custom-prop 
+						(car item) 
+						(get_cell_value tblobj ExcellColumn)
+						nil
+					)
+				) ;_ end of progn
+				(progn
+					(vla-RemoveCustomByKey (vla-Get-SummaryInfo adoc) (car item))
+					(setq n (1+ n))
+				) ;_ end of progn
+			) ;_ end of if
+		  )
+		  (	(and 
+				(wcmatch (car item) "Table*")
+				(null (handent (substr (dwgru-string-left-part (car item) "_") 6)))
+			)
+			(princ (strcat "\nТаблица " (substr (dwgru-string-left-part (car item) "_") 6) " не обнаружена в чертеже. Ссылки на нее удалены."))
+			(princ)
+			(vla-RemoveCustomByKey (vla-Get-SummaryInfo adoc) (car item))
+
+		  )	
+			
+			
+		) ;_ end of cond
+	) ;_ end of foreach
+	(if (> n 0) (alert (strcat "Количество удаленных ячеек, на которые ссылались поля: " (vl-princ-to-string n))))
+	(vla-regen adoc AcAllViewports)
+	(princ)
+) ;_ end of defun C:UpdateTextCellFields
+
+
+;;--------------------------------------------------------
+;; Функция получает ячейку таблицы по указанной точке
+;; Если точка внутри таблицы, возвращает список вида (<vla-объект таблицы> <номер строки> <номер столбца>)
+;; если вне таблицы - возвращает nil
+(defun get_cell_by_pick (pt / )
+				(setq tblobj nil
+					  tblset nil
+					  tblset (ssget "_X" '((0 . "ACAD_TABLE")))
+				) ;_ end of setq
+				(setq lst
+					   (mapcar 'vlax-ename->vla-object
+						   (vl-remove-if 'listp (mapcar 'cadr (ssnamex tblset)))
+					   ) ;_ end of mapcar
+				) ;_ end of setq
+				(mapcar
+				   '(lambda (x)
+						(or tblobj
+							(and
+								(= :vlax-true
+									(vla-HitTest
+												x
+												(vlax-3d-point (trans pt 1 0))
+												(vlax-3d-point (trans (getvar "VIEWDIR") 1 0))
+												'row
+												'col
+									) ;_ end of vla-HitTest
+								) ;_ end of =
+								(setq tblobj x)
+							) ;_ end of and
+						) ;_ end of or
+					) ;_ end of lambda
+					lst
+				) ;_ end of mapcar
+				(if (and tblobj row col) (list tblobj row col) nil)
+) ;_ end of defun (get_cell_by_pick)
+
+
+;;--------------------------------------------------------
+;; Функция получает строку - значение ячейки таблицы
+(defun get_cell_value (tblobj ExcellColumn /)
+;;; tblobj - vla-object 
+;;; ExcellColumn - string - "A1" B2"
+;;; Use
+;;; (get_cell_value (vlax-ename->vla-object(car(entsel))) "A2")
+	(apply
+		'(lambda (col row)
+			(LM:UnFormat (vla-GetText tblobj (1- row) (1-(Alpha2Number  col))) nil)
+		)
+		(_dwgru-str->list (strcase ExcellColumn))
+	)
+) ;_ end of defun get_cell_value
+
+
+;;; ************************************************************************
+;;; * Библиотека DWGruLispLib Copyright ©2007  DWGru Programmers Group
+;;; *
+;;; * _dwgru-dwgprops-get-all-prop
+;;; *
+;;; * 23/07/2008 Версия 0002. Makswell
+;;; * 27/12/2007 Версия 0001.  Владимир Азарко   (VVA)
+;;; ************************************************************************
+(defun _dwgru-dwgprops-get-all-prop (Doc / si ret nc key value)
+;;; Возвращает свойства файла, установленные командой _dwgprops
+;;; Возвращается ассоциативный список, где ключом служит:
+;;;      - для свойств, созданных пользователем (закладка ПРОЧИЕ)
+;;;          ИМЯ СВОЙСТВА
+;;;     - для стандартных свойств (закладка ДОКУМЕНТ)
+;;;             Поле                  Ключ  
+;;;             НАЗВАНИЕ           - *TITLE*
+;;;             АВТОР              - *AUTHOR*
+;;;             ТЕМА               - *SUBJECT*
+;;;             КЛЮЧЕВЫЕ СЛОВА     - *KEYWORDS*
+;;;             ЗАМЕТКИ            - *COMMENTS*
+;;;             БАЗА ГИПЕРССЫЛКИ   - *HYPERLINK*
+;;; Doc - указатель на обрабатываемый документ, nil - текущий
+
+  ;|
+;;; Пример
+(_dwgru-dwgprops-get-all-prop nil) ;;;(("*AUTHOR*" "VVA") ("*COMMENTS*" "Заметка") ("*HYPERLINK*" "База")
+                               ;;;("*KEYWORDS*" "Ключ") ("*TITLE*" "Назван") ("*SUBJECT*" "Тема") ("UNIQKEY" "Key"))
+|;
+  (and
+    (or	Doc
+	(setq Doc (vla-get-activeDocument (vlax-get-acad-object)))
+    )
+    (setq si (vla-get-SummaryInfo Doc))
+    (setq ret (list
+		(list "*AUTHOR*" (vla-get-author si))
+		(list "*COMMENTS*" (vla-get-comments si))
+		(list "*HYPERLINK*" (vla-get-HyperlinkBase si))
+		(list "*KEYWORDS*" (vla-get-keywords si))
+		(list "*TITLE*" (vla-get-Title si))
+		(list "*SUBJECT*" (vla-get-Subject si))
+	      )
+    )
+    (setq nc (vla-numcustominfo si))
+    (while (> nc 0)
+      (vla-GetCustomByIndex si (- nc 1) 'key 'value)
+      (setq ret (append ret (list (list key value))))
+      (setq nc (1- nc))
+    )
+    (vlax-release-object si)
+  )
+  ret
+) ;_end of defun (_dwgru-dwgprops-get-all-prop)
+
+
+;;; ************************************************************************
+;;; * Библиотека DWGruLispLib Copyright ©2007  DWGru Programmers Group
+;;; *
+;;; * _dwgru-dwgprops-get-custom-prop
+;;; *
+;;; * 27/12/2007 Версия 0001.  Владимир Азарко   (VVA)
+;;; ************************************************************************
+(defun _dwgru-dwgprops-get-custom-prop (key Doc / app counter counter2 counter3 doc dwgprops k v)
+;;; Возвращает значение свойства, созданного пользователем (команда _dwgprops)
+;;; Возвращается ассоциативный список, где ключом служит:
+;;;      - для свойств, созданных пользователем (закладка ПРОЧИЕ)
+;;;    key - строка ИМЯ СВОЙСТВА (закладка ПРОЧИЕ)
+;;;        - для стандартных свойств (закладка ДОКУМЕНТ)
+;;;              Поле                  Ключ  
+;;;             НАЗВАНИЕ           - *TITLE*
+;;;             АВТОР              - *AUTHOR*
+;;;             ТЕМА               - *SUBJECT*
+;;;             КЛЮЧЕВЫЕ СЛОВА     - *KEYWORDS*
+;;;             ЗАМЕТКИ            - *COMMENTS*
+;;;             БАЗА ГИПЕРССЫЛКИ   - *HYPERLINK*
+;;;
+;;; Использует функцию библиотеки
+;;;                 _dwgru-dwgprops-get-all-prop
+;;;                 _dwgru-assoc  (_dwgru-assoc-multi)
+ 
+;;; Doc - указатель на обрабатываемый документ, nil - текущий
+ 
+ (cadr(_dwgru-assoc key (_dwgru-dwgprops-get-all-prop Doc)))
+) ;_end of defun (_dwgru-dwgprops-get-custom-prop)
+
+
+;;; ************************************************************************
+;;; * Библиотека DWGruLispLib Copyright ©2007  DWGru Programmers Group
+;;; *
+;;; * _dwgru-dwgprops-set-custom-prop
+;;; *
+;;; * 23/07/2008 Версия 0002. Makswell
+;;; * 27/12/2007 Версия 0001.  Владимир Азарко   (VVA)
+;;; ************************************************************************
+(defun _dwgru-dwgprops-set-custom-prop (key value Doc / si)
+;;;Создает в свойствах рисунка (команда _dwgprops закладка ПРОЧИЕ)
+;;; Свойство с ключом key и значение value
+;;; Если свойства не было, оно создается, иначе изменяется
+;;;    key - строка ИМЯ СВОЙСТВА (закладка ПРОЧИЕ)
+;;;    value - строка (string) - значение свойства  
+;;; Использует функцию библиотеки
+;;;                 _dwgru-dwgprops-get-custom-prop
+;;; Doc - указатель на обрабатываемый документ, nil - текущий
+;;; Возвращает - nil
+  ;|
+;;;Пример
+(_dwgru-dwgprops-set-custom-prop "dwgru" "dwgru-dwgprops-set-custom-prop" nil)
+|;
+  (or Doc
+      (setq Doc (vla-Get-ActiveDocument (vlax-Get-Acad-Object)))
+  )
+  (setq si (vla-Get-SummaryInfo Doc))
+  (if (_dwgru-dwgprops-get-custom-prop key Doc)
+    (progn
+      (setq key (car (_dwgru-assoc key (_dwgru-dwgprops-get-all-prop Doc))))
+      (vla-SetCustomByKey si key value)
+    )
+    (vla-AddCustomInfo si key value)
+  )
+) ;_end of defun (_dwgru-dwgprops-set-custom-prop)
+
+
+(defun _dwgru-assoc-multi (key lst)
+  (if (= (type key) 'str)
+    (setq key (strcase key))
+    ) ;_ end of if
+  (vl-remove-if-not
+    (function
+      (lambda (a / b)
+        (and (setq b (car a))
+             (or (and (= (type b) 'str) (= (strcase b) key)) (equal b key))
+             ) ;_ end of and
+        ) ;_ end of lambda
+      ) ;_ end of function
+    lst
+    ) ;_ end of vl-remove-if-not
+) ;_ end of defun (_dwgru-assoc-multi)
+(defun _dwgru-assoc (key lst)
+  (car (_dwgru-assoc-multi key lst))
+) ;_ end of defun (_dwgru-assoc)
+
+
+;;; ************************************************************************
+;;; * Библиотека DWGruLispLib Copyright ©2007  DWGru Programmers Group
+;;; *
+;;; * _dwgru-string-some-part
+;;; *
+;;; * 03/12/2007 Версия 0001.  Сергей Зуев   (ShaggyDoc)
+;;; ************************************************************************
+(defun _dwgru-string-some-part
+                              (string delim_char is_left_part / lst)
+    ;;;  возврат левой (если is_left_part)или правой части
+    ;;;  строки string с разделителем  delim_char
+    ;;; Использует функцию библиотеки
+    ;;;                 dwgru-string-to-list
+
+    ;;; Параметры: 
+    ;;; string     - исходная строка
+    ;;; delim_char  - разделитель (string)
+    ;;; is_left_part  - T или NIL. Если истина (T), то слева. Иначе справа. (boolean)
+    ;;; Возврат:
+    ;;;   строку (String)
+  
+    ;;; Пример:
+  ;|
+(_dwgru-string-some-part " M1:=100" "=" T) ;_Результат   " M1:"
+(_dwgru-string-some-part " M1:=100" "=" NIL)  ;_Результат  "100"
+(_dwgru-string-some-part " M= M1:=100" "=" T) ;_ Результат  " M"
+(_dwgru-string-some-part " M= M1:=100" "=" NIL) ;_ Результат  "100"
+(_dwgru-string-some-part "просто строка" "=" T)  ;_ Результат  "просто строка"
+(_dwgru-string-some-part "просто строка" "=" NIL) ;_Результат   ""
+|;
+	(if (> (length	(setq lst
+						(dwgru-string-to-list string delim_char)
+					) ;_ end of setq
+			) ;_ end of length
+			1
+		) ;_ end of >
+		;; если список, иначе была просто строка
+		(if is_left_part (car lst) (last lst))
+		(if is_left_part string "")
+	) ;_ end of  if
+) ;_ end of defun (_dwgru-string-some-part)
+
+
+;;--------------------------------------------------------
+;; Функция разделяет строку на список текстовых и цифровых составляющих.
+;; Запятая между цифрами, зменяется на точечный разделитель дробной части.
+(defun _dwgru-str->list (s)
+                 ;|
+***************************************************************************************
+*
+* Программа разделяет строку на список текстовых и цифровых составляющих.
+* Запятая между цифрами, зменяется на точечный разделитель дробной части.
+* 
+**************************************************************************************
+*
+* Написал Елпанов Евгений       (ElpanovEvgeniy)
+*
+* дата создания (13/10/2007 a 11:42)
+* написано во время конкурса на форуме:
+* http://www.cadxp.com/XForum+viewthread-fid-101-tid-16943-page-2.html
+***************************************************************************************
+* Пример использования и результатов работы:
+* (_dwgru-str->list "point.25.4cm.")           => ("point." 25.4 "cm.")
+* (_dwgru-str->list "point.25,4cm.")           => ("point." 25.4 "cm.")
+* (_dwgru-str->list "point.3/8cm.")            => ("point." 0.375 "cm.")
+* (_dwgru-str->list "qvf12qsdf125 5sf 56dfv2") => ("qvf" 12 "qsdf" 125 " " 5 "sf " 56 "dfv" 2)
+***************************************************************************************
+ |;
+ (defun str->list1 (a b f)
+  (cond
+   ((null b)
+    (list (if f
+           (cond ((vl-position 46 a) (atof (vl-list->string (reverse a))))
+                 ((vl-position 47 a) (distof (vl-list->string (reverse a))))
+                 ((vl-position 44 a) (atof (vl-list->string (subst 46 44 (reverse a)))))
+                 (t (atoi (vl-list->string (reverse a))))
+           ) ;_ cond
+           (vl-list->string (reverse a))
+          ) ;_ if
+    ) ;_ list
+   )
+   (f
+    (if (or (= (car b) 44) (< 45 (car b) 58))
+     (str->list1 (cons (car b) a) (cdr b) f)
+     (cons (cond ((vl-position 46 a) (atof (vl-list->string (reverse a))))
+                 ((vl-position 47 a) (distof (vl-list->string (reverse a))))
+                 ((vl-position 44 a) (atof (vl-list->string (subst 46 44 (reverse a)))))
+                 (t (atoi (vl-list->string (reverse a))))
+           ) ;_ cond
+           (str->list1 (list (car b)) (cdr b) nil)
+     ) ;_ cons
+    ) ;_ if
+   )
+   (t
+    (if (< 47 (car b) 58)
+     (cons (vl-list->string (reverse a)) (str->list1 (list (car b)) (cdr b) t))
+     (str->list1 (cons (car b) a) (cdr b) nil)
+    ) ;_ if
+   )
+  ) ;_ cond
+ ) ;_ defun
+ (setq s (vl-string->list s))
+ (str->list1 (list (car s))
+             (cdr s)
+             (if (or (= (car s) 44) (< 45 (car s) 58))
+              t
+             ) ;_ if
+ )
+) ;_ end of defun (_dwgru-str->list)
+
+
+;;; ************************************************************************
+;;; * Библиотека DWGruLispLib Copyright ©2007  DWGru Programmers Group
+;;; *
+;;; * dwgru-string-to-list
+;;; *
+;;; * 03/12/2007 Версия 0001.  Сергей Зуев   (ShaggyDoc)
+;;; ************************************************************************
+(defun dwgru-string-to-list (str delimiter / pos)
+;;; Возврат списка подстрок строки str с разделителем  delimiter 
+;;; Использует функцию библиотеки
+    ;;;                 dwgru-string-replace
+    ;;; Параметры: 
+    ;;; string     - исходная строка
+    ;;; delimiter  - разделитель (string)
+    ;;; Возврат:
+    ;;;   строку (String)
+  
+    ;;; Пример:
+    ;|
+(dwgru-string-to-list "М:1=100" "=") ;_Результат ("М:1" "100")
+(dwgru-string-to-list "М:1=" "=") ;_Результат  ("М:1" "")
+(dwgru-string-to-list "" "=") ;_Результат  ("")
+(dwgru-string-to-list "1 2 3   4   5" " ") ;_Результат  ("1" "2" "3" "4" "5")
+ (dwgru-string-to-list "Я говорю, он говорит, они говорят" ",")
+ ;_Результат ("Я говорю" " он говорит" " они говорят")
+ (dwgru-string-to-list "123456789" "=") ;_Результат  ("123456789") 
+|;
+  ;;; для варианта, когда разделитель пробел надо
+;;; заменить в строке все двойные пробелы на одинарные
+    (if (= delimiter (chr 32))
+        (setq str (dwgru-string-replace str (strcat (chr 32) (chr 32)) delimiter))
+    ) ;_ end of if
+    (if (setq pos (vl-string-search delimiter str))
+        (cons
+            (substr str 1 pos)
+            (dwgru-string-to-list
+                (substr
+                    str
+                    (+ (strlen delimiter) pos 1)
+                ) ;_ end of substr
+                delimiter
+            ) ;_ end of ru-string-pl-string-to-list
+        ) ;_ end of cons
+        (cons str '())
+    ) ;_ end of if
+) ;_ end of defun (dwgru-string-to-list)
+
+
+;;; ************************************************************************
+;;; * Библиотека DWGruLispLib Copyright ©2007  DWGru Programmers Group
+;;; *
+;;; * dwgru-string-right-part
+;;; *
+;;; * 03/12/2007 Версия 0001.  Сергей Зуев   (ShaggyDoc)
+;;; ************************************************************************
+(defun dwgru-string-right-part (string delim_char)
+;;; возврат правой половины строки после разделителя
+;;; Использует функцию библиотеки
+    ;;;                 _dwgru-string-some-part
+    ;;; Параметры: 
+    ;;; string     - исходная строка
+    ;;; delim_char  - разделитель (string)
+    ;;; Возврат:
+    ;;;   строку (String)
+  
+    ;;; Пример:
+  
+;|
+(dwgru-string-right-part " M1:=100" "=")   ;_Результат  "100"
+(dwgru-string-right-part " M= M1:=100" "=") ;_Результат  "100"
+(dwgru-string-right-part "просто строка" "=") ;_Результат   "просто строка"
+(dwgru-string-right-part "просто=" "=")  ;_ ""
+(dwgru-string-right-part "890" ".")  ;_Результат  ""
+(dwgru-string-right-part ".2" ".")  ;_Результат  2
+(dwgru-string-right-part "2" ".")  ;_Результат  "" 
+(dwgru-string-right-part "2.400" ".") ;_Результат  "400"
+|;
+    (_dwgru-string-some-part string delim_char NIL)
+) ;_ end of defun (dwgru-string-right-part)
+
+
+;;; ************************************************************************
+;;; * Библиотека DWGruLispLib Copyright ©2007  DWGru Programmers Group
+;;; *
+;;; * dwgru-string-left-part
+;;; *
+;;; * 03/12/2007 Версия 0001.  Сергей Зуев   (ShaggyDoc)
+;;; ************************************************************************
+
+(defun dwgru-string-left-part (string delim_char)
+;;; возврат левой половины строки до разделителя delim_char
+;;; Использует функцию библиотеки
+    ;;;                 _dwgru-string-some-part
+
+    ;;; Параметры: 
+    ;;; string     - исходная строка
+    ;;; delim_char  - разделитель (string)
+    ;;; Возврат:
+    ;;;   строку (String)
+  
+    ;;; Пример:
+;|  
+(dwgru-string-left-part " M1:=100" "=")  ;_Результат  " М1:"
+(dwgru-string-left-part " M= M1:=100" "=")  ;_Результат  " М"
+(dwgru-string-left-part "просто строка" "=") ;_Результат   "просто строка"
+(dwgru-string-left-part "просто=" "=")  ;_Результат  "просто"
+|;
+(_dwgru-string-some-part string delim_char T)
+) ;_ end of defun (dwgru-string-left-part)
+
+
+;;-------------------=={ UnFormat String }==------------------;;
+;;                                                            ;;
+;;  Returns a string with all MText formatting codes removed. ;;
+;;------------------------------------------------------------;;
+;;  Author: Lee Mac, Copyright © 2011 - www.lee-mac.com       ;;
+;;------------------------------------------------------------;;
+;;  Arguments:                                                ;;
+;;  str - String to Process                                   ;;
+;;  mtx - MText Flag (T if string is for use in MText)        ;;
+;;------------------------------------------------------------;;
+;;  Returns:  String with formatting codes removed            ;;
+;;------------------------------------------------------------;;
+
+(defun LM:UnFormat ( str mtx / _replace rx )
+
+    (defun _replace ( new old str )
+        (vlax-put-property rx 'pattern old)
+        (vlax-invoke rx 'replace str new)
+    )
+    (if (setq rx (vlax-get-or-create-object "VBScript.RegExp"))
+        (progn
+            (setq str
+                (vl-catch-all-apply
+                    (function
+                        (lambda ( )
+                            (vlax-put-property rx 'global     actrue)
+                            (vlax-put-property rx 'multiline  actrue)
+                            (vlax-put-property rx 'ignorecase acfalse) 
+                            (foreach pair
+                               '(
+                                    ("\032"    . "\\\\\\\\")
+                                    (" "       . "\\\\P|\\n|\\t")
+                                    ("$1"      . "\\\\(\\\\[ACcFfHLlOopQTW])|\\\\[ACcFfHLlOopQTW][^\\\\;]*;|\\\\[ACcFfHLlOopQTW]")
+                                    ("$1$2/$3" . "([^\\\\])\\\\S([^;]*)[/#\\^]([^;]*);")
+                                    ("$1$2"    . "\\\\(\\\\S)|[\\\\](})|}")
+                                    ("$1"      . "[\\\\]({)|{")
+                                )
+                                (setq str (_replace (car pair) (cdr pair) str))
+                            )
+                            (if mtx
+                                (_replace "\\\\" "\032" (_replace "\\$1$2$3" "(\\\\[ACcFfHLlOoPpQSTW])|({)|(})" str))
+                                (_replace "\\"   "\032" str)
+                            )
+                        )
+                    )
+                )
+            )
+            (vlax-release-object rx)
+            (if (null (vl-catch-all-error-p str))
+                str
+            )
+        )
+    )
+) ;_end of defun (LM:UnFormat)
+
+
+(defun Number2Alpha (Num# / Val#)
+;-------------------------------------------------------------------------------
+; Number2Alpha - Converts Number into Alpha string
+; Function By: Gilles Chanteau from Marseille, France
+; Arguments: 1
+;   Num# = Number to convert
+; Syntax example: (Number2Alpha 731) = "ABC"
+;-------------------------------------------------------------------------------
+	(if (< Num# 27)
+		(chr (+ 64 Num#))
+		(if (= 0 (setq Val# (rem Num# 26)))
+			(strcat (Number2Alpha (1- (/ Num# 26))) "Z")
+			(strcat (Number2Alpha (/ Num# 26)) (chr (+ 64 Val#)))
+		);if
+	);if
+);defun Number2Alpha
+
+
+(defun Alpha2Number (Str$ / Num#)
+;-------------------------------------------------------------------------------
+; Alpha2Number - Converts Alpha string into Number
+; Function By: Gilles Chanteau from Marseille, France
+; Arguments: 1
+;   Str$ = String to convert
+; Syntax example: (Alpha2Number "ABC") = 731
+;-------------------------------------------------------------------------------
+  (if (= 0 (setq Num# (strlen Str$)))
+    0
+    (+ (* (- (ascii (strcase (substr Str$ 1 1))) 64) (expt 26 (1- Num#)))
+       (Alpha2Number (substr Str$ 2))
+    );+
+  );if
+);defun Alpha2Number
+(princ)

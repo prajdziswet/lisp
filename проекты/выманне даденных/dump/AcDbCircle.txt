@@ -1,0 +1,48 @@
+﻿дамп по объекту [AcDbCircle]
+========================================
+; IAcadCircle: Интерфейс AutoCAD для работы с кругами.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Area = 7.06858
+;   Center = (415725.0 114537.0 -7.10543e-15)
+;   Circumference = 9.42478
+;   Diameter = 3.0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "CA62"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000023740efaa18>
+;   Layer = "ЗАМЕНА ВЫКЛЮЧАТЕЛЕЙ 4 этап_БЛАГОУСТРОЙСТВО_покрытия глина"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = 5
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 559
+;   ObjectName (RO) = "AcDbCircle"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "ByLayer"
+;   Radius = 1.5
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000023740efb8b0>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

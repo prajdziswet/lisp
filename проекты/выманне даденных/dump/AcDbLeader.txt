@@ -1,0 +1,55 @@
+﻿дамп по объекту [AcDbLeader]
+========================================
+; IAcadLeader: Интерфейс AutoCAD для работы с выносками.
+; Значения свойств:
+;   Annotation = nil
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   ArrowheadBlock = ""
+;   ArrowheadSize = 2.5
+;   ArrowheadType = 0
+;   Coordinate = ...Индексированное содержимое не выводится...
+;   Coordinates = (120.0 0.0 0.0 130.0 10.0 0.0)
+;   DimensionLineColor = 0
+;   DimensionLineWeight = -2
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "2BF"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000029a8643f3a8>
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal (RO) = (0.0 0.0 1.0)
+;   ObjectID (RO) = 46
+;   ObjectName (RO) = "AcDbLeader"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   ScaleFactor = 1.0
+;   StyleName = "ISO-25"
+;   TextGap = 0.625
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029a8643f400>
+;   Type = 2
+;   VerticalTextPosition = 1
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   Evaluate ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

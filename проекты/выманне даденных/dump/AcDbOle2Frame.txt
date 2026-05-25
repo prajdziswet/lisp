@@ -1,0 +1,50 @@
+﻿дамп по объекту [AcDbOle2Frame]
+========================================
+; IAcadOle: Интерфейс IAcadOle
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "9B923"
+;   HasExtensionDictionary (RO) = 0
+;   Height = 13.6727
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3e4d8>
+;   InsertionPoint = (503.79 -864.859 0.0)
+;   Layer = "ОФ_рамка"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = 30
+;   LockAspectRatio = -1
+;   Material = "ByLayer"
+;   ObjectID (RO) = 568
+;   ObjectName (RO) = "AcDbOle2Frame"
+;   OleItemType = 3
+;   OlePlotQuality = 2
+;   OleSourceApp = "Picture (Enhanced Metafile)"
+;   OwnerID (RO) = 561
+;   PlotStyleName = "Цвет_7"
+;   Rotation = 0.0
+;   ScaleHeight = 0.0
+;   ScaleWidth = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3e530>
+;   Visible = -1
+;   Width = 45.9301
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

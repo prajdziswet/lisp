@@ -1,0 +1,72 @@
+﻿дамп по объекту [AcDbSpline]
+========================================
+; IAcadSpline: Интерфейс AutoCAD для работы со сплайнами.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Area (RO) = 4.849e-06
+;   Closed (RO) = 0
+;   Closed2 = 0
+;   ControlPoints = (51558.4 31999.3 0.0 51558.4 31999.3 0.0 ... )
+;   Degree (RO) = 3
+;   Degree2 = 3
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EndTangent = AutoCAD.Application: Общая ошибка моделирования
+;   EntityTransparency = "ПоСлою"
+;   FitPoints = nil
+;   FitTolerance = 0.0
+;   Handle (RO) = "5932B"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3d0f8>
+;   IsPeriodic (RO) = 0
+;   IsPlanar (RO) = -1
+;   IsRational (RO) = 0
+;   KnotParameterization = 15
+;   Knots = (0.0 0.0 0.0 0.0 0.264607 0.534953 ... )
+;   Layer = "ЗАМЕНА ВЫКЛЮЧАТЕЛЕЙ 3этап_ОБОРУДОВАНИЕ_ЭТО"
+;   Linetype = "Continuous"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   NumberOfControlPoints (RO) = 7
+;   NumberOfFitPoints (RO) = 0
+;   ObjectID (RO) = 552
+;   ObjectName (RO) = "AcDbSpline"
+;   OwnerID (RO) = 553
+;   PlotStyleName = "ByLayer"
+;   SplineFrame = 1
+;   SplineMethod = 1
+;   StartTangent = AutoCAD.Application: Общая ошибка моделирования
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3d4b0>
+;   Visible = -1
+;   Weights = AutoCAD.Application: Для полиномиального сплайна нет значений весов
+; Поддерживаемые методы:
+;   AddFitPoint (2)
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   DeleteFitPoint (1)
+;   ElevateOrder (1)
+;   GetBoundingBox (2)
+;   GetControlPoint (1)
+;   GetExtensionDictionary ()
+;   GetFitPoint (1)
+;   GetWeight (1)
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   PurgeFitData ()
+;   Reverse ()
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetControlPoint (2)
+;   SetFitPoint (2)
+;   SetWeight (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

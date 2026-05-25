@@ -1,0 +1,58 @@
+﻿дамп по объекту [AcDb2dPolyline]
+========================================
+; IAcadPolyline: Интерфейс AutoCAD для работы с полилиниями.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Area (RO) = 2.86748
+;   Closed = 0
+;   ConstantWidth = 0.0
+;   Coordinate = ...Индексированное содержимое не выводится...
+;   Coordinates = (4739.82 -2389.13 0.0 4740.36 -2388.94 0.0 ... )
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   Elevation = 0.0
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "C344"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3e9b8>
+;   Layer = "ОФ_ФОРМАТ_штамп_подписи"
+;   Length (RO) = 12.6314
+;   Linetype = "ByLayer"
+;   LinetypeGeneration = 0
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 558
+;   ObjectName (RO) = "AcDb2dPolyline"
+;   OwnerID (RO) = 557
+;   PlotStyleName = "ByLayer"
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca46ff0>
+;   Type = 1
+;   Visible = -1
+; Поддерживаемые методы:
+;   AppendVertex (1)
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   Explode ()
+;   GetBoundingBox (2)
+;   GetBulge (1)
+;   GetExtensionDictionary ()
+;   GetWidth (3)
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetBulge (2)
+;   SetWidth (3)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

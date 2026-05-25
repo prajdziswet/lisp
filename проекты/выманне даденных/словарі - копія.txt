@@ -1,0 +1,112 @@
+(vl-load-com)
+
+;; =======================================================================
+;; ПОДФУНКЦИЯ 1: Извлечение полезных данных (значений) из объекта
+;; =======================================================================
+(defun GetValuesFromDXF (dxf / data-str)
+  (setq data-str "")
+  (foreach rec dxf
+    ;; Берем коды с 1 по 369. Исключаем 5 (Handle), 100 (Subclass), 330/340/350/360 (Указатели)
+    (if (and (>= (car rec) 1) (<= (car rec) 369)
+             (not (member (car rec) '(5 100 330 340 350 360))))
+      ;; Записываем в формате [Код:Значение]
+      (setq data-str (strcat data-str "[" (itoa (car rec)) ":" (vl-prin1-to-string (cdr rec)) "] "))
+    )
+  )
+  (if (= data-str "") (setq data-str "<нет данных>") data-str)
+)
+
+;; =======================================================================
+;; ПОДФУНКЦИЯ 2 (РЕКУРСИВНАЯ): Обход словаря и всех его вложений
+;; =======================================================================
+(defun ParseDictionary (dict-ent level prefix / dxf entries name c-name c-ent c-dxf c-type result-str data)
+  (setq result-str "")
+  (setq dxf (entget dict-ent))
+  (setq entries nil name nil)
+
+  ;; Собираем все записи в текущем словаре
+  (foreach item dxf
+    (if (= (car item) 3) (setq name (cdr item))) ; Ловим имя
+    (if (and name (or (= (car item) 350) (= (car item) 360))) ; Ловим ссылку
+      (progn
+        (setq entries (append entries (list (cons name (cdr item)))))
+        (setq name nil)
+      )
+    )
+  )
+
+  ;; Перебираем найденные записи
+  (foreach e entries
+    (setq c-name (car e))       
+    (setq c-ent (cdr e))        
+    (setq c-dxf (entget c-ent)) 
+    (setq c-type (cdr (assoc 0 c-dxf))) 
+
+    ;; Записываем имя и тип в строку лога
+    (setq result-str (strcat result-str prefix "-> Имя: " c-name " | Тип: " c-type "\r\n"))
+
+    ;; ВЕТВЛЕНИЕ: ПАПКА ИЛИ ДАННЫЕ?
+    (if (= c-type "DICTIONARY")
+      ;; 1. Если это ВЛОЖЕННЫЙ СЛОВАРЬ (Папка), запускаем функцию снова (рекурсия), увеличив отступ
+      (setq result-str 
+        (strcat result-str 
+                (ParseDictionary c-ent (+ level 1) (strcat prefix "    "))))
+      
+      ;; 2. Если это ПЕРЕМЕННАЯ или ДАННЫЕ (XRECORD, DICTIONARYVAR и др.), достаем значения
+      (progn
+        (setq data (GetValuesFromDXF c-dxf))
+        (setq result-str (strcat result-str prefix "      Данные: " data "\r\n"))
+      )
+    )
+  )
+  ;; Возвращаем собранную строку
+  result-str
+)
+
+;; =======================================================================
+;; ГЛАВНАЯ КОМАНДА
+;; =======================================================================
+(defun c:ShowDetailedDicts ( / nod nod-dxf final-str d-path f-name full-path adodb-stream )
+  (setq final-str "=== ПОЛНАЯ СТРУКТУРА СЛОВАРЕЙ (С ВЛОЖЕНИЯМИ) ===\r\n\r\n")
+  
+  ;; 1. Получаем главный словарь чертежа
+  (setq nod (namedobjdict))
+  
+  ;; 2. Запускаем рекурсивный обход (начинаем с уровня 0, без отступов)
+  (princ "\nАнализ словарей запущен. Это может занять пару секунд...")
+  (setq final-str (strcat final-str (ParseDictionary nod 0 "")))
+  (setq final-str (strcat final-str "\r\n=== КОНЕЦ ОТЧЕТА ==="))
+
+  ;; 3. Выводим часть данных в консоль AutoCAD (чтобы было видно)
+  (princ (strcat "\n" final-str "\n"))
+  (textpage)
+
+  ;; --- ЧАСТЬ 4: СОХРАНЕНИЕ В ФАЙЛ UTF-8 ---
+  (setq d-path (getvar "DWGPREFIX"))
+  (if (or (not d-path) (= d-path "")) (setq d-path (getvar "ROAMABLEROOTPREFIX"))) ; Если чертеж не сохранен
+
+  (setq f-name (getstring T "\nВведите имя файла для сохранения словарей (без .txt) <по умолч. Dict_Log>: "))
+  (if (= f-name "") (setq f-name "Dict_Log")) ; Имя по умолчанию, если нажали просто Enter
+  
+  (setq full-path (strcat d-path f-name ".txt"))
+  
+  ;; Запись через ADODB.Stream для поддержки UTF-8
+  (setq adodb-stream (vlax-create-object "ADODB.Stream"))
+  (if adodb-stream
+    (progn
+      (vlax-put-property adodb-stream 'Type 2)      
+      (vlax-put-property adodb-stream 'Charset "UTF-8")
+      (vlax-invoke adodb-stream 'Open)
+      (vlax-invoke adodb-stream 'WriteText final-str)    
+      (vlax-invoke adodb-stream 'SaveToFile full-path 2) 
+      (vlax-invoke adodb-stream 'Close)
+      (vlax-release-object adodb-stream)
+      (princ (strcat "\n[OK] Подробный отчет сохранен в файл: " full-path))
+    )
+    (princ "\n[Ошибка] Не удалось создать файл лога.")
+  )
+  (princ)
+)
+
+;; Автозапуск
+(c:ShowDetailedDicts)

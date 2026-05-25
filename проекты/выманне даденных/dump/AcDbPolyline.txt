@@ -1,0 +1,57 @@
+﻿дамп по объекту [AcDbPolyline]
+========================================
+; IAcadLWPolyline: Интерфейс AutoCAD для работы с компактными полилиниями.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Area (RO) = 52.6019
+;   Closed = -1
+;   ConstantWidth = 0.0
+;   Coordinate = ...Индексированное содержимое не выводится...
+;   Coordinates = (415619.0 114513.0 415624.0 114516.0 415618.0 114525.0 ... )
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   Elevation = 174960.0
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "2A71"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000023740efb258>
+;   Layer = "ЗАМЕНА ВЫКЛЮЧАТЕЛЕЙ 1этап_БЛАГОУСТРОЙСТВО_покрытия"
+;   Length (RO) = 30.4613
+;   Linetype = "ByLayer"
+;   LinetypeGeneration = 0
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 546
+;   ObjectName (RO) = "AcDbPolyline"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "ByLayer"
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000023740efb370>
+;   Visible = -1
+; Поддерживаемые методы:
+;   AddVertex (2)
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   Explode ()
+;   GetBoundingBox (2)
+;   GetBulge (1)
+;   GetExtensionDictionary ()
+;   GetWidth (3)
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetBulge (2)
+;   SetWidth (3)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

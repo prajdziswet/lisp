@@ -1,0 +1,45 @@
+﻿дамп по объекту [AcDbSubDMesh]
+========================================
+; IAcadSubDMesh: Интерфейс AutoCAD SubDMesh
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Coordinate = ...Индексированное содержимое не выводится...
+;   Coordinates = (56.6685 -568.157 0.0 220.53 -470.067 0.0 ... )
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   FaceCount (RO) = 48
+;   Handle (RO) = "53C"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 00000292bc089218>
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   ObjectID (RO) = 60
+;   ObjectName (RO) = "AcDbSubDMesh"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   Smoothness = 0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 00000292bc089570>
+;   VertexCount (RO) = 42
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

@@ -1,0 +1,55 @@
+﻿дамп по объекту [AcDbText]
+========================================
+; IAcadText: Интерфейс AutoCAD для работы с текстом.
+; Значения свойств:
+;   Alignment = 10
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Backward = 0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "D9C3B"
+;   HasExtensionDictionary (RO) = 0
+;   Height = 1.25
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3d0f8>
+;   InsertionPoint = (416025.0 114634.0 0.0)
+;   Layer = "Размеры и текст"
+;   Linetype = "Continuous"
+;   LinetypeScale = 100.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 565
+;   ObjectName (RO) = "AcDbText"
+;   ObliqueAngle = 0.0
+;   OwnerID (RO) = 544
+;   PlotStyleName = "Цвет_7"
+;   Rotation = 0.0
+;   ScaleFactor = 1.0
+;   StyleName = "ГОСТ 2.304"
+;   TextAlignmentPoint = (416026.0 114634.0 0.0)
+;   TextGenerationFlag = 0
+;   TextString = "Поз."
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3d330>
+;   UpsideDown = 0
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   FieldCode ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

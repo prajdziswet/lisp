@@ -1,0 +1,48 @@
+﻿дамп по объекту [AcDbFace]
+========================================
+; IAcad3DFace: Интерфейс AutoCAD для работы с 3D-гранями.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Coordinate = ...Индексированное содержимое не выводится...
+;   Coordinates = (415668.0 114508.0 0.0 415672.0 114501.0 0.0 ... )
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "1331B3"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3d338>
+;   Layer = "ТОПОСЪЕМКА_Автомобильные и грунтовые дороги тропы"
+;   Linetype = "Continuous"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   ObjectID (RO) = 550
+;   ObjectName (RO) = "AcDbFace"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "Цвет_7"
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3d090>
+;   VisibilityEdge1 = -1
+;   VisibilityEdge2 = -1
+;   VisibilityEdge3 = -1
+;   VisibilityEdge4 = -1
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetInvisibleEdge (1)
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetInvisibleEdge (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

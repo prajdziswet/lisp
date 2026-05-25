@@ -1,0 +1,66 @@
+﻿дамп по объекту [AcDbMInsertBlock]
+========================================
+; IAcadMInsertBlock: Интерфейс AutoCAD для работы с множественными блоками.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Columns = 1
+;   ColumnSpacing = 0.0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EffectiveName (RO) = "местоКЗ"
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "538"
+;   HasAttributes (RO) = -1
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 00000292bc0886d8>
+;   InsertionPoint = (3.41201 -57.4774 0.0)
+;   InsUnits (RO) = "Безразмерные"
+;   InsUnitsFactor (RO) = 1.0
+;   IsDynamicBlock (RO) = 0
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Name = "местоКЗ"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 59
+;   ObjectName (RO) = "AcDbMInsertBlock"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   Rotation = 0.0
+;   Rows = 2
+;   RowSpacing = 100.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 00000292bc088eb0>
+;   Visible = -1
+;   XEffectiveScaleFactor = 11.3968
+;   XScaleFactor = 11.3968
+;   YEffectiveScaleFactor = 11.3968
+;   YScaleFactor = 11.3968
+;   ZEffectiveScaleFactor = 11.3968
+;   ZScaleFactor = 11.3968
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   ConvertToAnonymousBlock ()
+;   ConvertToStaticBlock (1)
+;   Copy ()
+;   Delete ()
+;   Explode ()
+;   GetAttributes ()
+;   GetBoundingBox (2)
+;   GetConstantAttributes ()
+;   GetDynamicBlockProperties ()
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   ResetBlock ()
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

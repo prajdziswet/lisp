@@ -1,0 +1,44 @@
+﻿дамп по объекту [AcDbXline]
+========================================
+; IAcadXline: Интерфейс AutoCAD для работы с прямыми.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   BasePoint = (60.0 0.0 0.0)
+;   DirectionVector = (0.707107 0.707107 0.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "2BD"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000029a859c6808>
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   ObjectID (RO) = 44
+;   ObjectName (RO) = "AcDbXline"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   SecondPoint = (60.7071 0.707107 0.0)
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029a859c5fc0>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

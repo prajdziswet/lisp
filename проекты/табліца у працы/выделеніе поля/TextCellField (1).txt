@@ -1,0 +1,211 @@
+;;--------------------------------------------------------
+;;Команда cоздает поле (field), ссылающееся на текстовое значение ячейки таблицы.
+;; Работает в связке с командой UpdateTextCellFields (см.ниже) 
+;; Подробности на http://forum.dwg.ru/showthread.php?p-1130077#post1130077
+;; Описание используемых функций
+;; get_cell_by_pick
+;; get_cell_value
+;; _dwgru-dwgprops-get-all-prop
+;; _dwgru-dwgprops-get-custom-prop
+;; _dwgru-dwgprops-set-custom-prop
+;; _dwgru-assoc-multi
+;; _dwgru-assoc
+;; _dwgru-string-some-part
+;; _dwgru-str->list
+;; dwgru-string-to-list
+;; dwgru-string-right-part
+;; dwgru-string-left-part
+;; LM:UnFormat
+;; Number2Alpha
+;; Alpha2Number
+(defun C:TCF nil (C:TextCellField))
+(defun C:TextCellField ( / *error* adoc oldOSMODE pt pt2 str TextHeight ColumnWidth txtobj tblobj tblset lst row col TargetObj field_name field_name_dialog)
+(vl-load-com)
+	(defun *error* (msg)
+		(if oldOSMODE (setvar "OSMODE" oldOSMODE))
+		(vla-EndUndomark adoc)
+		(princ)
+	) ;defun *error*
+	(vla-StartUndomark (setq adoc (vla-get-activedocument (vlax-get-acad-object))))
+	(setq oldOSMODE (getvar "OSMODE"))
+	(while (null row)
+		(setvar "OSMODE" 0)
+		(if (null pt)(setq pt (getpoint "\nВыберите ячейку таблицы <Отмена>:")))
+		(setvar "OSMODE" oldOSMODE)
+		(if (null pt) (progn (princ "\nОтменено пользователем") (exit)))
+		(if (get_cell_by_pick pt)
+			(progn
+				;; Диалоговое окно для выбора имени поля
+				(initget "Да Нет")
+				(setq field_name_dialog (getkword "\nДать уникальное имя полю? [Да/Нет] <Нет>: "))
+				(if (or (null field_name_dialog) (= field_name_dialog "Нет"))
+					;; Стандартное имя поля (как раньше)
+					(setq field_name
+						(strcat "Table" 
+								(vla-get-Handle tblobj)
+								"_" 
+								(vl-princ-to-string (Number2Alpha (1+ col)))
+								(vl-princ-to-string (1+ row))
+						) ;_ end of strcat
+					) ;_ end of setq field_name
+					;; Пользовательское имя поля
+					(progn
+						(setq field_name (getstring T "\nВведите уникальное имя поля: "))
+						(if (= field_name "")
+							(setq field_name
+								(strcat "Table" 
+										(vla-get-Handle tblobj)
+										"_" 
+										(vl-princ-to-string (Number2Alpha (1+ col)))
+										(vl-princ-to-string (1+ row))
+								) ;_ end of strcat
+							) ;_ end of setq field_name
+						) ;_ end of if
+					) ;_ end of progn
+				) ;_ end of if
+				
+				(setvar "OSMODE" 0)
+				(if (null pt2) (setq pt2 (getpoint "\nУкажите точку, ячейку или текстовый объект для вставки поля <Отмена> : ")))
+				(setvar "OSMODE" oldOSMODE)
+				(if (null pt2) (progn (princ "\nОтменено пользователем") (exit)))
+				(_dwgru-dwgprops-set-custom-prop 
+					field_name
+					(LM:UnFormat (vla-GetText tblobj row col) nil)
+					nil
+				);_ end of (_dwgru-dwgprops-set-custom-prop)
+				(setq str
+					(strcat "%<\\AcVar CustomDP." field_name ">%"
+					) ;_ end of strcat
+				) ;_ end of setq str
+				(setq TextHeight (vla-GetCellTextHeight tblobj row col))
+				(setq ColumnWidth (vla-GetColumnWidth tblobj col))
+				(cond
+					(	(get_cell_by_pick pt2) ;_cond #1
+						(if (eq (vla-IsContentEditable tblobj row col) :vlax-true)
+							(progn
+								(vla-SetText tblobj row col str)
+								(vla-SetCellTextHeight tblobj row col TextHeight)
+							) ;_ end of progn
+							(progn
+								(princ "\nСодержимое ячейки заблокировано")
+							) ;_ end of progn
+						) ;_ end of if
+					) ;_end of cond #1
+					(	(null (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "*TEXT,ATTRIB,ATTDEF,MULTILEADER")))) ;_cond #2
+						(progn
+							(setq txtobj
+								(vla-addMtext
+									(vla-get-ModelSpace adoc) 
+									(vlax-3d-point (trans pt2 1 0))
+									ColumnWidth
+									str
+								) ;_ end of vla-addtext
+							) ;_ end of setq txtobj
+							(vla-put-Height txtobj TextHeight)
+						) ;_ end of progn
+					) ;_end of cond #2
+					(	(setq ss (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "TEXT")))) ;_cond #3
+						(progn
+							(setq TargetObj (vlax-ename->vla-object (ssname ss 0)))
+							(vla-put-TextString TargetObj str)
+						) ;_ end of progn
+					) ;_end of cond #3
+					(	(setq ss (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "MTEXT")))) ;_cond #4
+						(progn
+							(setq TargetObj (vlax-ename->vla-object (ssname ss 0)))
+							(vla-put-TextString TargetObj "-")
+							(vla-put-TextString TargetObj str)
+						) ;_ end of progn
+					) ;_end of cond #4
+					(	(setq ss (ssget "_C" (polar pt2 (/ pi 4) 3) (polar pt2 (/ (* 5 pi) 4) 3) '((0 . "MULTILEADER")))) ;_cond #5
+						(progn
+							(setq TargetObj (vlax-ename->vla-object (ssname ss 0)))
+							(vla-put-TextString TargetObj (strcat "\\pxse0.76;" str))
+							(command "_.UPDATEFIELD" ss "")
+							(setq jstf (vla-get-TextJustify TargetObj))
+							(vla-put-TextJustify TargetObj 1)
+							(vla-put-TextJustify TargetObj jstf)
+						) ;_ end of progn
+					) ;_end of cond #5
+				) ;_ end of cond
+			) ;_ end of progn
+			(progn
+				(setvar "OSMODE" 0)
+				(setq pt (getpoint "\nЭто не таблица!\nВыберите ячейку таблицы <Отмена>:"))
+				(setvar "OSMODE" oldOSMODE)
+				(setq row nil)
+				(if (null pt) (progn (princ "\nОтменено пользователем") (exit)))
+			) ;_ end of progn
+		) ;_ end of if
+	) ;_ end of while
+	(vla-EndUndomark adoc)
+	(princ)
+) ;_ end of defun C:TextCellField
+
+
+;;--------------------------------------------------------
+;; Команда обновляет свойства чертежа (dvgprops) и поля, созданные 
+;; командой TextCellField (см. выше) в соответствии с содержимым ячейки таблицы
+(defun C:UTCF nil (C:UpdateTextCellFields))
+(defun C:UpdateTextCellFields ( / adoc DWGPROP n tblobj ExcellColumn row col)
+	(setq adoc (vla-get-activedocument (vlax-get-acad-object)))
+	(setq DWGPROP (_dwgru-dwgprops-get-all-prop nil))
+	(setq n 0)
+	(foreach item DWGPROP
+		(cond 
+			(	(wcmatch (car item) "Table*")
+				(progn
+					(if (wcmatch (car item) "Table*_*")
+						;; Стандартное имя поля TableXXXXX_XX
+						(progn
+							(setq tblobj (vlax-ename->vla-object (handent (substr (dwgru-string-left-part (car item) "_") 6))))
+							(setq ExcellColumn (dwgru-string-right-part (car item) "_"))
+							(setq row (cadr (_dwgru-str->list ExcellColumn)))
+							(setq col (Alpha2Number (car (_dwgru-str->list ExcellColumn))))
+						) ;_ end of progn
+						;; Пользовательское имя поля - ищем таблицу по содержимому всех полей
+						(progn
+							(setq tblobj nil)
+							;; Поиск таблицы, содержащей это поле
+							(foreach prop-item DWGPROP
+								(if (and (wcmatch (car prop-item) "Table*_*") (not tblobj))
+									(progn
+										(setq test-tblobj (vlax-ename->vla-object (handent (substr (dwgru-string-left-part (car prop-item) "_") 6))))
+										(if (and test-tblobj (equal (cdr item) (LM:UnFormat (vla-GetText test-tblobj 
+													(1- (cadr (_dwgru-str->list (dwgru-string-right-part (car prop-item) "_"))))
+													(1- (Alpha2Number (car (_dwgru-str->list (dwgru-string-right-part (car prop-item) "_")))))
+												) nil)))
+											(setq tblobj test-tblobj
+												  row (1- (cadr (_dwgru-str->list (dwgru-string-right-part (car prop-item) "_"))))
+												  col (1- (Alpha2Number (car (_dwgru-str->list (dwgru-string-right-part (car prop-item) "_")))))
+											) ;_ end of setq
+										) ;_ end of if
+									) ;_ end of progn
+								) ;_ end of if
+							) ;_ end of foreach
+						) ;_ end of progn
+					) ;_ end of if
+					(if (and tblobj (>= (vla-get-columns tblobj) (1+ col)) (>= (vla-get-rows tblobj) (1+ row)))
+						(progn
+							(_dwgru-dwgprops-set-custom-prop 
+								(car item) 
+								(LM:UnFormat (vla-GetText tblobj row col) nil)
+								nil
+							)
+						) ;_ end of progn
+						(progn
+							(vla-RemoveCustomByKey (vla-Get-SummaryInfo adoc) (car item))
+							(setq n (1+ n))
+						) ;_ end of progn
+					) ;_ end of if
+				) ;_ end of progn
+			)
+		) ;_ end of cond
+	) ;_ end of foreach
+	(if (> n 0) (alert (strcat "Количество удаленных ячеек, на которые ссылались поля: " (vl-princ-to-string n))))
+	(vla-regen adoc AcAllViewports)
+	(princ)
+) ;_ end of defun C:UpdateTextCellFields
+
+;; Остальные вспомогательные функции остаются без изменений
+;; ... (остальной код без изменений)

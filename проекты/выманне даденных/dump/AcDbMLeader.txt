@@ -1,0 +1,89 @@
+﻿дамп по объекту [AcDbMLeader]
+========================================
+; IAcadMLeader: Интерфейс мультивыносок AutoCAD
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   ArrowheadBlock = ""
+;   ArrowheadSize = 0.018
+;   ArrowheadType = 0
+;   BlockConnectionType = 0
+;   BlockScale = 1.0
+;   ContentBlockName = ""
+;   ContentBlockType = 6
+;   ContentType = 2
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   DogLegged = -1
+;   DoglegLength = 0.5
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "4012B"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3db78>
+;   LandingGap = 0.009
+;   Layer = "1_ПРОЕКТ_ЗаменаТ1Т2_ОБЪЕКТЫ_фундаменты_под наз.оборудования"
+;   LeaderCount (RO) = 1
+;   LeaderLineColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3e2f0>
+;   LeaderLinetype = "ByBlock"
+;   LeaderLineWeight = -2
+;   LeaderType = 1
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   ObjectID (RO) = 548
+;   ObjectName (RO) = "AcDbMLeader"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "ByLayer"
+;   ScaleFactor = 1.0
+;   StyleName = "Standard"
+;   TextAttachmentDirection = 0
+;   TextBackgroundFill = 0
+;   TextBottomAttachmentType = 0
+;   TextDirection = 5
+;   TextFrameDisplay = 0
+;   TextHeight = 0.15
+;   TextJustify = 2
+;   TextLeftAttachmentType = 1
+;   TextLineSpacingDistance = 0.25
+;   TextLineSpacingFactor = 1.0
+;   TextLineSpacingStyle = 1
+;   TextRightAttachmentType = 1
+;   TextRotation = 0.563939
+;   TextString = "\\pxqc;Фундамент  Фм2 \\P(под ЗОН-Т1 и ОПНН-Т1)"
+;   TextStyleName = "ГОСТ 2.304"
+;   TextTopAttachmentType = 0
+;   TextWidth = 4.92224
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3de70>
+;   Visible = -1
+; Поддерживаемые методы:
+;   AddLeader ()
+;   AddLeaderLine (2)
+;   AddLeaderLineEx (1)
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBlockAttributeValue (1)
+;   GetBoundingBox (2)
+;   GetDoglegDirection (1)
+;   GetExtensionDictionary ()
+;   GetLeaderIndex (1)
+;   GetLeaderLineIndexes (1)
+;   GetLeaderLineVertices (1)
+;   GetVertexCount (1)
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   RemoveLeader (1)
+;   RemoveLeaderLine (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetBlockAttributeValue (2)
+;   SetDoglegDirection (2)
+;   SetLeaderLineVertices (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

@@ -1,0 +1,56 @@
+﻿дамп по объекту [AcDbPdfReference]
+========================================
+; IAcadUnderlay: nil
+; Значения свойств:
+;   AdjustForBackground = -1
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   ClippingEnabled = 1
+;   Contrast = 100
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   Fade = 0
+;   File = "C:\\Users\\praj\\Documents\\МГЕА.674855.001-7-027-ЭП_Обложка.pdf"
+;   Handle (RO) = "425"
+;   HasExtensionDictionary (RO) = 0
+;   Height = 11.6933
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 00000292b39fa4e8>
+;   ItemName = "1"
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Monochrome = 0
+;   ObjectID (RO) = 54
+;   ObjectName (RO) = "AcDbPdfReference"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   Position = (156.596 12.767 0.0)
+;   Rotation = 0.0
+;   ScaleFactor = 1.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 00000292b39faea0>
+;   UnderlayLayerOverrideApplied = 0
+;   UnderlayName = "МГЕА.674855.001-7-027-ЭП_Обложка — 1"
+;   UnderlayVisibility = 1
+;   Visible = -1
+;   Width = 8.26833
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   ClipBoundary (1)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

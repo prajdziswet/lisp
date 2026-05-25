@@ -1,0 +1,75 @@
+(vl-load-com)
+
+(defun c:CopyDXFToClip ( / sel ent dxf str html pw cb d-path f-name full-path adodb-stream )
+  
+  ;; 1. Выбор объекта
+  (setq sel (entsel "\nВыберите объект для получения DXF кода: "))
+  
+  (if sel
+    (progn
+      (setq ent (car sel))
+      (setq dxf (entget ent '("*"))) ;; Получаем DXF
+      (setq str "")
+
+      ;; Формируем текст
+      (foreach item dxf
+        (setq str (strcat str (vl-prin1-to-string item) "\r\n"))
+      )
+
+      ;; --- ЧАСТЬ 1: БУФЕР ОБМЕНА ---
+      (setq html (vlax-create-object "htmlfile"))
+      (if html
+        (progn
+          (setq pw (vlax-get-property html 'ParentWindow))
+          (setq cb (vlax-get-property pw 'ClipboardData))
+          ;; Передаем только нужные параметры
+          (vlax-invoke cb 'SetData "Text" str)
+          (vlax-release-object html)
+          (princ "\n[OK] DXF код скопирован в буфер обмена.")
+        )
+      )
+
+      ;; --- ЧАСТЬ 2: СОХРАНЕНИЕ В ФАЙЛ UTF-8 ---
+      (setq d-path (getvar "DWGPREFIX"))
+      
+      ;; Если путь пустой (чертеж не сохранен), используем папку Мои документы
+      (if (or (not d-path) (= d-path ""))
+        (setq d-path (getvar "ROAMABLEROOTPREFIX"))
+      )
+
+      (setq f-name (getstring T "\nВведите имя файла (без расширения): "))
+
+      
+      (if (and f-name (/= f-name ""))
+        (progn
+          (setq full-path (strcat d-path f-name ".txt"))
+          
+          ;; Используем ADODB.Stream для UTF-8
+          (setq adodb-stream (vlax-create-object "ADODB.Stream"))
+          (if adodb-stream
+            (progn
+              (vlax-put-property adodb-stream 'Type 2)      ;; 2 = adTypeText
+              (vlax-put-property adodb-stream 'Charset "UTF-8")
+              (vlax-invoke adodb-stream 'Open)
+              (vlax-invoke adodb-stream 'WriteText str)    ;; Пишем данные
+              
+              ;; 2 = adSaveCreateOverWrite
+              (vlax-invoke adodb-stream 'SaveToFile full-path 2)
+              (vlax-invoke adodb-stream 'Close)
+              (vlax-release-object adodb-stream)
+              
+              (princ (strcat "\n[OK] Файл успешно создан: " full-path))
+            )
+            (princ "\n[Ошибка] Не удалось запустить ADODB.Stream.")
+          )
+        )
+        (princ "\n[Отмена] Имя файла не введено.")
+      )
+    )
+    (princ "\n[Отмена] Объект не выбран.")
+  )
+  (princ)
+)
+
+;; Автозапуск
+(c:CopyDXFToClip)

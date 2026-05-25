@@ -1,0 +1,51 @@
+﻿дамп по объекту [AcDbRegion]
+========================================
+; IAcadRegion: Интерфейс AutoCAD для работы с областями.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Area (RO) = 78.5398
+;   Centroid (RO) = (45.0 -55.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "304"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002922ae3a498>
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   MomentOfInertia (RO) = (238074.0 159534.0)
+;   Normal (RO) = (0.0 0.0 1.0)
+;   ObjectID (RO) = 51
+;   ObjectName (RO) = "AcDbRegion"
+;   OwnerID (RO) = 43
+;   Perimeter (RO) = 31.4159
+;   PlotStyleName = "ByLayer"
+;   PrincipalDirections (RO) = (1.0 0.0 0.0 1.0)
+;   PrincipalMoments (RO) = (490.874 490.874)
+;   ProductOfInertia (RO) = 194386.0
+;   RadiiOfGyration (RO) = (55.0568 45.0694)
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029a8643f040>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Boolean (2)
+;   Copy ()
+;   Delete ()
+;   Explode ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

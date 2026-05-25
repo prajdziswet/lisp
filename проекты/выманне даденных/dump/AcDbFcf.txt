@@ -1,0 +1,50 @@
+﻿дамп по объекту [AcDbFcf]
+========================================
+; IAcadTolerance: Интерфейс AutoCAD для работы с допусками ФиР.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   DimensionLineColor = 0
+;   DirectionVector = (1.0 0.0 0.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "4D4"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 00000292bc087f58>
+;   InsertionPoint = (70.3126 -23.9031 0.0)
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 58
+;   ObjectName (RO) = "AcDbFcf"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   ScaleFactor = 1.0
+;   StyleName = "ISO-25"
+;   TextColor = 0
+;   TextHeight = 2.5
+;   TextString = "%%v1%%v%%v%%v%%v\n%%v2%%v%%v%%v%%v\n100"
+;   TextStyle = "Standard"
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 00000292bc088eb0>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

@@ -1,0 +1,43 @@
+﻿дамп по объекту [AcDbPoint]
+========================================
+; IAcadPoint: Интерфейс AutoCAD для работы с точками.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Coordinates = (415662.0 114538.0 0.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "5F17A"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3d3f8>
+;   Layer = "1_ПРОЕКТ_ЗаменаТ1Т2_РЕЛЬЕФ_сущ"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = 30
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 564
+;   ObjectName (RO) = "AcDbPoint"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "ByLayer"
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3d4b0>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

@@ -1,0 +1,68 @@
+﻿дамп по объекту [AcDbAttributeDefinition]
+========================================
+; IAcadAttribute: Интерфейс AutoCAD для работы с атрибутами.
+; Значения свойств:
+;   Alignment = 10
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Backward = 0
+;   Constant = 0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   FieldLength = 0
+;   Handle (RO) = "1E83B"
+;   HasExtensionDictionary (RO) = -1
+;   Height = 2.5
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3ca38>
+;   InsertionPoint = (-31.7982 18.8 0.0)
+;   Invisible = 0
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   LockPosition = -1
+;   Material = "ByLayer"
+;   Mode = 16
+;   MTextAttribute = 0
+;   MTextAttributeContent = ""
+;   MTextBoundaryWidth = 0.0
+;   MTextDrawingDirection = 5
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 570
+;   ObjectName (RO) = "AcDbAttributeDefinition"
+;   ObliqueAngle = 0.0
+;   OwnerID (RO) = 571
+;   PlotStyleName = "ByBlock"
+;   Preset = 0
+;   PromptString = ""
+;   Rotation = 0.0
+;   ScaleFactor = 1.0
+;   StyleName = "GOST 2.304_09"
+;   TagString = "ЛИСТ"
+;   TextAlignmentPoint = (-27.5125 20.05 0.0)
+;   TextGenerationFlag = 0
+;   TextString = "####"
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca468d0>
+;   UpsideDown = 0
+;   Verify = 0
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()
+;   UpdateMTextAttribute ()

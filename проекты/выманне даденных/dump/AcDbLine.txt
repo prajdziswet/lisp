@@ -1,0 +1,48 @@
+﻿дамп по объекту [AcDbLine]
+========================================
+; IAcadLine: Интерфейс AutoCAD для работы с отрезками.
+; Значения свойств:
+;   Angle (RO) = 0.0
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Delta (RO) = (92.5 0.0 0.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EndPoint = (416115.0 114638.0 0.0)
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "D9C3A"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3d098>
+;   Layer = "0"
+;   Length (RO) = 92.5
+;   Linetype = "ByLayer"
+;   LinetypeScale = 100.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 549
+;   ObjectName (RO) = "AcDbLine"
+;   OwnerID (RO) = 544
+;   PlotStyleName = "Цвет_7"
+;   StartPoint = (416023.0 114638.0 0.0)
+;   Thickness = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3ce50>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Offset (1)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

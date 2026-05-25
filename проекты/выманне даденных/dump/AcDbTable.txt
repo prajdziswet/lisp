@@ -1,0 +1,234 @@
+﻿дамп по объекту [AcDbTable]
+========================================
+; IAcadTable: Интерфейс IAcadTable для работы с таблицами.
+; Значения свойств:
+;   AllowManualHeights = -1
+;   AllowManualPositions = -1
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   BreaksEnabled = -1
+;   BreakSpacing = 10.0
+;   Columns = 5
+;   ColumnWidth (RO) = ...Индексированное содержимое не выводится...
+;   Direction = (1.0 0.0 0.0)
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 000001e2017ed208>
+;   EnableBreak (RO) = ...Индексированное содержимое не выводится...
+;   EntityTransparency = "ПоСлою"
+;   FlowDirection = 0
+;   Handle (RO) = "B54"
+;   HasExtensionDictionary (RO) = 0
+;   HasSubSelection (RO) = 0
+;   HeaderSuppressed = 0
+;   Height = 41.6667
+;   HorzCellMargin = 1.5
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000001e1aa5439e8>
+;   InsertionPoint = (64.5738 175.003 0.0)
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = 20
+;   Material = "ByLayer"
+;   MinimumTableHeight (RO) = 27.249
+;   MinimumTableWidth (RO) = 32.5
+;   ObjectID (RO) = 42
+;   ObjectName (RO) = "AcDbTable"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   RegenerateTableSuppressed = 0
+;   RepeatBottomLabels = 0
+;   RepeatTopLabels = -1
+;   RowHeight (RO) = ...Индексированное содержимое не выводится...
+;   Rows = 3
+;   StyleName = "РосЭП"
+;   TableBreakFlowDirection = 1
+;   TableBreakHeight = 56.0
+;   TableStyleOverrides (RO) = (1)
+;   TitleSuppressed = -1
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000001e1aa54c0e0>
+;   VertCellMargin = 1.5
+;   Visible = -1
+;   Width = 185.0
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   ClearSubSelection ()
+;   ClearTableStyleOverrides (1)
+;   Copy ()
+;   CreateContent (3)
+;   Delete ()
+;   DeleteCellContent (2)
+;   DeleteColumns (2)
+;   DeleteContent (2)
+;   DeleteRows (2)
+;   EnableMergeAll (3)
+;   FormatValue (4)
+;   GenerateLayout ()
+;   GetAlignment (1)
+;   GetAttachmentPoint (2)
+;   GetAutoScale (2)
+;   GetAutoScale2 (3)
+;   GetBackgroundColor (1)
+;   GetBackgroundColorNone (1)
+;   GetBlockAttributeValue (3)
+;   GetBlockAttributeValue2 (4)
+;   GetBlockRotation (2)
+;   GetBlockScale (2)
+;   GetBlockTableRecordId (2)
+;   GetBlockTableRecordId2 (3)
+;   GetBoundingBox (2)
+;   GetBreakHeight (1)
+;   GetCellAlignment (2)
+;   GetCellBackgroundColor (2)
+;   GetCellBackgroundColorNone (2)
+;   GetCellContentColor (2)
+;   GetCellDataType (4)
+;   GetCellExtents (3)
+;   GetCellFormat (2)
+;   GetCellGridColor (3)
+;   GetCellGridLineWeight (3)
+;   GetCellGridVisibility (3)
+;   GetCellState (2)
+;   GetCellStyle (2)
+;   GetCellStyleOverrides (2)
+;   GetCellTextHeight (2)
+;   GetCellTextStyle (2)
+;   GetCellType (2)
+;   GetCellValue (2)
+;   GetColumnName (1)
+;   GetColumnWidth (1)
+;   GetContentColor (1)
+;   GetContentColor2 (3)
+;   GetContentLayout (2)
+;   GetContentType (2)
+;   GetCustomData (4)
+;   GetDataFormat (3)
+;   GetDataType (3)
+;   GetDataType2 (5)
+;   GetExtensionDictionary ()
+;   GetFieldId (2)
+;   GetFieldId2 (3)
+;   GetFormat (1)
+;   GetFormula (3)
+;   GetGridColor (2)
+;   GetGridColor2 (3)
+;   GetGridDoubleLineSpacing (3)
+;   GetGridLineStyle (3)
+;   GetGridLinetype (3)
+;   GetGridLineWeight (2)
+;   GetGridLineWeight2 (3)
+;   GetGridVisibility (2)
+;   GetGridVisibility2 (3)
+;   GetHasFormula (3)
+;   GetMargin (3)
+;   GetMinimumColumnWidth (1)
+;   GetMinimumRowHeight (1)
+;   GetOverride (3)
+;   GetRotation (3)
+;   GetRowHeight (1)
+;   GetRowType (1)
+;   GetScale (3)
+;   GetSubSelection (4)
+;   GetText (2)
+;   GetTextHeight (1)
+;   GetTextHeight2 (3)
+;   GetTextRotation (2)
+;   GetTextString (3)
+;   GetTextStyle (1)
+;   GetTextStyle2 (3)
+;   GetValue (3)
+;   GetXData (3)
+;   Highlight (1)
+;   HitTest (4)
+;   InsertColumns (3)
+;   InsertColumnsAndInherit (3)
+;   InsertRows (3)
+;   InsertRowsAndInherit (3)
+;   IntersectWith (2)
+;   IsContentEditable (2)
+;   IsEmpty (2)
+;   IsFormatEditable (2)
+;   IsMergeAllEnabled (2)
+;   IsMergedCell (6)
+;   MergeCells (4)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   MoveContent (4)
+;   RecomputeTableBlock (1)
+;   RemoveAllOverrides (2)
+;   ReselectSubRegion ()
+;   ResetCellValue (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   Select (8)
+;   SelectSubRegion (10)
+;   SetAlignment (2)
+;   SetAutoScale (3)
+;   SetAutoScale2 (4)
+;   SetBackgroundColor (2)
+;   SetBackgroundColorNone (2)
+;   SetBlockAttributeValue (4)
+;   SetBlockAttributeValue2 (5)
+;   SetBlockRotation (3)
+;   SetBlockScale (3)
+;   SetBlockTableRecordId (4)
+;   SetBlockTableRecordId2 (5)
+;   SetBreakHeight (2)
+;   SetCellAlignment (3)
+;   SetCellBackgroundColor (3)
+;   SetCellBackgroundColorNone (3)
+;   SetCellContentColor (3)
+;   SetCellDataType (4)
+;   SetCellFormat (3)
+;   SetCellGridColor (4)
+;   SetCellGridLineWeight (4)
+;   SetCellGridVisibility (4)
+;   SetCellState (3)
+;   SetCellStyle (3)
+;   SetCellTextHeight (3)
+;   SetCellTextStyle (3)
+;   SetCellType (3)
+;   SetCellValue (3)
+;   SetCellValueFromText (4)
+;   SetColumnName (2)
+;   SetColumnWidth (2)
+;   SetContentColor (2)
+;   SetContentColor2 (4)
+;   SetContentLayout (3)
+;   SetCustomData (4)
+;   SetDataFormat (4)
+;   SetDataType (3)
+;   SetDataType2 (5)
+;   SetFieldId (3)
+;   SetFieldId2 (5)
+;   SetFormat (2)
+;   SetFormula (4)
+;   SetGridColor (3)
+;   SetGridColor2 (4)
+;   SetGridDoubleLineSpacing (4)
+;   SetGridLineStyle (4)
+;   SetGridLinetype (4)
+;   SetGridLineWeight (3)
+;   SetGridLineWeight2 (4)
+;   SetGridVisibility (3)
+;   SetGridVisibility2 (4)
+;   SetMargin (4)
+;   SetOverride (4)
+;   SetRotation (4)
+;   SetRowHeight (2)
+;   SetScale (4)
+;   SetSubSelection (4)
+;   SetText (3)
+;   SetTextHeight (2)
+;   SetTextHeight2 (4)
+;   SetTextRotation (3)
+;   SetTextString (4)
+;   SetTextStyle (2)
+;   SetTextStyle2 (4)
+;   SetToolTip (3)
+;   SetValue (4)
+;   SetValueFromText (5)
+;   SetXData (2)
+;   TransformBy (1)
+;   UnmergeCells (4)
+;   Update ()

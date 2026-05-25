@@ -1,0 +1,44 @@
+﻿дамп по объекту [AcDbPolyFaceMesh]
+========================================
+; IAcadPolyfaceMesh: Интерфейс AutoCAD для работы с произвольными сетями.
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Coordinate = ...Индексированное содержимое не выводится...
+;   Coordinates = (1720.49 631.085 0.0 2161.54 637.473 0.0 ... )
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 00000292b369f898>
+;   EntityTransparency = "ПоСлою"
+;   Handle (RO) = "2C5"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000029273c93388>
+;   Layer = "0"
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   NumberOfFaces (RO) = 0
+;   NumberOfVertices (RO) = 5
+;   ObjectID (RO) = 55
+;   ObjectName (RO) = "AcDbPolyFaceMesh"
+;   OwnerID (RO) = 66
+;   PlotStyleName = "ByLayer"
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029273c931a0>
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

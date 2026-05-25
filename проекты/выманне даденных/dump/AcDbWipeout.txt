@@ -1,0 +1,57 @@
+﻿дамп по объекту [AcDbWipeout]
+========================================
+; IAcadWipeout: Интерфейс AutoCAD для маскированных растровых изображений
+; Значения свойств:
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   Brightness = 50
+;   ClippingEnabled = -1
+;   Contrast = 50
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000023746b56298>
+;   EntityTransparency = "ПоСлою"
+;   Fade = 0
+;   Handle (RO) = "6AE79"
+;   HasExtensionDictionary (RO) = 0
+;   Height (RO) = 1.0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 000002375ca3f018>
+;   ImageFile = AutoCAD.Application: Пустой ID объекта
+;   ImageHeight = 1.0
+;   ImageVisibility = -1
+;   ImageWidth = 1.0
+;   Layer = "0"
+;   Linetype = "ByBlock"
+;   LinetypeScale = 1.0
+;   Lineweight = -2
+;   Material = "ByLayer"
+;   Name = AutoCAD.Application: Ключ не найден
+;   ObjectID (RO) = 572
+;   ObjectName (RO) = "AcDbWipeout"
+;   Origin = (-0.5 -0.5 0.0)
+;   OwnerID (RO) = 573
+;   PlotStyleName = "ByBlock"
+;   Rotation = 0.0
+;   ScaleFactor = 1.0
+;   ShowRotation = -1
+;   transparency = 0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 000002375ca3e050>
+;   Visible = -1
+;   Width (RO) = 1.0
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   ClipBoundary (1)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()

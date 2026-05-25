@@ -1,0 +1,105 @@
+﻿дамп по объекту [AcDbOrdinateDimension]
+========================================
+; IAcadDimOrdinate: Интерфейс AutoCAD для работы с ординтатными размерами.
+; Значения свойств:
+;   AltRoundDistance = 0.0
+;   AltSubUnitsFactor = 100.0
+;   AltSubUnitsSuffix = ""
+;   AltSuppressLeadingZeros = 0
+;   AltSuppressTrailingZeros = 0
+;   AltSuppressZeroFeet = -1
+;   AltSuppressZeroInches = -1
+;   AltTextPrefix = ""
+;   AltTextSuffix = ""
+;   AltTolerancePrecision = 3
+;   AltToleranceSuppressLeadingZeros = 0
+;   AltToleranceSuppressTrailingZeros = 0
+;   AltToleranceSuppressZeroFeet = -1
+;   AltToleranceSuppressZeroInches = -1
+;   AltUnits = 0
+;   AltUnitsFormat = 2
+;   AltUnitsPrecision = 3
+;   AltUnitsScale = 0.0393701
+;   Application (RO) = #<VLA-OBJECT IAcadApplication 00007ff6af345ca0>
+;   ArrowheadSize = 2.5
+;   DecimalSeparator = ","
+;   DimTxtDirection = 0
+;   Document (RO) = #<VLA-OBJECT IAcadDocument 0000029235172058>
+;   EntityTransparency = "ПоСлою"
+;   ExtensionLineColor = 0
+;   ExtensionLineOffset = 0.625
+;   ExtensionLineWeight = -2
+;   ExtLineFixedLen = 1.0
+;   ExtLineFixedLenSuppress = 0
+;   FractionFormat = 0
+;   Handle (RO) = "2F2"
+;   HasExtensionDictionary (RO) = 0
+;   Hyperlinks (RO) = #<VLA-OBJECT IAcadHyperlinks 0000029a8643fe88>
+;   Layer = "0"
+;   LinearScaleFactor = 1.0
+;   Linetype = "ByLayer"
+;   LinetypeScale = 1.0
+;   Lineweight = -1
+;   Material = "ByLayer"
+;   Measurement (RO) = 60.0
+;   Normal = (0.0 0.0 1.0)
+;   ObjectID (RO) = 49
+;   ObjectName (RO) = "AcDbOrdinateDimension"
+;   OwnerID (RO) = 43
+;   PlotStyleName = "ByLayer"
+;   PrimaryUnitsPrecision = 2
+;   Rotation = 0.0
+;   RoundDistance = 0.0
+;   ScaleFactor = 1.0
+;   StyleName = "ISO-25"
+;   SubUnitsFactor = 100.0
+;   SubUnitsSuffix = ""
+;   SuppressLeadingZeros = 0
+;   SuppressTrailingZeros = -1
+;   SuppressZeroFeet = -1
+;   SuppressZeroInches = -1
+;   TextColor = 0
+;   TextFill = 0
+;   TextFillColor = 0
+;   TextGap = 0.625
+;   TextHeight = 2.5
+;   TextMovement = 0
+;   TextOverride = ""
+;   TextPosition = (63.0986 -17.5819 0.0)
+;   TextPrefix = ""
+;   TextRotation = 0.0
+;   TextStyle = "Standard"
+;   TextSuffix = ""
+;   ToleranceDisplay = 0
+;   ToleranceHeightScale = 1.0
+;   ToleranceJustification = 0
+;   ToleranceLowerLimit = 0.0
+;   TolerancePrecision = 2
+;   ToleranceSuppressLeadingZeros = 0
+;   ToleranceSuppressTrailingZeros = -1
+;   ToleranceSuppressZeroFeet = -1
+;   ToleranceSuppressZeroInches = -1
+;   ToleranceUpperLimit = 0.0
+;   TrueColor = #<VLA-OBJECT IAcadAcCmColor 0000029a8643ef80>
+;   UnitsFormat = 2
+;   VerticalTextPosition = 1
+;   Visible = -1
+; Поддерживаемые методы:
+;   ArrayPolar (3)
+;   ArrayRectangular (6)
+;   Copy ()
+;   Delete ()
+;   GetBoundingBox (2)
+;   GetExtensionDictionary ()
+;   GetXData (3)
+;   Highlight (1)
+;   IntersectWith (2)
+;   Mirror (2)
+;   Mirror3D (3)
+;   Move (2)
+;   Rotate (2)
+;   Rotate3D (3)
+;   ScaleEntity (2)
+;   SetXData (2)
+;   TransformBy (1)
+;   Update ()
