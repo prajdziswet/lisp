@@ -1,4 +1,4 @@
 (defun c:test () 
-  (alert "Привет")
+  (alert "автокад тест")
   (princ)
 )
