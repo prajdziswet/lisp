@@ -1687,26 +1687,64 @@
 )
 
 ;------------------------перадача друку у іншых файлах(адчынене файлау)---------------------------------
+(defun ShowFileListDialog (file_list / dcl_file file_handle dcl_id result)
+  (setq dcl_file (vl-filename-mktemp "file_list.dcl"))
+  (setq file_handle (open dcl_file "w"))
+  (write-line "file_list_dcl : dialog {" file_handle)
+  (write-line "  label = \"Список файлов для печати\";" file_handle)
+  (write-line "  : text { label = \"Будут напечатаны следующие файлы из папки:\"; }" file_handle)
+  (write-line "  : list_box {" file_handle)
+  (write-line "    key = \"files_list\";" file_handle)
+  (write-line "    width = 50;" file_handle)
+  (write-line "    height = 12;" file_handle)
+  (write-line "  }" file_handle)
+  (write-line "  ok_cancel;" file_handle)
+  (write-line "}" file_handle)
+  (close file_handle)
+  
+  (setq dcl_id (load_dialog dcl_file))
+  (if (not (new_dialog "file_list_dcl" dcl_id))
+    (setq result 0)
+    (progn
+      (start_list "files_list")
+      (foreach item file_list
+        (add_list item)
+      )
+      (end_list)
+      (setq result (start_dialog))
+      (unload_dialog dcl_id)
+      (vl-file-delete dcl_file)
+    )
+  )
+  (= result 1)
+)
+
+
 (defun peshat-spds-file (/ peshat-files peshat-file) 
   ;перадача аргументау дыялогу
   (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;выбар файлау
-  (while (/= peshat-files nil) 
-    (if (/= (GETVAR "dwgname") (car peshat-files)) 
-      (progn 
-        (vl-bb-set 'directory-p 1) ;запуск у іншых адчыняем дакумент
-        (setq peshat-file (strcat (GETVAR "dwgprefix") (car peshat-files))) ;адчыняемы файл
-        (setq peshat-files (cdr peshat-files)) ;обрезка
-        (setq peshat-file (vla-Open 
-                            (vla-get-Documents (vlax-get-acad-object))
-                            peshat-file
-                            :flax-true
-                            ""
-                          )
-        ) ;адчыненне
-        (vla-Close peshat-file :vlax-false) ;зачыненне
-      ) ;end progn
-      (setq peshat-files (cdr peshat-files)) ;обрезка
+  
+  (if (ShowFileListDialog peshat-files)
+    (progn
+      (while (/= peshat-files nil) 
+        (if (/= (GETVAR "dwgname") (car peshat-files)) 
+          (progn 
+            (vl-bb-set 'directory-p 1) ;запуск у іншых адчыняем дакумент
+            (setq peshat-file (strcat (GETVAR "dwgprefix") (car peshat-files))) ;адчыняемы файл
+            (setq peshat-files (cdr peshat-files)) ;обрезка
+            (setq peshat-file (vla-Open 
+                                (vla-get-Documents (vlax-get-acad-object))
+                                peshat-file
+                                :flax-true
+                                ""
+                              )
+            ) ;адчыненне
+            (vla-Close peshat-file :vlax-false) ;зачыненне
+          ) ;end progn
+          (setq peshat-files (cdr peshat-files)) ;обрезка
+        )
+      ) ;end while and if
+      (vl-bb-set 'directory-p nil) ;забарона друку у іншых файлах
     )
-  ) ;end while and if
-  (vl-bb-set 'directory-p nil) ;забарона друку у іншых файлах
+  )
 )					;--
