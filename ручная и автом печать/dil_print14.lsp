@@ -1044,7 +1044,11 @@
   (setq poloz (nth 4 spis))
   (setq model (nth 5 spis))
   (setq nameris (nth 6 spis)) ;назва рысынка, у "наступных" не вызначаецца
-  (setq ctb_file (if (= acad_color 1) "acad.ctb" "monochrome.ctb"))
+  (setq ctb_file (if (or (= acad_color 1) (= (nth 7 spis) T)) 
+                   "acad.ctb"
+                   "monochrome.ctb"
+                 )
+  )
 
   (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
 
@@ -1468,7 +1472,9 @@
 
 
 ;------------------------утварэнне спісау друку іх нумерацыя,ад дыялогу---------------------------------
-(defun zapusk_druk (/ f_temp ris_temp) 
+(defun zapusk_druk (/ f_temp ris_temp color_indices temp_druk_v idx item old_cdr 
+                    updated_cdr
+                   ) 
 
   ;друк полилиний-блокау-спдс
   (poli)
@@ -1480,6 +1486,36 @@
   (del_dubl)
   (prin_numar) ;прастаука нумароу вызначанага спису
   (zad_n) ;прастаука нумароу невызначанага спису
+
+  (if (and (= acad_color 2) (/= druk_v nil)) 
+    (progn 
+      (setq color_indices (ShowSheetColorDialog druk_v))
+      (setq temp_druk_v nil)
+      (setq idx 0)
+      (foreach item druk_v 
+        (if (member idx color_indices) 
+          (progn 
+            (setq old_cdr (cdr item))
+            (setq updated_cdr (list 
+                                (nth 0 old_cdr)
+                                (nth 1 old_cdr)
+                                (nth 2 old_cdr)
+                                (nth 3 old_cdr)
+                                (nth 4 old_cdr)
+                                (nth 5 old_cdr)
+                                (nth 6 old_cdr)
+                                T
+                              )
+            )
+            (setq temp_druk_v (cons (cons (car item) updated_cdr) temp_druk_v))
+          )
+          (setq temp_druk_v (cons item temp_druk_v))
+        )
+        (setq idx (1+ idx))
+      )
+      (setq druk_v (reverse temp_druk_v))
+    )
+  )
 
   (setq f_temp "")
   (setq ris_temp "")
@@ -1518,11 +1554,14 @@
   )
   (write-line "}" file_handle)
   (write-line "}" file_handle)
-  (write-line ": toggle {" file_handle)
-  (write-line "key = \"acad_color\";" file_handle)
-  (write-line "label = \"запрашивать цвет\";" file_handle)
-  (write-line "value = \"0\";" file_handle)
-  (write-line "}" file_handle)
+  (write-line ": popup_list {" file_handle)
+  (write-line "    label = \"Цвет:\";" file_handle)
+  (write-line "    key = \"color_select\";" file_handle)
+  (write-line "    list = \"монохромный\\nвсе в цвете\\nзапрашивать цвет\";" 
+              file_handle
+  )
+  (write-line "    value = \"0\";" file_handle)
+  (write-line "  }" file_handle)
   (write-line ":popup_list{label=\"\";" file_handle)
   (write-line "list=\"не склеивать\\nсклеить по файлам\\nсклеить в общий файл\";value=\"2\";key=\"sfile_merge\";}" 
               file_handle
@@ -1557,7 +1596,7 @@
           sfile_all 1
     )
   )
-  (setq acad_color (atoi (get_tile "acad_color")))
+  (setq acad_color (atoi (get_tile "color_select")))
 )
 
 ;------------------------выклік діалогу---------------------------------
@@ -1610,6 +1649,7 @@
 
   (if (= ddi 1) 
     (progn 
+      (vl-bb-set 'acad_color acad_color)
       ;усталека первічных параметрау
       (vl-bb-set 
         'file_all
@@ -1627,9 +1667,13 @@
         )
       )
       (vl-bb-set 'file_ris nil) ;обнуление
-      (zapusk_druk)
-      (if (= rys 0) 
-        (peshat-spds-file)
+      (if (or (/= rys 0) (peshat-spds-file-prepare)) 
+        (progn 
+          (zapusk_druk)
+          (if (= rys 0) 
+            (peshat-spds-file-run)
+          )
+        )
       )
       (if (= needAdd nil) (setq needAdd 0))
 
@@ -1657,78 +1701,51 @@
 (print "загружена автоматічская печать")
 (princ)
 
-;------------------------выклік діалогу з рэдактара---------------------------------
-;stor убрана, оставлена для совемстимости верстий
-(defun dil_spds_new (needAdd stor / auto) 
-  (setq auto T)
-  (c:dil_spds)
-)
-
-
-
-
-;============================================================================
-;------------------------друк у іншых файлах---------------------------------
-;============================================================================
-(defun open-p ()  ;numar
-  ;задаванне параметрау выбару
-  (if (= (vl-bb-ref 'directory-p) 1) 
-    (progn 
-      (vl-bb-set 'directory-p nil)
-
-      ;друк
-      (zapusk_druk)
-    )
-  )
-)
-					;запуск в открываемых файлах
-(if (/= (vl-bb-ref 'directory-p) nil) 
-  (open-p)
-)
-
-;------------------------перадача друку у іншых файлах(адчынене файлау)---------------------------------
-(defun ShowFileListDialog (file_list / dcl_file file_handle dcl_id result)
-  (setq dcl_file (vl-filename-mktemp "file_list.dcl"))
-  (setq file_handle (open dcl_file "w"))
-  (write-line "file_list_dcl : dialog {" file_handle)
-  (write-line "  label = \"Список файлов для печати\";" file_handle)
-  (write-line "  : text { label = \"Будут напечатаны следующие файлы из папки:\"; }" file_handle)
-  (write-line "  : list_box {" file_handle)
-  (write-line "    key = \"files_list\";" file_handle)
-  (write-line "    width = 50;" file_handle)
-  (write-line "    height = 12;" file_handle)
-  (write-line "  }" file_handle)
-  (write-line "  ok_cancel;" file_handle)
-  (write-line "}" file_handle)
-  (close file_handle)
-  
-  (setq dcl_id (load_dialog dcl_file))
-  (if (not (new_dialog "file_list_dcl" dcl_id))
-    (setq result 0)
-    (progn
-      (start_list "files_list")
-      (foreach item file_list
-        (add_list item)
-      )
-      (end_list)
-      (setq result (start_dialog))
-      (unload_dialog dcl_id)
-      (vl-file-delete dcl_file)
-    )
-  )
-  (= result 1)
-)
-
-
-(defun peshat-spds-file (/ peshat-files peshat-file) 
+(defun peshat-spds-file-prepare (/ peshat-files result selected_files color_mode) 
   ;перадача аргументау дыялогу
   (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;выбар файлау
-  
-  (if (ShowFileListDialog peshat-files)
-    (progn
+
+  (if (and (= rys 0) (= acad_color 2) (> (length peshat-files) 1)) 
+    (progn 
+      (setq result (ShowFileListDialog peshat-files))
+      (if result 
+        (progn 
+          (setq selected_files (car result))
+          (setq color_mode (cdr result))
+          (vl-bb-set 'folder_color_mode color_mode)
+          (vl-bb-set 'folder_color_files selected_files)
+          T
+        )
+        nil
+      )
+    )
+    (progn 
+      (vl-bb-set 'folder_color_mode acad_color)
+      (vl-bb-set 'folder_color_files nil)
+      T
+    )
+  )
+)
+
+
+(defun peshat-spds-file-run (/ peshat-files peshat-file selected_files color_mode 
+                             current_color
+                            ) 
+  (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;выбар файлау
+  (setq selected_files (vl-bb-ref 'folder_color_files))
+  (setq color_mode (vl-bb-ref 'folder_color_mode))
+  (if (= color_mode nil) (setq color_mode acad_color))
+
+  (if peshat-files 
+    (progn 
       (while (/= peshat-files nil) 
         (if (/= (GETVAR "dwgname") (car peshat-files)) 
           (progn 
+            (if (member (car peshat-files) selected_files) 
+              (setq current_color color_mode)
+              (setq current_color 0)
+            )
+            (vl-bb-set 'acad_color current_color)
             (vl-bb-set 'directory-p 1) ;запуск у іншых адчыняем дакумент
             (setq peshat-file (strcat (GETVAR "dwgprefix") (car peshat-files))) ;адчыняемы файл
             (setq peshat-files (cdr peshat-files)) ;обрезка
@@ -1742,6 +1759,204 @@
             (vla-Close peshat-file :vlax-false) ;зачыненне
           ) ;end progn
           (setq peshat-files (cdr peshat-files)) ;обрезка
+        )
+      ) ;end while
+      (vl-bb-set 'directory-p nil) ;забарона друку у іншых файлах
+    )
+  )
+)
+
+;------------------------выклік діалогу з рэдактара---------------------------------
+;stor убрана, оставлена для совемстимости верстий
+(defun dil_spds_new (needAdd stor / auto) 
+  (setq auto T)
+  (c:dil_spds)
+)
+
+
+;============================================================================
+;------------------------друк у іншых файлах---------------------------------
+;============================================================================
+(defun open-p ()  ;numar
+  ;задаванне параметрау выбару
+  (if (= (vl-bb-ref 'directory-p) 1) 
+    (progn 
+      (vl-bb-set 'directory-p nil)
+      (if (vl-bb-ref 'acad_color) 
+        (setq acad_color (vl-bb-ref 'acad_color))
+      )
+      ;друк
+      (zapusk_druk)
+    )
+  )
+)
+					;запуск в открываемых файлах
+(if (/= (vl-bb-ref 'directory-p) nil) 
+  (open-p)
+)
+
+(defun ShowSheetColorDialog (sheets / dcl_file file_handle dcl_id result 
+                             selected_indices selected_sheets read_list index item 
+                             display_list name
+                            ) 
+  (setq dcl_file (vl-filename-mktemp "sheet_color.dcl"))
+  (setq file_handle (open dcl_file "w"))
+  (write-line "sheet_color_dcl : dialog {" file_handle)
+  (write-line "  label = \"Печать в цвете\";" file_handle)
+  (write-line "  : text { label = \"Выберите чертежи для печати в цвете:\"; }" 
+              file_handle
+  )
+  (write-line "  : text { label = \"п.с. подсказка: несколько чертежей выбираются через Ctrl\"; }" file_handle)
+  (write-line "  : list_box {" file_handle)
+  (write-line "    key = \"sheets_list\";" file_handle)
+  (write-line "    width = 60;" file_handle)
+  (write-line "    height = 15;" file_handle)
+  (write-line "    multiple_select = true;" file_handle)
+  (write-line "  }" file_handle)
+  (write-line "  ok_cancel;" file_handle)
+  (write-line "}" file_handle)
+  (close file_handle)
+
+  (setq display_list nil)
+  (foreach item sheets 
+    (setq name (nth 6 (cdr item)))
+    (if (and name (/= name "")) 
+      (setq display_list (cons (strcat (car item) " - " name) display_list))
+      (setq display_list (cons (car item) display_list))
+    )
+  )
+  (setq display_list (reverse display_list))
+
+  (setq dcl_id (load_dialog dcl_file))
+  (if (not (new_dialog "sheet_color_dcl" dcl_id)) 
+    (setq result 0)
+    (progn 
+      (start_list "sheets_list")
+      (foreach item display_list 
+        (add_list item)
+      )
+      (end_list)
+      (action_tile "accept" 
+                   "(setq selected_indices (get_tile \"sheets_list\")) (done_dialog 1)"
+      )
+      (action_tile "cancel" "(done_dialog 0)")
+      (setq result (start_dialog))
+      (unload_dialog dcl_id)
+      (vl-file-delete dcl_file)
+    )
+  )
+  (if (= result 1) 
+    (if (and selected_indices (/= selected_indices "")) 
+      (read (strcat "(" selected_indices ")"))
+      nil
+    )
+    nil
+  )
+)
+
+
+(defun ShowFileListDialog (file_list / dcl_file file_handle dcl_id result 
+                           selected_indices selected_files read_list color_mode
+                          ) 
+  (setq dcl_file (vl-filename-mktemp "file_list.dcl"))
+  (setq file_handle (open dcl_file "w"))
+  (write-line "file_list_dcl : dialog {" file_handle)
+  (write-line "  label = \"Список файлов для печати\";" file_handle)
+  (write-line "  : boxed_column { label = \"Что делать с выбраными:\";" 
+              file_handle
+  )
+  (write-line "    : radio_column {" file_handle)
+  (write-line "      : radio_button {key = \"file_color_all\"; label = \"все цветные чертежи в файлах\"; value = 1;}" 
+              file_handle
+  )
+  (write-line "      : radio_button {key = \"file_color_ask\"; label = \"запрашивать цвет чертежей в файле\";}" 
+              file_handle
+  )
+  (write-line "    }" file_handle)
+  (write-line "  }" file_handle)
+  (write-line "  : text { label = \"Выберите, какие файлы спрашивать или печатать в цвете:\"; }" 
+              file_handle
+  )
+  (write-line "  : text { label = \"п.с. не выбранные распечатаются в монохроме...\"; }" 
+              file_handle
+  )
+  (write-line "  : text { label = \"Подсказка: несколько чертежей выбираются через Ctrl\"; }" 
+              file_handle
+  )
+  (write-line "  : list_box {" file_handle)
+  (write-line "    key = \"files_list\";" file_handle)
+  (write-line "    width = 50;" file_handle)
+  (write-line "    height = 12;" file_handle)
+  (write-line "    multiple_select = true;" file_handle)
+  (write-line "  }" file_handle)
+  (write-line "  ok_cancel;" file_handle)
+  (write-line "}" file_handle)
+  (close file_handle)
+
+  (setq dcl_id (load_dialog dcl_file))
+  (if (not (new_dialog "file_list_dcl" dcl_id)) 
+    (setq result 0)
+    (progn 
+      (start_list "files_list")
+      (foreach item file_list 
+        (add_list item)
+      )
+      (end_list)
+      (action_tile "accept" 
+                   "(setq selected_indices (get_tile \"files_list\")) (setq color_mode (if (= (atoi (get_tile \"file_color_all\")) 1) 1 2)) (done_dialog 1)"
+      )
+      (action_tile "cancel" "(done_dialog 0)")
+      (setq result (start_dialog))
+      (unload_dialog dcl_id)
+      (vl-file-delete dcl_file)
+    )
+  )
+  (if (= result 1) 
+    (progn 
+      (setq selected_files nil)
+      (if (and selected_indices (/= selected_indices "")) 
+        (progn 
+          (setq read_list (read (strcat "(" selected_indices ")")))
+          (foreach idx read_list 
+            (setq selected_files (cons (nth idx file_list) selected_files))
+          )
+          (setq selected_files (reverse selected_files))
+        )
+      )
+      (cons selected_files color_mode)
+    )
+    nil
+  )
+)
+
+
+(defun peshat-spds-file (/ peshat-files peshat-file files_to_print) 
+  ;перадача аргументау дыялогу
+  (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;выбар файлау
+
+  (if (and (= rys 0) (= acad_color 2) (> (length peshat-files) 1)) 
+    (setq files_to_print (ShowFileListDialog peshat-files))
+    (setq files_to_print peshat-files)
+  )
+
+  (if files_to_print 
+    (progn 
+      (while (/= files_to_print nil) 
+        (if (/= (GETVAR "dwgname") (car files_to_print)) 
+          (progn 
+            (vl-bb-set 'directory-p 1) ;запуск у іншых адчыняем дакумент
+            (setq peshat-file (strcat (GETVAR "dwgprefix") (car files_to_print))) ;адчыняемы файл
+            (setq files_to_print (cdr files_to_print)) ;обрезка
+            (setq peshat-file (vla-Open 
+                                (vla-get-Documents (vlax-get-acad-object))
+                                peshat-file
+                                :flax-true
+                                ""
+                              )
+            ) ;адчыненне
+            (vla-Close peshat-file :vlax-false) ;зачыненне
+          ) ;end progn
+          (setq files_to_print (cdr files_to_print)) ;обрезка
         )
       ) ;end while and if
       (vl-bb-set 'directory-p nil) ;забарона друку у іншых файлах
