@@ -1837,3 +1837,71 @@
   (dbx-execute-print-and-return)
 )
 
+(defun c:view_formats (/ active-doc old-ctab old-viewctr old-viewsize all-sheets total-sheets idx item model 
+                       x1 x2 num format-name msg druk_n druk_v
+                      ) 
+  (vl-load-com)
+  (PRINC "\n-----Аналіз файла для прагляду фарматак-----\n")
+  (setq old-ctab (getvar "ctab"))
+  (setq old-viewctr (getvar "VIEWCTR"))
+  (setq old-viewsize (getvar "VIEWSIZE"))
+  (setq active-doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+
+  (setq druk_n nil
+        druk_v nil
+  )
+  (dbx-scan-document active-doc (getvar "dwgname") nil)
+  (del_dubl)
+  (prin_numar)
+  (zad_n)
+
+  (setq all-sheets (append druk_v druk_n))
+
+  (if (not all-sheets) 
+    (princ "\nФарматкі не знойдзены.\n")
+    (progn 
+      (setq total-sheets (length all-sheets)
+            idx          1
+      )
+      (foreach item all-sheets 
+        (print item)
+        (setq num         (nth 0 item)
+              x1          (nth 1 item)
+              x2          (nth 2 item)
+              format-name (nth 3 item)
+              model       (nth 6 item)
+        )
+
+        (if (/= (getvar "ctab") model) 
+          (setvar "ctab" model)
+        )
+
+        (command "_.zoom" "_w" x1 x2)
+
+        (setq msg (strcat "\nПрагляд фарматкі " 
+                          (itoa idx)
+                          " з "
+                          (itoa total-sheets)
+                          " ["
+                          format-name
+                          " / Ліст: "
+                          model
+                          " / №: "
+                          (vl-princ-to-string num)
+                          "]. Націсніце Enter або Прабел для наступнай... "
+                  )
+        )
+        (getstring msg)
+        (setq idx (1+ idx))
+      )
+      (if (/= (getvar "ctab") old-ctab) 
+        (setvar "ctab" old-ctab)
+      )
+      (command "_.zoom" "_c" old-viewctr old-viewsize)
+      (princ "\nПрагляд фарматак завершаны.\n")
+    )
+  )
+  (princ)
+)
+
+
