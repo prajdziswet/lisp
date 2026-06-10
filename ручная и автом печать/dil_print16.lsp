@@ -1596,7 +1596,7 @@
           (add_edit needAdd (vl-bb-ref 'file_all))
           (progn 
             (startapp 
-              "__prog\\exe\\FormMerge\\FormMergeExe.exe"
+              "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
               (strcat "\"" (vl-bb-ref 'file_all) "\"")
             )
             (command)
