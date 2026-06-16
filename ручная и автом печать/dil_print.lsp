@@ -1596,8 +1596,8 @@
           (add_edit needAdd (vl-bb-ref 'file_all))
           (progn 
             (startapp 
-              ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-              "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+              "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
+              ;"e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
               (strcat "\"" (vl-bb-ref 'file_all) "\"")
             )
             (command)
