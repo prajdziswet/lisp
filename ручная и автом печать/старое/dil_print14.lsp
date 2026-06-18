@@ -1,453 +1,482 @@
-;вяртанне назову рысунка
-(defun namelist (/ x_temp1 x_temp2 nabor_s temp_all text n len i text)
+;РІСЏСЂС‚Р°РЅРЅРµ РЅР°Р·РѕРІСѓ СЂС‹СЃСѓРЅРєР°
+(defun namelist (/ x_temp1 x_temp2 nabor_s temp_all text n len i text) 
   (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
   (setq x_temp2 (list (- (car x2) (/ 55 mash)) (+ (last x2) (/ 5 mash))))
   (setq text "")
-  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
+  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;Р·СѓРјР°РІР°РЅРЅРµ Р°РєРЅР° РЅСѓРјР°СЂР°
   (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*EXT"))))
-  (if (and (/= nil nabor_s) (= (sslength nabor_s) 1))
-;progn
-    (progn
+  (if (and (/= nil nabor_s) (= (sslength nabor_s) 1)) 
+    ;progn
+    (progn 
       (setq temp_all (entget (ssname nabor_s 0)))
-      (if (= (cdr (assoc 0 temp_all)) "MTEXT")
-	(progn
-	  (command "_.Explode" (ssname nabor_s 0)) ;получение текста
-	  (setq temp_all (ssget "_p" '((0 . "TEXT"))))
-	  (setq i 0 len (sslength temp_all))
-	  (while (< i len)
-	    (setq text (strcat text (cdr (assoc 1 (entget (ssname temp_all i))))))
-	    (setq i (+ 1 i))
-		   )
-	  
-	  (command "_u")
-	 )
-	(if (= (cdr (assoc 0 temp_all)) "TEXT")
-	  (setq text (strcat text (cdr (assoc 1 temp_all))))
-	 )
-       );end if
-     );end progn
-    (if (and (/= nil nabor_s) (> (sslength nabor_s) 1))
-      (progn
-	(setq i 0 len (sslength nabor_s))
-      (while (< i len)
-	    (setq text (strcat text (cdr (assoc 1 (entget (ssname nabor_s i))))))
-	(setq i (+ 1 i))
-		   )
-	
-      ))
-   );end if
+      (if (= (cdr (assoc 0 temp_all)) "MTEXT") 
+        (progn 
+          (command "_.Explode" (ssname nabor_s 0)) ;РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚Р°
+          (setq temp_all (ssget "_p" '((0 . "TEXT"))))
+          (setq i   0
+                len (sslength temp_all)
+          )
+          (while (< i len) 
+            (setq text (strcat text (cdr (assoc 1 (entget (ssname temp_all i))))))
+            (setq i (+ 1 i))
+          )
+
+          (command "_u")
+        )
+        (if (= (cdr (assoc 0 temp_all)) "TEXT") 
+          (setq text (strcat text (cdr (assoc 1 temp_all))))
+        )
+      ) ;end if
+    ) ;end progn
+    (if (and (/= nil nabor_s) (> (sslength nabor_s) 1)) 
+      (progn 
+        (setq i   0
+              len (sslength nabor_s)
+        )
+        (while (< i len) 
+          (setq text (strcat text (cdr (assoc 1 (entget (ssname nabor_s i))))))
+          (setq i (+ 1 i))
+        )
+      )
+    )
+  ) ;end if
   (command "_u")
   (if (= text nil) (setq text ""))
   (setq text text)
-  
- );end defun
+);end defun
 
-;вяртанне шифру
-(defun nameshifr (temp / x_temp1 x_temp2 nabor_s temp_all text n len i text);temp nil-верхняя шапка, инакш-нижняя
-  (if (/= nil temp)
-    (progn
-  (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
-  (setq x_temp2 (list (- (car x2) (/ 15 mash)) (+ (last x2) (/ 5 mash))))
-  )
-    (progn
-  (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 60 mash))))
-  (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 50 mash))))
-  ));сканчэнне вызначэнне каардынат
+;РІСЏСЂС‚Р°РЅРЅРµ С€РёС„СЂСѓ
+(defun nameshifr (temp / x_temp1 x_temp2 nabor_s temp_all text n len i text)  ;temp nil-РІРµСЂС…РЅСЏСЏ С€Р°РїРєР°, РёРЅР°РєС€-РЅРёР¶РЅСЏСЏ
+  (if (/= nil temp) 
+    (progn 
+      (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
+      (setq x_temp2 (list (- (car x2) (/ 15 mash)) (+ (last x2) (/ 5 mash))))
+    )
+    (progn 
+      (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 60 mash))))
+      (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 50 mash))))
+    )
+  ) ;СЃРєР°РЅС‡СЌРЅРЅРµ РІС‹Р·РЅР°С‡СЌРЅРЅРµ РєР°Р°СЂРґС‹РЅР°С‚
   (setq text "")
-  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
+  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;Р·СѓРјР°РІР°РЅРЅРµ Р°РєРЅР° РЅСѓРјР°СЂР°
   (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*EXT"))))
-  (if (and (/= nil nabor_s) (= (sslength nabor_s) 1))
-;progn
-    (progn
+  (if (and (/= nil nabor_s) (= (sslength nabor_s) 1)) 
+    ;progn
+    (progn 
       (setq temp_all (entget (ssname nabor_s 0)))
-      (if (= (cdr (assoc 0 temp_all)) "MTEXT")
-	(progn
-	  (command "_.Explode" (ssname nabor_s 0)) ;получение текста
-	  (setq temp_all (ssget "_p" '((0 . "TEXT"))))
-	  (setq i 0 len (sslength temp_all))
-	  (while (< i len)
-	    (setq text (strcat text (cdr (assoc 1 (entget (ssname temp_all i))))))
-	    (setq i (+ 1 i))
-		   )
-	  
-	  (command "_u")
-	 )
-	(if (= (cdr (assoc 0 temp_all)) "TEXT")
-	  (setq text (strcat text (cdr (assoc 1 temp_all))))
-	 )
-       );end if
-     );end progn
-    (if (and (/= nil nabor_s) (> (sslength nabor_s) 1))
-      (progn
-	(setq i 0 len (sslength nabor_s))
-      (while (< i len)
-	    (setq text (strcat text (cdr (assoc 1 (entget (ssname nabor_s i))))))
-	(setq i (+ 1 i))
-		   )
-	
-      ))
-   );end if
+      (if (= (cdr (assoc 0 temp_all)) "MTEXT") 
+        (progn 
+          (command "_.Explode" (ssname nabor_s 0)) ;РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚Р°
+          (setq temp_all (ssget "_p" '((0 . "TEXT"))))
+          (setq i   0
+                len (sslength temp_all)
+          )
+          (while (< i len) 
+            (setq text (strcat text (cdr (assoc 1 (entget (ssname temp_all i))))))
+            (setq i (+ 1 i))
+          )
+
+          (command "_u")
+        )
+        (if (= (cdr (assoc 0 temp_all)) "TEXT") 
+          (setq text (strcat text (cdr (assoc 1 temp_all))))
+        )
+      ) ;end if
+    ) ;end progn
+    (if (and (/= nil nabor_s) (> (sslength nabor_s) 1)) 
+      (progn 
+        (setq i   0
+              len (sslength nabor_s)
+        )
+        (while (< i len) 
+          (setq text (strcat text (cdr (assoc 1 (entget (ssname nabor_s i))))))
+          (setq i (+ 1 i))
+        )
+      )
+    )
+  ) ;end if
   (command "_u")
   (setq text text)
-  
- )
-;сканчэнне вяртанне шифру
+)
+;СЃРєР°РЅС‡СЌРЅРЅРµ РІСЏСЂС‚Р°РЅРЅРµ С€РёС„СЂСѓ
 
-; для выбранного многострочного текста очищает форматирование.=============================================================================|;
-(defun clear-mtext1 (string-to-normalize               /
-               sub_string         sub_pos           left_string
-               right_string
-               )
-  (if (or
-    (setq sub_pos (vl-string-search "{f" string-to-normalize))
-    (setq sub_pos (vl-string-search "{\\" string-to-normalize))
-    (setq sub_pos (vl-string-search "\\f" string-to-normalize))
-    (setq sub_pos (vl-string-search "{\\f" string-to-normalize))
-    ) ;_ end of or
-    (progn
-      (setq left_string            ;все, что до "{"
-         (vl-string-trim
-           "{"
-           (substr
-         string-to-normalize
-         1
-         (vl-string-position
-           (ascii "\\")
-           string-to-normalize
-           sub_pos
-           ) ;_ end of vl-string-position
-         ) ;_ end of substr
-           ) ;_ end of vl-string-trim
-        ) ;_ end of setq
-      ;; Вот здесь была ошибка при некоторых условиях
-      (if (vl-string-position
-        (ascii ";")
-        string-to-normalize
-        sub_pos
-        ) ;_ end of vl-string-position
-    (setq right_string        ;все, что между {f и ;
-           (substr
-         string-to-normalize
-         (+ (vl-string-position
-              (ascii ";")
-              string-to-normalize
-              sub_pos
-              ) ;_ end of vl-string-position
-            2
-            ) ;_ end of +
-         ) ;_ end of substr
-          ) ;_ end of setq
-    (setq right_string "")
-    ) ;_ end of if
-      (_kpblc-clear-mtext (strcat left_string right_string))
-      ) ;_ end of progn
-    ;; Старый вариант попытки снесения "}"
-    ;;(vl-string-trim "}" string-to-normalize)
-    ;; Новый вариант снесения "}"
-    (vl-list->string
-      (vl-remove
-    (ascii "}")
-    (vl-string->list string-to-normalize)
-    ) ;_ end of vl-remove
-      ) ;_ end of vl-list->string
-    ) ;_ end of if
-  ) ;_ end of defun
-(defun clear-mtext (string-to-normalize / poz)
+; РґР»СЏ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РјРЅРѕРіРѕСЃС‚СЂРѕС‡РЅРѕРіРѕ С‚РµРєСЃС‚Р° РѕС‡РёС‰Р°РµС‚ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ.=============================================================================|;
+(defun clear-mtext1 (string-to-normalize / sub_string sub_pos left_string 
+                     right_string
+                    ) 
+  (if 
+    (or 
+      (setq sub_pos (vl-string-search "{f" string-to-normalize))
+      (setq sub_pos (vl-string-search "{\\" string-to-normalize))
+      (setq sub_pos (vl-string-search "\\f" string-to-normalize))
+      (setq sub_pos (vl-string-search "{\\f" string-to-normalize))
+    ) ;_ end of or
+    (progn 
+      (setq left_string ;РІСЃРµ, С‡С‚Рѕ РґРѕ "{"
+                        (vl-string-trim 
+                          "{"
+                          (substr 
+                            string-to-normalize
+                            1
+                            (vl-string-position 
+                              (ascii "\\")
+                              string-to-normalize
+                              sub_pos
+                            ) ;_ end of vl-string-position
+                          ) ;_ end of substr
+                        ) ;_ end of vl-string-trim
+      ) ;_ end of setq
+      ;; Р’РѕС‚ Р·РґРµСЃСЊ Р±С‹Р»Р° РѕС€РёР±РєР° РїСЂРё РЅРµРєРѕС‚РѕСЂС‹С… СѓСЃР»РѕРІРёСЏС…
+      (if 
+        (vl-string-position 
+          (ascii ";")
+          string-to-normalize
+          sub_pos
+        ) ;_ end of vl-string-position
+        (setq right_string ;РІСЃРµ, С‡С‚Рѕ РјРµР¶РґСѓ {f Рё ;
+                           (substr 
+                             string-to-normalize
+                             (+ 
+                               (vl-string-position 
+                                 (ascii ";")
+                                 string-to-normalize
+                                 sub_pos
+                               ) ;_ end of vl-string-position
+                               2
+                             ) ;_ end of +
+                           ) ;_ end of substr
+        ) ;_ end of setq
+        (setq right_string "")
+      ) ;_ end of if
+      (_kpblc-clear-mtext (strcat left_string right_string))
+    ) ;_ end of progn
+    ;; РЎС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚ РїРѕРїС‹С‚РєРё СЃРЅРµСЃРµРЅРёСЏ "}"
+    ;;(vl-string-trim "}" string-to-normalize)
+    ;; РќРѕРІС‹Р№ РІР°СЂРёР°РЅС‚ СЃРЅРµСЃРµРЅРёСЏ "}"
+    (vl-list->string 
+      (vl-remove 
+        (ascii "}")
+        (vl-string->list string-to-normalize)
+      ) ;_ end of vl-remove
+    ) ;_ end of vl-list->string
+  ) ;_ end of if
+) ;_ end of defun
+(defun clear-mtext (string-to-normalize / poz) 
   (setq string-to-normalize (clear-mtext1 string-to-normalize))
   (if (wcmatch string-to-normalize "\\*;*") 
-    (progn
-      (setq poz (+ (vl-string-search ";" string-to-normalize (vl-string-search "\\" string-to-normalize 0)) 2))
+    (progn 
+      (setq poz (+ 
+                  (vl-string-search ";" 
+                                    string-to-normalize
+                                    (vl-string-search "\\" string-to-normalize 0)
+                  )
+                  2
+                )
+      )
       (substr string-to-normalize poz (- (strlen string-to-normalize) poz -1))
-   )
-    (setq string-to-normalize string-to-normalize)
     )
+    (setq string-to-normalize string-to-normalize)
   )
+)
 ;----------------------------------------------------
 
-;--------------функция атрыманне с дин.блоку тексту----------------
-(defun get-block-att (name_bl / vla-nameobj spis atts x1temp y1temp x2temp y2temp)
-    (if (= 'LIST (type name_bl))
-    (progn
-     (setq name_bl (car name_bl))
-	)
-   )
-  ;преобразование имени ва вла
+;--------------С„СѓРЅРєС†РёСЏ Р°С‚СЂС‹РјР°РЅРЅРµ СЃ РґРёРЅ.Р±Р»РѕРєСѓ С‚РµРєСЃС‚Сѓ----------------
+(defun get-block-att (name_bl / vla-nameobj spis atts x1temp y1temp x2temp y2temp) 
+  (if (= 'LIST (type name_bl)) 
+    (progn 
+      (setq name_bl (car name_bl))
+    )
+  )
+  ;РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РёРјРµРЅРё РІР° РІР»Р°
   (setq vla-nameobj (vlax-ename->vla-object name_bl))
 
-  ;получение атрибутов
-(setq atts (vlax-safearray->list 
-                       (vlax-variant-value
-                         (vla-getattributes vla-nameobj)
-                       )))
-  ;(vla-get-tagstring tag)-название атрибута тут не будем проверять, возьмет сам атрибут
-(foreach tag atts
-  (if (= (vla-get-visible tag) :vlax-true)
-    (progn
-      (setq point (cdr (assoc 11 (entget (vlax-vla-object->ename tag)))))
-      (setq x1temp (nth 0 point) y1temp (nth 1 point))
-      (setq x2temp (nth 0 x2) y2temp (nth 1 x2))
-      (cond ((and (< (- x2temp (* mash 40)) x1temp) (> (- x2temp (* mash 25)) x1temp)
-	       (> y1temp (+ (* mash 20) y2temp)) (< y1temp (+ (* mash 30) y2temp)))
-	     (setq numa (vla-get-TextString tag))   )
-	    ((and (< (- x2temp (* mash 15)) x1temp) (> (- x2temp (* mash 5)) x1temp)
-	       (> y1temp (+ (* mash 5) y2temp)) (< y1temp (+ (* mash 13) y2temp)))
-	     (setq numa (vla-get-TextString tag))   )
-	    ((and (< (- x2temp (* mash 125)) x1temp) (> (- x2temp (* mash 55)) x1temp)
-	       (> y1temp (+ (* mash 5) y2temp)) (< y1temp (+ (* mash 20) y2temp)))
-	     (setq nameris  (clear-mtext (vla-get-TextString tag)))
-	     )
-	)
-     )
+  ;РїРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
+  (setq atts (vlax-safearray->list 
+               (vlax-variant-value 
+                 (vla-getattributes vla-nameobj)
+               )
+             )
+  )
+  ;(vla-get-tagstring tag)-РЅР°Р·РІР°РЅРёРµ Р°С‚СЂРёР±СѓС‚Р° С‚СѓС‚ РЅРµ Р±СѓРґРµРј РїСЂРѕРІРµСЂСЏС‚СЊ, РІРѕР·СЊРјРµС‚ СЃР°Рј Р°С‚СЂРёР±СѓС‚
+  (foreach tag atts 
+    (if (= (vla-get-visible tag) :vlax-true) 
+      (progn 
+        (setq point (cdr (assoc 11 (entget (vlax-vla-object->ename tag)))))
+        (setq x1temp (nth 0 point)
+              y1temp (nth 1 point)
+        )
+        (setq x2temp (nth 0 x2)
+              y2temp (nth 1 x2)
+        )
+        (cond 
+          ((and (< (- x2temp (* mash 40)) x1temp) 
+                (> (- x2temp (* mash 25)) x1temp)
+                (> y1temp (+ (* mash 20) y2temp))
+                (< y1temp (+ (* mash 30) y2temp))
+           )
+           (setq numa (vla-get-TextString tag))
+          )
+          ((and (< (- x2temp (* mash 15)) x1temp) 
+                (> (- x2temp (* mash 5)) x1temp)
+                (> y1temp (+ (* mash 5) y2temp))
+                (< y1temp (+ (* mash 13) y2temp))
+           )
+           (setq numa (vla-get-TextString tag))
+          )
+          ((and (< (- x2temp (* mash 125)) x1temp) 
+                (> (- x2temp (* mash 55)) x1temp)
+                (> y1temp (+ (* mash 5) y2temp))
+                (< y1temp (+ (* mash 20) y2temp))
+           )
+           (setq nameris (clear-mtext (vla-get-TextString tag)))
+          )
+        )
+      )
     )
-  
-  
+  )
 )
- )
 ;-------------------------------
 
 
-;выхад з пдф
-(defun exit_pdf ()
-	  (startapp "__prog\\exe\\pdf_exit.exe")
-          (command)
-    
-  );выхад з пдф
+;РІС‹С…Р°Рґ Р· РїРґС„
+(defun exit_pdf () 
+  (startapp "__prog\\exe\\pdf_exit.exe")
+  (command)
+);РІС‹С…Р°Рґ Р· РїРґС„
 
 
 
 
-;;---------------------нормализация № старонки----------------------
-(defun norma_n (/ str)
+;;---------------------РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ в„– СЃС‚Р°СЂРѕРЅРєРё----------------------
+(defun norma_n (/ str) 
   (setq str (cdr (assoc 1 (entget (ssname nabor_s 0)))))
   (setq str (vl-string-trim " " str))
-  (if (wcmatch str "#,##,###,#`.#,##`.#,###`.#,#`.##,##`.##,###`.##,#`.###,##`.###,###`.###")
-(princ str)
-(princ nil)
+  (if 
+    (wcmatch str 
+             "#,##,###,#`.#,##`.#,###`.#,#`.##,##`.##,###`.##,#`.###,##`.###,###`.###"
     )
-					;end if
+    (princ str)
+    (princ nil)
+  )
+  ;end if
 )
 
-;;---------------------нормализация № старонки(спдс)----------------------
-(defun norma_n2	(str)
+;;---------------------РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ в„– СЃС‚Р°СЂРѕРЅРєРё(СЃРїРґСЃ)----------------------
+(defun norma_n2 (str) 
   (setq str (vl-string-trim " " str))
-  (if (wcmatch str "#,##,###,#`.#,##`.#,###`.#,#`.##,##`.##,###`.##,#`.###,##`.###,###`.###")
-(princ str)
-(princ nil)
-    )					;end if
+  (if 
+    (wcmatch str 
+             "#,##,###,#`.#,##`.#,###`.#,#`.##,##`.##,###`.##,#`.###,##`.###,###`.###"
+    )
+    (princ str)
+    (princ nil)
+  ) ;end if
 )
 
 
-;;---------------------вызначэнне № старонки----------------------
-(defun numar_s (/ x_temp1 x_temp2 nabor_s xtemp temp_lm)
-  (setq temp_lm (getvar "ctab"))	;атрыманне ліста або мадэлі дзе знаходзіца карыстальнік
+;;---------------------РІС‹Р·РЅР°С‡СЌРЅРЅРµ в„– СЃС‚Р°СЂРѕРЅРєРё----------------------
+(defun numar_s (/ x_temp1 x_temp2 nabor_s xtemp temp_lm) 
+  (setq temp_lm (getvar "ctab")) ;Р°С‚СЂС‹РјР°РЅРЅРµ Р»С–СЃС‚Р° Р°Р±Рѕ РјР°РґСЌР»С– РґР·Рµ Р·РЅР°С…РѕРґР·С–С†Р° РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–Рє
 
- (setq zapret_nomer nil)
+  (setq zapret_nomer nil)
 
-  (setq
-    x_temp1 (list (- (car x2) (/ 40 mash)) (+ (last x2) (/ 30 mash)))
+  (setq x_temp1 (list (- (car x2) (/ 40 mash)) (+ (last x2) (/ 30 mash))))
+  (setq x_temp2 (list (- (car x2) (/ 25 mash)) (+ (last x2) (/ 20 mash))))
+  (if (/= model temp_lm) 
+    (setvar "ctab" model) ;РїРµСЂР°С…РѕРґ РЅР° РїР°С‚СЂСЌР±РЅС‹ Р»С–СЃС‚ Р°Р±Рѕ РјР°РґРµР»СЊ
   )
-  (setq
-    x_temp2 (list (- (car x2) (/ 25 mash)) (+ (last x2) (/ 20 mash)))
-  )
-  (if (/= model temp_lm)
-    (setvar "ctab" model)		;пераход на патрэбны ліст або мадель
-  )
-  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
+  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;Р·СѓРјР°РІР°РЅРЅРµ Р°РєРЅР° РЅСѓРјР°СЂР°
   (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
   (command "_u")
-  ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-  (if (/= model temp_lm)
-    (setvar "ctab" temp_lm)		;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+  ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;РІСЏСЂС‚Р°РЅРЅРµ Р·СѓРјР°РІР°РЅРЅСЏ
+  (if (/= model temp_lm) 
+    (setvar "ctab" temp_lm) ;РїРµСЂР°С…РѕРґ РЅР° РїР°РїСЏСЂСЌРґРЅС– Р»С–СЃС‚ РґР·Рµ Р·РЅР°С…РѕРґР·С–СѓСЃСЏ РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–Рє
   )
 
-  (if (and (/= nabor_s nil) (= (sslength nabor_s) 1))
+  (if (and (/= nabor_s nil) (= (sslength nabor_s) 1)) 
     (norma_n)
-    (progn
-      ;праверка наяунасти "листов"----------------------------
-      (setq x_temp1 (list (- (car x2) (/ 25 mash))
-			  (+ (last x2) (/ 30 mash))
-		    )
+    (progn 
+      ;РїСЂР°РІРµСЂРєР° РЅР°СЏСѓРЅР°СЃС‚Рё "Р»РёСЃС‚РѕРІ"----------------------------
+      (setq x_temp1 (list (- (car x2) (/ 25 mash)) 
+                          (+ (last x2) (/ 30 mash))
+                    )
       )
-      (setq x_temp2
-	     (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 20 mash)))
+      (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 20 mash))))
+      (if (/= model temp_lm) 
+        (setvar "ctab" model) ;РїРµСЂР°С…РѕРґ РЅР° РїР°С‚СЂСЌР±РЅС‹ Р»С–СЃС‚ Р°Р±Рѕ РјР°РґРµР»СЊ
       )
-      (if (/= model temp_lm)
-	(setvar "ctab" model)		;пераход на патрэбны ліст або мадель
-      )
-      (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
+      (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;Р·СѓРјР°РІР°РЅРЅРµ Р°РєРЅР° РЅСѓРјР°СЂР°
       (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
       (command "_u")
-      ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-      (if (/= model temp_lm)
-	(setvar "ctab" temp_lm)		;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+      ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;РІСЏСЂС‚Р°РЅРЅРµ Р·СѓРјР°РІР°РЅРЅСЏ
+      (if (/= model temp_lm) 
+        (setvar "ctab" temp_lm) ;РїРµСЂР°С…РѕРґ РЅР° РїР°РїСЏСЂСЌРґРЅС– Р»С–СЃС‚ РґР·Рµ Р·РЅР°С…РѕРґР·С–СѓСЃСЏ РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–Рє
       )
 
-      (if (and (/= nabor_s nil) (= (sslength nabor_s) 1))
-	(setq zapret_nomer (norma_n))
+      (if (and (/= nabor_s nil) (= (sslength nabor_s) 1)) 
+        (setq zapret_nomer (norma_n))
       )
-      ;---------------сканчэнне листов-------------------------
-      (if (= nil zapret_nomer)
-	(progn
-	  ;калі малы штамп
-	(setq zapret_name T)
-	
-      (setq x_temp1 (list (- (car x2) (/ 15 mash))
-			  (+ (last x2) (/ 13 mash))
-		    )
-      )
-      (setq x_temp2
-	     (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 5 mash)))
-      )
+      ;---------------СЃРєР°РЅС‡СЌРЅРЅРµ Р»РёСЃС‚РѕРІ-------------------------
+      (if (= nil zapret_nomer) 
+        (progn 
+          ;РєР°Р»С– РјР°Р»С‹ С€С‚Р°РјРї
+          (setq zapret_name T)
 
-      (if (/= model temp_lm)
-	(setvar "ctab" model)		;пераход на патрэбны ліст або мадель
-      )
-      (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
-      (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*ext"))))
-      (command "_u")
-      ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-      (if (/= model temp_lm)
-	(setvar "ctab" temp_lm)		;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
-      )
+          (setq x_temp1 (list (- (car x2) (/ 15 mash)) 
+                              (+ (last x2) (/ 13 mash))
+                        )
+          )
+          (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 5 mash))))
 
-      (if (and (/= nabor_s nil) (= (sslength nabor_s) 1))
-	(setq zapret_nomer (norma_n))
-      )					;end if
+          (if (/= model temp_lm) 
+            (setvar "ctab" model) ;РїРµСЂР°С…РѕРґ РЅР° РїР°С‚СЂСЌР±РЅС‹ Р»С–СЃС‚ Р°Р±Рѕ РјР°РґРµР»СЊ
+          )
+          (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;Р·СѓРјР°РІР°РЅРЅРµ Р°РєРЅР° РЅСѓРјР°СЂР°
+          (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*ext"))))
+          (command "_u")
+          ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;РІСЏСЂС‚Р°РЅРЅРµ Р·СѓРјР°РІР°РЅРЅСЏ
+          (if (/= model temp_lm) 
+            (setvar "ctab" temp_lm) ;РїРµСЂР°С…РѕРґ РЅР° РїР°РїСЏСЂСЌРґРЅС– Р»С–СЃС‚ РґР·Рµ Р·РЅР°С…РѕРґР·С–СѓСЃСЏ РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–Рє
+          )
 
-      )
-	(princ zapret_nomer)
-	);end if с запретом zapret_nomer-номер листов
-    )					;end progn
-  )					;end if
+          (if (and (/= nabor_s nil) (= (sslength nabor_s) 1)) 
+            (setq zapret_nomer (norma_n))
+          ) ;end if
+        )
+        (princ zapret_nomer)
+      ) ;end if СЃ Р·Р°РїСЂРµС‚РѕРј zapret_nomer-РЅРѕРјРµСЂ Р»РёСЃС‚РѕРІ
+    ) ;end progn
+  ) ;end if
+)					;РєР°РЅРµС† РІС‹Р·РЅР°С‡СЌРЅРЅРµ СЃС‚Р°СЂРѕРЅРєРё
 
-)					;канец вызначэнне старонки
-
-;;---------------------праверка супадзенне нумароу----------------------
-(defun prin_numar (/ nov_spis druk_v1 nomer_s nlist xt1 xt2 xt11 xt22)
+;;---------------------РїСЂР°РІРµСЂРєР° СЃСѓРїР°РґР·РµРЅРЅРµ РЅСѓРјР°СЂРѕСѓ----------------------
+(defun prin_numar (/ nov_spis druk_v1 nomer_s nlist xt1 xt2 xt11 xt22) 
   (setq nov_spis nil)
-  (if (and (/= druk_v nil) (/= (last druk_v) nil))
-    (progn
-      (while (and (/= druk_v nil) (/= (last druk_v) nil))
-	(setq druk_v1 nil)
-	(if (= nov_spis nil)
-	  (setq	nov_spis (list (cons (car (car druk_v))
-				     (cdr (car druk_v))
-			       )
-			 )
-	  )
-	  (setq
-	    nov_spis (append (list (cons (car (car druk_v))
-					 (cdr (car druk_v))
-				   )
-			     )
-			     nov_spis
-		     )
-	  )
-	)				;end if
-	(setq nomer_s (car (car druk_v))) ;атрыманне нумару старонки
-	(setq xt1 nil
-	      xt2 nil
-	)
-	(setq xt1 (nth 1 (car druk_v)))
-	(setq xt2 (nth 2 (car druk_v)))
-	(setq nlist 1)
-	(setq druk_v (cdr druk_v))	;знишчэнне першага-ен перайшоу у новы спис
-	(while (/= druk_v nil)
-	  (if (equal nomer_s (car (car druk_v)))
-	    (progn
-	      (setq xt11 nil
-		    xt22 nil
-	      )
-	      (setq xt11 (nth 1 (car druk_v)))
-	      (setq xt22 (nth 2 (car druk_v)))
-	      (if (and (= (nth 0 xt1) (nth 0 xt11))
-		       (= (nth 1 xt1) (nth 1 xt11))
-		       (= (nth 0 xt2) (nth 0 xt22))
-		       (= (nth 1 xt2) (nth 1 xt22))
-		  )
-		(setq druk_v (cdr druk_v)) ;знишчэнне першага
-		(progn
-		  (setq
-		    nov_spis (cons (cons (strcat nomer_s
-						 "+"
-						 (rtos nlist 2 0)
-					 )
-					 (cdr (car druk_v))
-				   )
-				   nov_spis
-			     )
-		  )
-		  (setq nlist (1+ nlist))
-		  (setq druk_v (cdr druk_v)) ;знишчэнне першага
-		)
-	      )				;end - progn
-
-	    )
-	    (progn
-	      (if (/= druk_v1 nil)
-		(setq druk_v1 (cons (car druk_v) druk_v1))
-		(setq druk_v1 (list (car druk_v)))
-	      )
-	      (setq druk_v (cdr druk_v)) ;знишчэнне першага
-	    )
-	  )				;end if
-	)				;end while
-	(setq druk_v druk_v1)
-
-      )					;end while
-      (if (and (/= druk_v nil) (= (last druk_v) nil))
-	(setq nov_spis
-	       (append
-		 nov_spis
-		 (list (cons (car druk_v) (cdr druk_v)))
-	       )
-	)
+  (if (and (/= druk_v nil) (/= (last druk_v) nil)) 
+    (progn 
+      (while (and (/= druk_v nil) (/= (last druk_v) nil)) 
+        (setq druk_v1 nil)
+        (if (= nov_spis nil) 
+          (setq nov_spis (list 
+                           (cons (car (car druk_v)) 
+                                 (cdr (car druk_v))
+                           )
+                         )
+          )
+          (setq nov_spis (append 
+                           (list 
+                             (cons (car (car druk_v)) 
+                                   (cdr (car druk_v))
+                             )
+                           )
+                           nov_spis
+                         )
+          )
+        ) ;end if
+        (setq nomer_s (car (car druk_v))) ;Р°С‚СЂС‹РјР°РЅРЅРµ РЅСѓРјР°СЂСѓ СЃС‚Р°СЂРѕРЅРєРё
+        (setq xt1 nil
+              xt2 nil
+        )
+        (setq xt1 (nth 1 (car druk_v)))
+        (setq xt2 (nth 2 (car druk_v)))
+        (setq nlist 1)
+        (setq druk_v (cdr druk_v)) ;Р·РЅРёС€С‡СЌРЅРЅРµ РїРµСЂС€Р°РіР°-РµРЅ РїРµСЂР°Р№С€РѕСѓ Сѓ РЅРѕРІС‹ СЃРїРёСЃ
+        (while (/= druk_v nil) 
+          (if (equal nomer_s (car (car druk_v))) 
+            (progn 
+              (setq xt11 nil
+                    xt22 nil
+              )
+              (setq xt11 (nth 1 (car druk_v)))
+              (setq xt22 (nth 2 (car druk_v)))
+              (if 
+                (and (= (nth 0 xt1) (nth 0 xt11)) 
+                     (= (nth 1 xt1) (nth 1 xt11))
+                     (= (nth 0 xt2) (nth 0 xt22))
+                     (= (nth 1 xt2) (nth 1 xt22))
+                )
+                (setq druk_v (cdr druk_v)) ;Р·РЅРёС€С‡СЌРЅРЅРµ РїРµСЂС€Р°РіР°
+                (progn 
+                  (setq nov_spis (cons 
+                                   (cons 
+                                     (strcat nomer_s 
+                                             "+"
+                                             (rtos nlist 2 0)
+                                     )
+                                     (cdr (car druk_v))
+                                   )
+                                   nov_spis
+                                 )
+                  )
+                  (setq nlist (1+ nlist))
+                  (setq druk_v (cdr druk_v)) ;Р·РЅРёС€С‡СЌРЅРЅРµ РїРµСЂС€Р°РіР°
+                )
+              ) ;end - progn
+            )
+            (progn 
+              (if (/= druk_v1 nil) 
+                (setq druk_v1 (cons (car druk_v) druk_v1))
+                (setq druk_v1 (list (car druk_v)))
+              )
+              (setq druk_v (cdr druk_v)) ;Р·РЅРёС€С‡СЌРЅРЅРµ РїРµСЂС€Р°РіР°
+            )
+          ) ;end if
+        ) ;end while
+        (setq druk_v druk_v1)
+      ) ;end while
+      (if (and (/= druk_v nil) (= (last druk_v) nil)) 
+        (setq nov_spis (append 
+                         nov_spis
+                         (list (cons (car druk_v) (cdr druk_v)))
+                       )
+        )
       )
       (setq druk_v nov_spis)
-    )					;end progn
-    (progn
-      (if (/= druk_v nil)
-	(setq druk_v (cons (car druk_v) (cdr druk_v)))
+    ) ;end progn
+    (progn 
+      (if (/= druk_v nil) 
+        (setq druk_v (cons (car druk_v) (cdr druk_v)))
       )
     )
-  )					;end if
+  ) ;end if
 )					;end defun vuznach povtor
 
-;;---------------------прастауленне невызначаных нумароу----------------------
-(defun zad_n (/ nlist)
+;;---------------------РїСЂР°СЃС‚Р°СѓР»РµРЅРЅРµ РЅРµРІС‹Р·РЅР°С‡Р°РЅС‹С… РЅСѓРјР°СЂРѕСѓ----------------------
+(defun zad_n (/ nlist) 
   (setq nlist 1)
-  (while (/= druk_n nil)
-    (if	(/= druk_v nil)
-      (if (/= (last druk_n) nil)
-	(setq druk_v (append druk_v
-			     (list (cons (strcat (rtos nlist 2 0) "~")
-					 (cdr (car druk_n))
-				   )
-			     )
-		     )
-	)
-	(setq druk_v
-	       (cons (cons (strcat (rtos nlist 2 0) "~") (cdr druk_n))
-		     druk_v
-	       )
-	)
-      )					;end if
-      (if (/= (last druk_n) nil)
-	(setq druk_v (list (cons (strcat (rtos nlist 2 0) "~")
-				 (cdr (car druk_n))
-			   )
-		     )
-	)
-	(setq druk_v (cons (strcat (rtos nlist 2 0) "~") (cdr druk_n)))
-      )					;end if
-    )					;end if ///
+  (while (/= druk_n nil) 
+    (if (/= druk_v nil) 
+      (if (/= (last druk_n) nil) 
+        (setq druk_v (append druk_v 
+                             (list 
+                               (cons (strcat (rtos nlist 2 0) "~") 
+                                     (cdr (car druk_n))
+                               )
+                             )
+                     )
+        )
+        (setq druk_v (cons (cons (strcat (rtos nlist 2 0) "~") (cdr druk_n)) 
+                           druk_v
+                     )
+        )
+      ) ;end if
+      (if (/= (last druk_n) nil) 
+        (setq druk_v (list 
+                       (cons (strcat (rtos nlist 2 0) "~") 
+                             (cdr (car druk_n))
+                       )
+                     )
+        )
+        (setq druk_v (cons (strcat (rtos nlist 2 0) "~") (cdr druk_n)))
+      ) ;end if
+    ) ;end if ///
     (setq nlist (1+ nlist))
-    (if	(/= (last druk_n) nil)
+    (if (/= (last druk_n) nil) 
       (setq druk_n (cdr druk_n))
       (setq druk_n nil)
     )
   )
-)					;end zadфту num
+)					;end zadС„С‚Сѓ num
 
 ;=================================================================
 
@@ -455,241 +484,245 @@
 
 ;=================================================================
 
-;;---------------------вызначэнне фармату----------------------
-(defun v_formats ( / dis1 dis2 mash)
-  ;нормализация координат
+;;---------------------РІС‹Р·РЅР°С‡СЌРЅРЅРµ С„Р°СЂРјР°С‚Сѓ----------------------
+(defun v_formats (/ dis1 dis2 mash) 
+  ;РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ РєРѕРѕСЂРґРёРЅР°С‚
   (normal_points)
 
-  ;определения длины сторон
+  ;РѕРїСЂРµРґРµР»РµРЅРёСЏ РґР»РёРЅС‹ СЃС‚РѕСЂРѕРЅ
   (SETQ dis1 (ABS (- (CAR x1) (CAR x2))))
   (SETQ dis2 (ABS (- (CADR x2) (CADR x1))))
 
-  (if (not mash)
-    (progn
-  ;;вызначэнне маштабу 1-1 або 1-100
-  (if (> dis1 dis2)
-    (if	(< dis1 27000)
-      (SETQ mash 1)
-      (progn
-	(SETQ dis1 (/ dis1 100))
-	(SETQ dis2 (/ dis2 100))
-	(SETQ mash 0.01)
+  (if (not mash) 
+    (progn 
+      ;;РІС‹Р·РЅР°С‡СЌРЅРЅРµ РјР°С€С‚Р°Р±Сѓ 1-1 Р°Р±Рѕ 1-100
+      (if (> dis1 dis2) 
+        (if (< dis1 27000) 
+          (SETQ mash 1)
+          (progn 
+            (SETQ dis1 (/ dis1 100))
+            (SETQ dis2 (/ dis2 100))
+            (SETQ mash 0.01)
+          )
+        )
+        (if (< dis2 27000) 
+          (SETQ mash 1)
+          (progn 
+            (SETQ dis1 (/ dis1 100))
+            (SETQ dis2 (/ dis2 100))
+            (SETQ mash 0.01)
+          )
+        )
       )
     )
-    (if	(< dis2 27000)
-      (SETQ mash 1)
-      (progn
-	(SETQ dis1 (/ dis1 100))
-	(SETQ dis2 (/ dis2 100))
-	(SETQ mash 0.01)
-      )
+    (progn 
+      (SETQ dis1 (* dis1 mash))
+      (SETQ dis2 (* dis2 mash))
     )
   )
-  )
-    (progn
-      	(SETQ dis1 (* dis1 mash))
-	(SETQ dis2 (* dis2 mash))
-     ))
 
-  ; подфункция определения//отклонения от стандарта
-  (Defun ff1 (dis11 dis22 x1 x2)
-    (if	(and (equal dis11 x1 2.01) (equal dis22 x2 2.01))
+  ; РїРѕРґС„СѓРЅРєС†РёСЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ//РѕС‚РєР»РѕРЅРµРЅРёСЏ РѕС‚ СЃС‚Р°РЅРґР°СЂС‚Р°
+  (Defun ff1 (dis11 dis22 x1 x2) 
+    (if (and (equal dis11 x1 2.01) (equal dis22 x2 2.01)) 
       T
       nil
     )
   )
 
-  (if (= format nil)
-    (if	(> dis1 dis2)
-      (progn
-	(SETQ poloz "А")
-	(SETQ format
-	       (COND
-		 ((ff1 dis1 dis2 630 297) "А4х3 (630.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 841 297) "А4х4 (841.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 1051 297) "А4х5 (1051.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 1261 297) "А4х6 (1261.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 1471 297) "А4х7 (1471.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 1682 297) "А4х8 (1682.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 1892 297) "А4х9 (1892.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 891 420) "А3х3 (891.00 x 420.00 мм)")
-		 ((ff1 dis1 dis2 1189 420) "А3х4 (1189.00 x 420.00 мм)")
-		 ((ff1 dis1 dis2 1486 420) "А3х5 (1486.00 x 420.00 мм)")
-		 ((ff1 dis1 dis2 1783 420) "А3х6 (1783.00 x 420.00 мм)")
-		 ((ff1 dis1 dis2 2080 420) "А3х7 (2080.00 x 420.00 мм)")
-		 ((ff1 dis1 dis2 1261 594) "А2х3 (1261.00 x 594.00 мм)")
-		 ((ff1 dis1 dis2 1682 594) "А2х4 (1682.00 x 594.00 мм)")
-		 ((ff1 dis1 dis2 2102 594) "А2х5 (2102.00 x 594.00 мм)")
-		 ((ff1 dis1 dis2 1783 841) "А1х3 (1783.00 x 841.00 мм)")
-		 ((ff1 dis1 dis2 2378 841) "А1х4 (2378.00 x 841.00 мм)")
-		 ((ff1 dis1 dis2 1682 1189) "А0х2 (1682.00 x 1189.00 мм)")
-		 ((ff1 dis1 dis2 2523 1189) "А0х3 (2523.00 x 1189.00 мм)")
-		 ((ff1 dis1 dis2 1189 841) "А0 (1189.00 x 841.00 мм)")
-		 ((ff1 dis1 dis2 841 594) "А1 (841.00 x 594.00 мм)")
-		 ((ff1 dis1 dis2 594 420) "А2 (594.00 x 420.00 мм)")
-		 ((ff1 dis1 dis2 420 297) "А3 (420.00 x 297.00 мм)")
-		 ((ff1 dis1 dis2 297 210) "А4 (297.00 x 210.00 мм)")
-		 (T nil)
-	       )
-	)
-      )					;то
-      (progn
-	(SETQ poloz "К")
-	(SETQ format
-	       (COND
-		 ((ff1 dis2 dis1 630 297) "А4х3 (297.00 x 630.00 мм)")
-		 ((ff1 dis2 dis1 841 297) "А4х4 (297.00 x 841.00 мм)")
-		 ((ff1 dis2 dis1 1051 297) "А4х5 (297.00 x 1051.00 мм)")
-		 ((ff1 dis2 dis1 1261 297) "А4х6 (297.00 x 1261.00 мм)")
-		 ((ff1 dis2 dis1 1471 297) "А4х7 (297.00 x 1471.00 мм)")
-		 ((ff1 dis2 dis1 1682 297) "А4х8 (297.00 x 1682.00 мм)")
-		 ((ff1 dis2 dis1 1892 297) "А4х9 (297.00 x 1892.00 мм)")
-		 ((ff1 dis2 dis1 891 420) "А3х3 (420.00 x 891.00 мм)")
-		 ((ff1 dis2 dis1 1189 420) "А3х4 (420.00 x 1189.00 мм)")
-		 ((ff1 dis2 dis1 1486 420) "А3х5 (420.00 x 1486.00 мм)")
-		 ((ff1 dis2 dis1 1783 420) "А3х6 (420.00 x 1783.00 мм)")
-		 ((ff1 dis2 dis1 2080 420) "А3х7 (420.00 x 2080.00 мм)")
-		 ((ff1 dis2 dis1 1261 594) "А2х3 (594.00 x 1261.00 мм)")
-		 ((ff1 dis2 dis1 1682 594) "А2х4 (594.00 x 1682.00 мм)")
-		 ((ff1 dis2 dis1 2102 594) "А2х5 (594.00 x 2102.00 мм)")
-		 ((ff1 dis2 dis1 1783 841) "А1х3 (841.00 x 1783.00 мм)")
-		 ((ff1 dis2 dis1 2378 841) "А1х4 (841.00 x 2378.00 мм)")
-		 ((ff1 dis2 dis1 1682 1189) "А0х2 (1189.00 x 1682.00 мм)")
-		 ((ff1 dis2 dis1 2523 1189) "А0х3 (1189.00 x 2523.00 мм)")
-		 ((ff1 dis2 dis1 1189 841) "А0 (841.00 x 1189.00 мм)")
-		 ((ff1 dis2 dis1 841 594) "А1 (594.00 x 841.00 мм)")
-		 ((ff1 dis2 dis1 594 420) "А2 (420.00 x 594.00 мм)")
-		 ((ff1 dis2 dis1 420 297) "А3 (297.00 x 420.00 мм)")
-		 ((ff1 dis2 dis1 297 210) "А4 (210.00 x 297.00 мм)")
-		 (T nil)
-	       )
-	)
-	;;закрывает иначе
-      )					;закрывает сам иф
-    )					;закрывает верх иф   
+  (if (= format nil) 
+    (if (> dis1 dis2) 
+      (progn 
+        (SETQ poloz "Рђ")
+        (SETQ format (COND 
+                       ((ff1 dis1 dis2 630 297) "Рђ4С…3 (630.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 841 297) "Рђ4С…4 (841.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 1051 297) "Рђ4С…5 (1051.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 1261 297) "Рђ4С…6 (1261.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 1471 297) "Рђ4С…7 (1471.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 1682 297) "Рђ4С…8 (1682.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 1892 297) "Рђ4С…9 (1892.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 891 420) "Рђ3С…3 (891.00 x 420.00 РјРј)")
+                       ((ff1 dis1 dis2 1189 420) "Рђ3С…4 (1189.00 x 420.00 РјРј)")
+                       ((ff1 dis1 dis2 1486 420) "Рђ3С…5 (1486.00 x 420.00 РјРј)")
+                       ((ff1 dis1 dis2 1783 420) "Рђ3С…6 (1783.00 x 420.00 РјРј)")
+                       ((ff1 dis1 dis2 2080 420) "Рђ3С…7 (2080.00 x 420.00 РјРј)")
+                       ((ff1 dis1 dis2 1261 594) "Рђ2С…3 (1261.00 x 594.00 РјРј)")
+                       ((ff1 dis1 dis2 1682 594) "Рђ2С…4 (1682.00 x 594.00 РјРј)")
+                       ((ff1 dis1 dis2 2102 594) "Рђ2С…5 (2102.00 x 594.00 РјРј)")
+                       ((ff1 dis1 dis2 1783 841) "Рђ1С…3 (1783.00 x 841.00 РјРј)")
+                       ((ff1 dis1 dis2 2378 841) "Рђ1С…4 (2378.00 x 841.00 РјРј)")
+                       ((ff1 dis1 dis2 1682 1189) "Рђ0С…2 (1682.00 x 1189.00 РјРј)")
+                       ((ff1 dis1 dis2 2523 1189) "Рђ0С…3 (2523.00 x 1189.00 РјРј)")
+                       ((ff1 dis1 dis2 1189 841) "Рђ0 (1189.00 x 841.00 РјРј)")
+                       ((ff1 dis1 dis2 841 594) "Рђ1 (841.00 x 594.00 РјРј)")
+                       ((ff1 dis1 dis2 594 420) "Рђ2 (594.00 x 420.00 РјРј)")
+                       ((ff1 dis1 dis2 420 297) "Рђ3 (420.00 x 297.00 РјРј)")
+                       ((ff1 dis1 dis2 297 210) "Рђ4 (297.00 x 210.00 РјРј)")
+                       (T nil)
+                     )
+        )
+      ) ;С‚Рѕ
+      (progn 
+        (SETQ poloz "Рљ")
+        (SETQ format (COND 
+                       ((ff1 dis2 dis1 630 297) "Рђ4С…3 (297.00 x 630.00 РјРј)")
+                       ((ff1 dis2 dis1 841 297) "Рђ4С…4 (297.00 x 841.00 РјРј)")
+                       ((ff1 dis2 dis1 1051 297) "Рђ4С…5 (297.00 x 1051.00 РјРј)")
+                       ((ff1 dis2 dis1 1261 297) "Рђ4С…6 (297.00 x 1261.00 РјРј)")
+                       ((ff1 dis2 dis1 1471 297) "Рђ4С…7 (297.00 x 1471.00 РјРј)")
+                       ((ff1 dis2 dis1 1682 297) "Рђ4С…8 (297.00 x 1682.00 РјРј)")
+                       ((ff1 dis2 dis1 1892 297) "Рђ4С…9 (297.00 x 1892.00 РјРј)")
+                       ((ff1 dis2 dis1 891 420) "Рђ3С…3 (420.00 x 891.00 РјРј)")
+                       ((ff1 dis2 dis1 1189 420) "Рђ3С…4 (420.00 x 1189.00 РјРј)")
+                       ((ff1 dis2 dis1 1486 420) "Рђ3С…5 (420.00 x 1486.00 РјРј)")
+                       ((ff1 dis2 dis1 1783 420) "Рђ3С…6 (420.00 x 1783.00 РјРј)")
+                       ((ff1 dis2 dis1 2080 420) "Рђ3С…7 (420.00 x 2080.00 РјРј)")
+                       ((ff1 dis2 dis1 1261 594) "Рђ2С…3 (594.00 x 1261.00 РјРј)")
+                       ((ff1 dis2 dis1 1682 594) "Рђ2С…4 (594.00 x 1682.00 РјРј)")
+                       ((ff1 dis2 dis1 2102 594) "Рђ2С…5 (594.00 x 2102.00 РјРј)")
+                       ((ff1 dis2 dis1 1783 841) "Рђ1С…3 (841.00 x 1783.00 РјРј)")
+                       ((ff1 dis2 dis1 2378 841) "Рђ1С…4 (841.00 x 2378.00 РјРј)")
+                       ((ff1 dis2 dis1 1682 1189) "Рђ0С…2 (1189.00 x 1682.00 РјРј)")
+                       ((ff1 dis2 dis1 2523 1189) "Рђ0С…3 (1189.00 x 2523.00 РјРј)")
+                       ((ff1 dis2 dis1 1189 841) "Рђ0 (841.00 x 1189.00 РјРј)")
+                       ((ff1 dis2 dis1 841 594) "Рђ1 (594.00 x 841.00 РјРј)")
+                       ((ff1 dis2 dis1 594 420) "Рђ2 (420.00 x 594.00 РјРј)")
+                       ((ff1 dis2 dis1 420 297) "Рђ3 (297.00 x 420.00 РјРј)")
+                       ((ff1 dis2 dis1 297 210) "Рђ4 (210.00 x 297.00 РјРј)")
+                       (T nil)
+                     )
+        )
+        ;;Р·Р°РєСЂС‹РІР°РµС‚ РёРЅР°С‡Рµ
+      ) ;Р·Р°РєСЂС‹РІР°РµС‚ СЃР°Рј РёС„
+    ) ;Р·Р°РєСЂС‹РІР°РµС‚ РІРµСЂС… РёС„
   )
- )
+)
 
-; нормализация координат
-(defun normal_points (/ xtemp)
-    ;нормализация координат
-  (if (and (= 3 (length x1)) (= 3 (length x2)) (/= 0 (length x1)))
-    (progn
+; РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ РєРѕРѕСЂРґРёРЅР°С‚
+(defun normal_points (/ xtemp) 
+  ;РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ РєРѕРѕСЂРґРёРЅР°С‚
+  (if (and (= 3 (length x1)) (= 3 (length x2)) (/= 0 (length x1))) 
+    (progn 
       (setq x1 (list (car x1) (nth 1 x1)))
       (setq x2 (list (car x2) (nth 1 x2)))
     )
   )
-  ;сканчэнне нармализации каардынат
-(if (> (nth 1 x2) (nth 1 x1))
-    (progn
+  ;СЃРєР°РЅС‡СЌРЅРЅРµ РЅР°СЂРјР°Р»РёР·Р°С†РёРё РєР°Р°СЂРґС‹РЅР°С‚
+  (if (> (nth 1 x2) (nth 1 x1)) 
+    (progn 
       (setq xtemp (nth 1 x1))
       (setq x1 (list (car x1) (nth 1 x2)))
       (setq x2 (list (car x2) xtemp))
     )
   )
-(if (> (nth 0 x1) (nth 0 x2))
-    (progn
+  (if (> (nth 0 x1) (nth 0 x2)) 
+    (progn 
       (setq xtemp (nth 0 x1))
       (setq x1 (list (car x2) (nth 1 x1)))
       (setq x2 (list xtemp (nth 1 x2)))
-    ))
+    )
   )
+)
 
 ;=================================================================
 
 ;=================================================================
 
 ;=================================================================
-(defun try (namefunc lists / catchit)
-(setq catchit (vl-catch-all-apply namefunc lists))
-(if (vl-catch-all-error-p catchit)
-  (progn
-    (print (strcat "Памылка у функціі: " (vl-symbol-name namefunc) " - " (vl-catch-all-error-message catchit)))
-    (princ)
-   )
- )
- )
-;вызначэнне фармату полилилиний
-(defun polyline_format	(nameobj / vla-nameobj property)
-  (setq nameris nil zapret_name nil format nil)
-  (if (= 'LIST (type nameobj))
-    (progn
-     (setq nameobj (car nameobj))
-	)
-   )
-  (if (/= nil (setq property (entget nameobj)))
-(progn
-	(setq model (cdr (assoc 410 property))) ;model-list
-        (setq vla-nameobj (vlax-ename->vla-object nameobj))
-	(vla-GetBoundingBox vla-nameobj 'x1 'x2)
-	(setq x1 (vlax-safearray->list x1))
-	(setq x2 (vlax-safearray->list x2))
-	(if (and (/= x1 nil) (/= x2 nil))
-	  (progn
-	   (normal_points)
-	   (v_formats)
-	   )
-	)
-  )) ;end if  
-)					;канец вызначэнне формата
+(defun try (namefunc lists / catchit) 
+  (setq catchit (vl-catch-all-apply namefunc lists))
+  (if (vl-catch-all-error-p catchit) 
+    (progn 
+      (print 
+        (strcat "РџР°РјС‹Р»РєР° Сѓ С„СѓРЅРєС†С–С–: " 
+                (vl-symbol-name namefunc)
+                " - "
+                (vl-catch-all-error-message catchit)
+        )
+      )
+      (princ)
+    )
+  )
+)
+;РІС‹Р·РЅР°С‡СЌРЅРЅРµ С„Р°СЂРјР°С‚Сѓ РїРѕР»РёР»РёР»РёРЅРёР№
+(defun polyline_format (nameobj / vla-nameobj property) 
+  (setq nameris     nil
+        zapret_name nil
+        format      nil
+  )
+  (if (= 'LIST (type nameobj)) 
+    (progn 
+      (setq nameobj (car nameobj))
+    )
+  )
+  (if (/= nil (setq property (entget nameobj))) 
+    (progn 
+      (setq model (cdr (assoc 410 property))) ;model-list
+      (setq vla-nameobj (vlax-ename->vla-object nameobj))
+      (vla-GetBoundingBox vla-nameobj 'x1 'x2)
+      (setq x1 (vlax-safearray->list x1))
+      (setq x2 (vlax-safearray->list x2))
+      (if (and (/= x1 nil) (/= x2 nil)) 
+        (progn 
+          (normal_points)
+          (v_formats)
+        )
+      )
+    )
+  ) ;end if
+)					;РєР°РЅРµС† РІС‹Р·РЅР°С‡СЌРЅРЅРµ С„РѕСЂРјР°С‚Р°
 
-;;-----------------------------друк поліліній-------------------------
-(defun poli (/	     x3	     len     nabor_poly	     list_pol
-	     x1	     x2	     format  mash    poloz   i	     i1
-	     x3	     model
-	    )
+;;-----------------------------РґСЂСѓРє РїРѕР»С–Р»С–РЅС–Р№-------------------------
+(defun poli (/ x3 len nabor_poly list_pol x1 x2 format mash poloz i i1 x3 model) 
   (setq zapret_name nil)
   (vl-load-com)
-  (if (= true_explode nil)
-  (setq nabor_poly (ssget "_X" '((0 . "LWPOLYLINE"))))
-  (setq nabor_poly (ssget "_p" '((0 . "LWPOLYLINE"))))
-    )
-
-  (if (null nabor_poly)
-
-    (progn
-      (princ "\nНе составлен список полініній. ")
-					; сообщение об отсутствии
-      (princ)				; тихий выход
-    )					; конец progn
-
-    (progn
-      (setq i	-1
-	    len	(sslength nabor_poly)
-      )
-      (repeat len
-	(setq i (1+ i))
-
-	; Выбор следующего примитива и получение его списка    
-	(setq x1 nil
-	      x2 nil
-	      x3 nil
-	)
-
-	(setq mash 1)
-	(try 'polyline_format (list (ssname nabor_poly i)));имя примитива - формат
-	;(polyline_format (ssname nabor_poly i))
-
-	(if (= format nil)
-(progn
-  (setq mash 100)
-  (try 'polyline_format (list (ssname nabor_poly i)));имя примитива - формат
-  ;(polyline_format (ssname nabor_poly i))
- )
-	)
-	
-	(if (/= format nil)
-	  (utvar nil)
-	)
-
-      )
-      ;;конец repeat
-    )					;конец progn
-
+  (if (= true_explode nil) 
+    (setq nabor_poly (ssget "_X" '((0 . "LWPOLYLINE"))))
+    (setq nabor_poly (ssget "_p" '((0 . "LWPOLYLINE"))))
   )
-  ;;конец if
 
-)					;канец дефана полі
+  (if (null nabor_poly) 
+
+    (progn 
+      (princ "\nРќРµ СЃРѕСЃС‚Р°РІР»РµРЅ СЃРїРёСЃРѕРє РїРѕР»С–РЅС–РЅС–Р№. ")
+      ; СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС‚СЃСѓС‚СЃС‚РІРёРё
+      (princ) ; С‚РёС…РёР№ РІС‹С…РѕРґ
+    ) ; РєРѕРЅРµС† progn
+
+    (progn 
+      (setq i   -1
+            len (sslength nabor_poly)
+      )
+      (repeat len 
+        (setq i (1+ i))
+
+        ; Р’С‹Р±РѕСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РїСЂРёРјРёС‚РёРІР° Рё РїРѕР»СѓС‡РµРЅРёРµ РµРіРѕ СЃРїРёСЃРєР°
+        (setq x1 nil
+              x2 nil
+              x3 nil
+        )
+
+        (setq mash 1)
+        (try 'polyline_format (list (ssname nabor_poly i))) ;РёРјСЏ РїСЂРёРјРёС‚РёРІР° - С„РѕСЂРјР°С‚
+        ;(polyline_format (ssname nabor_poly i))
+
+        (if (= format nil) 
+          (progn 
+            (setq mash 100)
+            (try 'polyline_format (list (ssname nabor_poly i))) ;РёРјСЏ РїСЂРёРјРёС‚РёРІР° - С„РѕСЂРјР°С‚
+            ;(polyline_format (ssname nabor_poly i))
+          )
+        )
+
+        (if (/= format nil) 
+          (utvar nil)
+        )
+      )
+      ;;РєРѕРЅРµС† repeat
+    ) ;РєРѕРЅРµС† progn
+  )
+  ;;РєРѕРЅРµС† if
+)					;РєР°РЅРµС† РґРµС„Р°РЅР° РїРѕР»С–
 
 ;=================================================================
 
@@ -697,66 +730,67 @@
 
 ;=================================================================
 
-;вызначэнне параметрау блоку нумар-имя
+;РІС‹Р·РЅР°С‡СЌРЅРЅРµ РїР°СЂР°РјРµС‚СЂР°Сѓ Р±Р»РѕРєСѓ РЅСѓРјР°СЂ-РёРјСЏ
 
 
-;;-----------------------------друк блокау-------------------------
-(defun blocks (/	 x3	   len	     nabor_blocks
-	       list_pol	 x1	   x2	     x3	       format
-	       mash	 poloz	   model     list_block
-	       i	 i1	   model1    temp_lm   true_explode
-	       obj	 len1  list_b1   list_b2 osmode_old_
-	      )
+;;-----------------------------РґСЂСѓРє Р±Р»РѕРєР°Сѓ-------------------------
+(defun blocks (/ x3 len nabor_blocks list_pol x1 x2 x3 format mash poloz model 
+               list_block i i1 model1 temp_lm true_explode obj len1 list_b1 list_b2 
+               osmode_old_
+              ) 
   (vl-load-com)
   ;break osmode
-   (setq osmode_old_ (getvar "osmode") )
-   (setvar "osmode" 0)
-  ;выбор блоков
-  (setq	nabor_blocks
-	 (ssget	"_X"
-		(list (cons 0 "INSERT")
-		      (cons 100 "AcDbBlockReference")
-		)
-	 )
+  (setq osmode_old_ (getvar "osmode"))
+  (setvar "osmode" 0)
+  ;РІС‹Р±РѕСЂ Р±Р»РѕРєРѕРІ
+  (setq nabor_blocks (ssget "_X" 
+                            (list (cons 0 "INSERT") 
+                                  (cons 100 "AcDbBlockReference")
+                            )
+                     )
   )
-(print nabor_blocks)(princ)
-  (if (null nabor_blocks)
+  (print nabor_blocks)
+  (princ)
+  (if (null nabor_blocks) 
 
-    (progn
-      (princ "\nНе составлен список блоков. ")
-					; сообщение об отсутствии
-      (princ)				; тихий выход
-    )					; конец progn
+    (progn 
+      (princ "\nРќРµ СЃРѕСЃС‚Р°РІР»РµРЅ СЃРїРёСЃРѕРє Р±Р»РѕРєРѕРІ. ")
+      ; СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС‚СЃСѓС‚СЃС‚РІРёРё
+      (princ) ; С‚РёС…РёР№ РІС‹С…РѕРґ
+    ) ; РєРѕРЅРµС† progn
 
-    (progn
-      (setq i	-1
-	    len	(sslength nabor_blocks)
+    (progn 
+      (setq i   -1
+            len (sslength nabor_blocks)
       )
-      (repeat len
-	(setq i (1+ i))			; Выбор следующего примитива и получение его списка
+      (repeat len 
+        (setq i (1+ i)) ; Р’С‹Р±РѕСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РїСЂРёРјРёС‚РёРІР° Рё РїРѕР»СѓС‡РµРЅРёРµ РµРіРѕ СЃРїРёСЃРєР°
         (SETQ name (ssname nabor_blocks i))
-	(if (/= nil (setq property (entget name)))
-	  (progn
-	   (setq mash (/ 1 (cdr (assoc 41 property))))
-           (try 'polyline_format (list name));имя примитива - формат
-	;--------------------------------------------------
-	(if (/= format nil)
-(progn
-  (try 'get-block-att (list name))
-  (utvar numa)
-  (setq nameris nil numa nil format nil)
- ))	
-	;end if
+        (if (/= nil (setq property (entget name))) 
+          (progn 
+            (setq mash (/ 1 (cdr (assoc 41 property))))
+            (try 'polyline_format (list name)) ;РёРјСЏ РїСЂРёРјРёС‚РёРІР° - С„РѕСЂРјР°С‚
+            ;--------------------------------------------------
+            (if (/= format nil) 
+              (progn 
+                (try 'get-block-att (list name))
+                (utvar numa)
+                (setq nameris nil
+                      numa    nil
+                      format  nil
+                )
+              )
+            )
+            ;end if
+          )
+        )
 
-      ))
-
-      ;;конец repeat
-    )					
+        ;;РєРѕРЅРµС† repeat
+      )
+    )
   )
-
-)
-(setvar "osmode" osmode_old_)
-  )					;канец дефана блокау
+  (setvar "osmode" osmode_old_)
+)					;РєР°РЅРµС† РґРµС„Р°РЅР° Р±Р»РѕРєР°Сѓ
 
 
 
@@ -766,216 +800,240 @@
 
 ;=================================================================
 
-;;---------------------вызначэнне СПДС формат----------------------
-(defun v_format_spds (/ i z f_temp numa)
+;;---------------------РІС‹Р·РЅР°С‡СЌРЅРЅРµ РЎРџР”РЎ С„РѕСЂРјР°С‚----------------------
+(defun v_format_spds (/ i z f_temp numa) 
 
   (setq format nil)
-  ;;вызначэнне маштабу
-  (if (/= (assoc 40 list1) nil)
+  ;;РІС‹Р·РЅР°С‡СЌРЅРЅРµ РјР°С€С‚Р°Р±Сѓ
+  (if (/= (assoc 40 list1) nil) 
     (setq mash (/ 1 (cdr (assoc 40 list1))))
     (setq mash 1)
   )
-;нормализация координат
-  (if (and (= 3 (length x1)) (= 3 (length x2)) (/= 0 (length x1)))
-    (progn
+  ;РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ РєРѕРѕСЂРґРёРЅР°С‚
+  (if (and (= 3 (length x1)) (= 3 (length x2)) (/= 0 (length x1))) 
+    (progn 
       (setq x1 (list (car x1) (nth 1 x1)))
       (setq x2 (list (car x2) (nth 1 x2)))
     )
   )
-(if (> (last x2) (last x1))
-    (progn
+  (if (> (last x2) (last x1)) 
+    (progn 
       (setq xtemp (last x1))
       (setq x1 (list (car x1) (last x2)))
       (setq x2 (list (car x2) xtemp))
     )
   )
-  ;;вызначэнне положения
-  (if (> (abs (- (car x2) (car x1)))
-	 (abs (- (last x1) (last x2)))
-      )
-    (SETQ poloz "А")
-    (SETQ poloz "К")
+  ;;РІС‹Р·РЅР°С‡СЌРЅРЅРµ РїРѕР»РѕР¶РµРЅРёСЏ
+  (if 
+    (> (abs (- (car x2) (car x1))) 
+       (abs (- (last x1) (last x2)))
+    )
+    (SETQ poloz "Рђ")
+    (SETQ poloz "Рљ")
   )
-  (setq	i 0
-	z 0
+  (setq i 0
+        z 0
   )
-  (while (< i 10)
-    (if	(= "Info" (cdr (nth (+ 10 z) list1)))
-      (progn
-	(setq i 10)
-	(setq z (1+ z))
+  (while (< i 10) 
+    (if (= "Info" (cdr (nth (+ 10 z) list1))) 
+      (progn 
+        (setq i 10)
+        (setq z (1+ z))
       )
-      (progn
-	(setq z (1+ z))
-	(setq i (1+ i))
+      (progn 
+        (setq z (1+ z))
+        (setq i (1+ i))
       )
     )
-  )					;end while
+  ) ;end while
 
-  (if (/= z 10)
-    (progn
+  (if (/= z 10) 
+    (progn 
       (setq f_temp (vl-string-trim " " (cdr (nth (+ 10 z) list1))))
-      (setq f_temp (substr f_temp
-			   (+ (vl-string-search "\t" f_temp) 2)
-			   (strlen f_temp)
-		   )
+      (setq f_temp (substr f_temp 
+                           (+ (vl-string-search "\t" f_temp) 2)
+                           (strlen f_temp)
+                   )
       )
-      (setq f_temp (substr f_temp
-			   (+ (vl-string-search "\t" f_temp) 2)
-			   (strlen f_temp)
-		   )
+      (setq f_temp (substr f_temp 
+                           (+ (vl-string-search "\t" f_temp) 2)
+                           (strlen f_temp)
+                   )
       )
-      ;вызначэнне нумару спдс
-      (setq
-	numa (norma_n2
-	       (substr f_temp (+ (vl-string-search "\t" f_temp) 2) 10)
-	     )
+      ;РІС‹Р·РЅР°С‡СЌРЅРЅРµ РЅСѓРјР°СЂСѓ СЃРїРґСЃ
+      (setq numa (norma_n2 
+                   (substr f_temp (+ (vl-string-search "\t" f_temp) 2) 10)
+                 )
       )
       (setq f_temp (substr f_temp 1 (vl-string-search "\n" f_temp)))
-      (setq f_temp (vl-string-subst "А" "A" f_temp))
-      (setq f_temp (vl-string-subst "х" "x" f_temp))
+      (setq f_temp (vl-string-subst "Рђ" "A" f_temp))
+      (setq f_temp (vl-string-subst "С…" "x" f_temp))
     )
   )
 
-  (if (= poloz "А")
-    (SETQ format
-	   (COND
-	     ((= "А4х3" f_temp) "А4х3 (630.00 x 297.00 мм)")
-	     ((= "А4х4" f_temp) "А4х4 (841.00 x 297.00 мм)")
-	     ((= "А4х5" f_temp) "А4х5 (1051.00 x 297.00 мм)")
-	     ((= "А4х6" f_temp) "А4х6 (1261.00 x 297.00 мм)")
-	     ((= "А4х7" f_temp) "А4х7 (1471.00 x 297.00 мм)")
-	     ((= "А4х8" f_temp) "А4х8 (1682.00 x 297.00 мм)")
-	     ((= "А4х9" f_temp) "А4х9 (1892.00 x 297.00 мм)")
-	     ((= "А3х3" f_temp) "А3х3 (891.00 x 420.00 мм)")
-	     ((= "А3х4" f_temp) "А3х4 (1189.00 x 420.00 мм)")
-	     ((= "А3х5" f_temp) "А3х5 (1486.00 x 420.00 мм)")
-	     ((= "А3х6" f_temp) "А3х6 (1783.00 x 420.00 мм)")
-	     ((= "А3х7" f_temp) "А3х7 (2080.00 x 420.00 мм)")
-	     ((= "А2х3" f_temp) "А2х3 (1261.00 x 594.00 мм)")
-	     ((= "А2х4" f_temp) "А2х4 (1682.00 x 594.00 мм)")
-	     ((= "А2х5" f_temp) "А2х5 (2102.00 x 594.00 мм)")
-	     ((= "А1х3" f_temp) "А1х3 (1783.00 x 841.00 мм)")
-	     ((= "А1х4" f_temp) "А1х4 (2378.00 x 841.00 мм)")
-	     ((= "А0х2" f_temp) "А0х2 (1682.00 x 1189.00 мм)")
-	     ((= "А0х3" f_temp) "А0х3 (2523.00 x 1189.00 мм)")
-	     ((= "А0" f_temp) "А0 (1189.00 x 841.00 мм)")
-	     ((= "А1" f_temp) "А1 (841.00 x 594.00 мм)")
-	     ((= "А2" f_temp) "А2 (594.00 x 420.00 мм)")
-	     ((= "А3" f_temp) "А3 (420.00 x 297.00 мм)")
-	     ((= "А4" f_temp) "А4 (297.00 x 210.00 мм)")
-	     (T nil)
-	   )
-    )					;то
-    (SETQ format
-	   (COND
-	     ((= "А4х3" f_temp) "А4х3 (297.00 x 630.00 мм)")
-	     ((= "А4х4" f_temp) "А4х4 (297.00 x 841.00 мм)")
-	     ((= "А4х5" f_temp) "А4х5 (297.00 x 1051.00 мм)")
-	     ((= "А4х6" f_temp) "А4х6 (297.00 x 1261.00 мм)")
-	     ((= "А4х7" f_temp) "А4х7 (297.00 x 1471.00 мм)")
-	     ((= "А4х8" f_temp) "А4х8 (297.00 x 1682.00 мм)")
-	     ((= "А4х9" f_temp) "А4х9 (297.00 x 1892.00 мм)")
-	     ((= "А3х3" f_temp) "А3х3 (420.00 x 891.00 мм)")
-	     ((= "А3х4" f_temp) "А3х4 (420.00 x 1189.00 мм)")
-	     ((= "А3х5" f_temp) "А3х5 (420.00 x 1486.00 мм)")
-	     ((= "А3х6" f_temp) "А3х6 (420.00 x 1783.00 мм)")
-	     ((= "А3х7" f_temp) "А3х7 (420.00 x 2080.00 мм)")
-	     ((= "А2х3" f_temp) "А2х3 (594.00 x 1261.00 мм)")
-	     ((= "А2х4" f_temp) "А2х4 (594.00 x 1682.00 мм)")
-	     ((= "А2х5" f_temp) "А2х5 (594.00 x 2102.00 мм)")
-	     ((= "А1х3" f_temp) "А1х3 (841.00 x 1783.00 мм)")
-	     ((= "А1х4" f_temp) "А1х4 (841.00 x 2378.00 мм)")
-	     ((= "А0х2" f_temp) "А0х2 (1189.00 x 1682.00 мм)")
-	     ((= "А0х3" f_temp) "А0х3 (1189.00 x 2523.00 мм)")
-	     ((= "А0" f_temp) "А0 (841.00 x 1189.00 мм)")
-	     ((= "А1" f_temp) "А1 (594.00 x 841.00 мм)")
-	     ((= "А2" f_temp) "А2 (420.00 x 594.00 мм)")
-	     ((= "А3" f_temp) "А3 (297.00 x 420.00 мм)")
-	     ((= "А4" f_temp) "А4 (210.00 x 297.00 мм)")
-	     (T nil)
-	   )
+  (if (= poloz "Рђ") 
+    (SETQ format (COND 
+                   ((= "Рђ4С…3" f_temp) "Рђ4С…3 (630.00 x 297.00 РјРј)")
+                   ((= "Рђ4С…4" f_temp) "Рђ4С…4 (841.00 x 297.00 РјРј)")
+                   ((= "Рђ4С…5" f_temp) "Рђ4С…5 (1051.00 x 297.00 РјРј)")
+                   ((= "Рђ4С…6" f_temp) "Рђ4С…6 (1261.00 x 297.00 РјРј)")
+                   ((= "Рђ4С…7" f_temp) "Рђ4С…7 (1471.00 x 297.00 РјРј)")
+                   ((= "Рђ4С…8" f_temp) "Рђ4С…8 (1682.00 x 297.00 РјРј)")
+                   ((= "Рђ4С…9" f_temp) "Рђ4С…9 (1892.00 x 297.00 РјРј)")
+                   ((= "Рђ3С…3" f_temp) "Рђ3С…3 (891.00 x 420.00 РјРј)")
+                   ((= "Рђ3С…4" f_temp) "Рђ3С…4 (1189.00 x 420.00 РјРј)")
+                   ((= "Рђ3С…5" f_temp) "Рђ3С…5 (1486.00 x 420.00 РјРј)")
+                   ((= "Рђ3С…6" f_temp) "Рђ3С…6 (1783.00 x 420.00 РјРј)")
+                   ((= "Рђ3С…7" f_temp) "Рђ3С…7 (2080.00 x 420.00 РјРј)")
+                   ((= "Рђ2С…3" f_temp) "Рђ2С…3 (1261.00 x 594.00 РјРј)")
+                   ((= "Рђ2С…4" f_temp) "Рђ2С…4 (1682.00 x 594.00 РјРј)")
+                   ((= "Рђ2С…5" f_temp) "Рђ2С…5 (2102.00 x 594.00 РјРј)")
+                   ((= "Рђ1С…3" f_temp) "Рђ1С…3 (1783.00 x 841.00 РјРј)")
+                   ((= "Рђ1С…4" f_temp) "Рђ1С…4 (2378.00 x 841.00 РјРј)")
+                   ((= "Рђ0С…2" f_temp) "Рђ0С…2 (1682.00 x 1189.00 РјРј)")
+                   ((= "Рђ0С…3" f_temp) "Рђ0С…3 (2523.00 x 1189.00 РјРј)")
+                   ((= "Рђ0" f_temp) "Рђ0 (1189.00 x 841.00 РјРј)")
+                   ((= "Рђ1" f_temp) "Рђ1 (841.00 x 594.00 РјРј)")
+                   ((= "Рђ2" f_temp) "Рђ2 (594.00 x 420.00 РјРј)")
+                   ((= "Рђ3" f_temp) "Рђ3 (420.00 x 297.00 РјРј)")
+                   ((= "Рђ4" f_temp) "Рђ4 (297.00 x 210.00 РјРј)")
+                   (T nil)
+                 )
+    ) ;С‚Рѕ
+    (SETQ format (COND 
+                   ((= "Рђ4С…3" f_temp) "Рђ4С…3 (297.00 x 630.00 РјРј)")
+                   ((= "Рђ4С…4" f_temp) "Рђ4С…4 (297.00 x 841.00 РјРј)")
+                   ((= "Рђ4С…5" f_temp) "Рђ4С…5 (297.00 x 1051.00 РјРј)")
+                   ((= "Рђ4С…6" f_temp) "Рђ4С…6 (297.00 x 1261.00 РјРј)")
+                   ((= "Рђ4С…7" f_temp) "Рђ4С…7 (297.00 x 1471.00 РјРј)")
+                   ((= "Рђ4С…8" f_temp) "Рђ4С…8 (297.00 x 1682.00 РјРј)")
+                   ((= "Рђ4С…9" f_temp) "Рђ4С…9 (297.00 x 1892.00 РјРј)")
+                   ((= "Рђ3С…3" f_temp) "Рђ3С…3 (420.00 x 891.00 РјРј)")
+                   ((= "Рђ3С…4" f_temp) "Рђ3С…4 (420.00 x 1189.00 РјРј)")
+                   ((= "Рђ3С…5" f_temp) "Рђ3С…5 (420.00 x 1486.00 РјРј)")
+                   ((= "Рђ3С…6" f_temp) "Рђ3С…6 (420.00 x 1783.00 РјРј)")
+                   ((= "Рђ3С…7" f_temp) "Рђ3С…7 (420.00 x 2080.00 РјРј)")
+                   ((= "Рђ2С…3" f_temp) "Рђ2С…3 (594.00 x 1261.00 РјРј)")
+                   ((= "Рђ2С…4" f_temp) "Рђ2С…4 (594.00 x 1682.00 РјРј)")
+                   ((= "Рђ2С…5" f_temp) "Рђ2С…5 (594.00 x 2102.00 РјРј)")
+                   ((= "Рђ1С…3" f_temp) "Рђ1С…3 (841.00 x 1783.00 РјРј)")
+                   ((= "Рђ1С…4" f_temp) "Рђ1С…4 (841.00 x 2378.00 РјРј)")
+                   ((= "Рђ0С…2" f_temp) "Рђ0С…2 (1189.00 x 1682.00 РјРј)")
+                   ((= "Рђ0С…3" f_temp) "Рђ0С…3 (1189.00 x 2523.00 РјРј)")
+                   ((= "Рђ0" f_temp) "Рђ0 (841.00 x 1189.00 РјРј)")
+                   ((= "Рђ1" f_temp) "Рђ1 (594.00 x 841.00 РјРј)")
+                   ((= "Рђ2" f_temp) "Рђ2 (420.00 x 594.00 РјРј)")
+                   ((= "Рђ3" f_temp) "Рђ3 (297.00 x 420.00 РјРј)")
+                   ((= "Рђ4" f_temp) "Рђ4 (210.00 x 297.00 РјРј)")
+                   (T nil)
+                 )
     )
-    ;;закрывает иначе
+    ;;Р·Р°РєСЂС‹РІР°РµС‚ РёРЅР°С‡Рµ
   )
-  (if (/= format nil)
+  (if (/= format nil) 
     (utvar numa)
   )
 )
-;канец вызначэнне формата
+;РєР°РЅРµС† РІС‹Р·РЅР°С‡СЌРЅРЅРµ С„РѕСЂРјР°С‚Р°
 
-;------------------------СПДС вызначэнне-------------------------------
-(defun spds1
-       (/ x1 x2 format mash poloz model i1 i nabor len list1 list2 name1 name2 name3)
+;------------------------РЎРџР”РЎ РІС‹Р·РЅР°С‡СЌРЅРЅРµ-------------------------------
+(defun spds1 (/ x1 x2 format mash poloz model i1 i nabor len list1 list2 name1 name2 
+              name3
+             ) 
   (setq nabor (ssget "X"))
-(vl-load-com)
-  (if (null nabor)
+  (vl-load-com)
+  (if (null nabor) 
 
-    (progn
-      (princ "\nНе составлен список. ")	; сообщение об отсутствии
-      (princ)				; тихий выход
-    )					; конец progn
+    (progn 
+      (princ "\nРќРµ СЃРѕСЃС‚Р°РІР»РµРЅ СЃРїРёСЃРѕРє. ") ; СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС‚СЃСѓС‚СЃС‚РІРёРё
+      (princ) ; С‚РёС…РёР№ РІС‹С…РѕРґ
+    ) ; РєРѕРЅРµС† progn
 
-    (progn
-      (setq i	-1
-	    len	(sslength nabor)
+    (progn 
+      (setq i   -1
+            len (sslength nabor)
       )
-      (repeat len
-	(setq i (1+ i))
-					; Выбор следующего примитива и получение его списка
-	(setq list1 (entget (ssname nabor i)))
-	(if (= "SPDSFORMAT" (strcase (cdr (assoc 0 list1))))
-	  (progn
-	    (setq nameris nil zapret_name nil)
-	    (setq list2 (vlax-ename->vla-object (ssname nabor i)))
-	    (vla-GetBoundingBox list2 'x1 'x2)
-	    (setq x1 (vlax-safearray->list x1))
-	    (setq x2 (vlax-safearray->list x2))
+      (repeat len 
+        (setq i (1+ i))
+        ; Р’С‹Р±РѕСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РїСЂРёРјРёС‚РёРІР° Рё РїРѕР»СѓС‡РµРЅРёРµ РµРіРѕ СЃРїРёСЃРєР°
+        (setq list1 (entget (ssname nabor i)))
+        (if (= "SPDSFORMAT" (strcase (cdr (assoc 0 list1)))) 
+          (progn 
+            (setq nameris     nil
+                  zapret_name nil
+            )
+            (setq list2 (vlax-ename->vla-object (ssname nabor i)))
+            (vla-GetBoundingBox list2 'x1 'x2)
+            (setq x1 (vlax-safearray->list x1))
+            (setq x2 (vlax-safearray->list x2))
 
-	    (setq model (cdr (assoc 410 list1))) ;model-list
-	    (if (<= (length list1) 95)
-	    	(if (/= (vl-position (cons 301 "Drawing type") list1) nil)
-	      (setq zapret_name T nameris nil)
-		(setq zapret_name nil nameris nil)
-		  )
-	      (progn
-	    (setq name1 (cdr (nth (+ 1 (vl-position (cons 301 "Drawing type") list1)) list1)))
-	    (if (/= nil (vl-position (cons 301 "Drawing type1") list1))
-	    (setq name2 (cdr (nth (+ 1 (vl-position (cons 301 "Drawing type1") list1)) list1)))
-	      )
-	    (if (/= nil (vl-position (cons 301 "Drawing type1") list1))
-	    (setq name3 (cdr (nth (+ 1 (vl-position (cons 301 "Drawing type2") list1)) list1)))
-	      )
-	    (if (and (/= name2 nil) (/= name3 nil))
-	    (setq nameris (vl-string-trim " " (strcat name1 name2 name3)))
-	      (setq nameris (vl-string-trim " " name1))
-	      )
-	     ));nd progn if
-	    ;вызначэнне назову рысынка
+            (setq model (cdr (assoc 410 list1))) ;model-list
+            (if (<= (length list1) 95) 
+              (if (/= (vl-position (cons 301 "Drawing type") list1) nil) 
+                (setq zapret_name T
+                      nameris     nil
+                )
+                (setq zapret_name nil
+                      nameris     nil
+                )
+              )
+              (progn 
+                (setq name1 (cdr 
+                              (nth 
+                                (+ 1 (vl-position (cons 301 "Drawing type") list1))
+                                list1
+                              )
+                            )
+                )
+                (if (/= nil (vl-position (cons 301 "Drawing type1") list1)) 
+                  (setq name2 (cdr 
+                                (nth 
+                                  (+ 1 
+                                     (vl-position (cons 301 "Drawing type1") list1)
+                                  )
+                                  list1
+                                )
+                              )
+                  )
+                )
+                (if (/= nil (vl-position (cons 301 "Drawing type1") list1)) 
+                  (setq name3 (cdr 
+                                (nth 
+                                  (+ 1 
+                                     (vl-position (cons 301 "Drawing type2") list1)
+                                  )
+                                  list1
+                                )
+                              )
+                  )
+                )
+                (if (and (/= name2 nil) (/= name3 nil)) 
+                  (setq nameris (vl-string-trim " " (strcat name1 name2 name3)))
+                  (setq nameris (vl-string-trim " " name1))
+                )
+              )
+            ) ;nd progn if
+            ;РІС‹Р·РЅР°С‡СЌРЅРЅРµ РЅР°Р·РѕРІСѓ СЂС‹СЃС‹РЅРєР°
 
-	    (if	(and (/= x1 nil) (/= x2 nil))
-	      (v_format_spds)
-	    )
-
-	  )
-
-
-	)				;);end if spdsFormat
-
+            (if (and (/= x1 nil) (/= x2 nil)) 
+              (v_format_spds)
+            )
+          )
+        ) ;);end if spdsFormat
       )
-      ;;конец repeat
-    )					;конец progn
-
+      ;;РєРѕРЅРµС† repeat
+    ) ;РєРѕРЅРµС† progn
   )
-  ;;конец if
+  ;;РєРѕРЅРµС† if
 )
 
 ;---------------------print_s-------------------
-(defun print_s (spis / x1 x2 format mash poloz model temp_lm list_n
-		fileuser fi0 cmd nameris)
-					;
+(defun print_s (spis / x1 x2 format mash poloz model temp_lm list_n fileuser fi0 cmd 
+                nameris ctb_file
+               ) 
+  ;
 
-  (setq temp_lm (getvar "ctab"))	;атрыманне ліста або мадэлі дзе знаходзіца карыстальнік
+  (setq temp_lm (getvar "ctab")) ;Р°С‚СЂС‹РјР°РЅРЅРµ Р»С–СЃС‚Р° Р°Р±Рѕ РјР°РґСЌР»С– РґР·Рµ Р·РЅР°С…РѕРґР·С–С†Р° РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–Рє
   (setq list_n (car spis))
   (if (/= list_n nil) (setq list_n1 list_n))
   (setq spis (cdr spis))
@@ -985,573 +1043,925 @@
   (setq mash (nth 3 spis))
   (setq poloz (nth 4 spis))
   (setq model (nth 5 spis))
-  (setq nameris (nth 6 spis));назва рысынка, у "наступных" не вызначаецца
+  (setq nameris (nth 6 spis)) ;РЅР°Р·РІР° СЂС‹СЃС‹РЅРєР°, Сѓ "РЅР°СЃС‚СѓРїРЅС‹С…" РЅРµ РІС‹Р·РЅР°С‡Р°РµС†С†Р°
+  (setq ctb_file (if (or (= acad_color 1) (= (nth 7 spis) T)) 
+                   "acad.ctb"
+                   "monochrome.ctb"
+                 )
+  )
 
-  (setvar "ctab" model)			;пераход на патрэбны ліст або мадель
+  (setvar "ctab" model) ;РїРµСЂР°С…РѕРґ РЅР° РїР°С‚СЂСЌР±РЅС‹ Р»С–СЃС‚ Р°Р±Рѕ РјР°РґРµР»СЊ
 
-  (if (and (/= format nil) (/= (GETVAR "LOCALE") "ENG"))
-    (progn
-					;имя рысунка
-      (if (/= list_n nil)
-	(SETQ
-	  fileuser (STRCAT (SUBSTR (GETVAR "dwgname")
-				   1
-				   (- (STRLEN (GETVAR "dwgname")) 4)
-			   )
-			   "_"
-			   list_n
-		   )
-	)
-	(SETQ fileuser (SUBSTR (GETVAR "dwgname")
-			       1
-			       (- (STRLEN (GETVAR "dwgname")) 4)
-		       )
-	)
+  (if (and (/= format nil) (/= (GETVAR "LOCALE") "ENG")) 
+    (progn 
+      ;РёРјСЏ СЂС‹СЃСѓРЅРєР°
+      (if (/= list_n nil) 
+        (SETQ fileuser (STRCAT 
+                         (SUBSTR (GETVAR "dwgname") 
+                                 1
+                                 (- (STRLEN (GETVAR "dwgname")) 4)
+                         )
+                         "_"
+                         list_n
+                       )
+        )
+        (SETQ fileuser (SUBSTR (GETVAR "dwgname") 
+                               1
+                               (- (STRLEN (GETVAR "dwgname")) 4)
+                       )
+        )
       )
-      (if (equal f_temp "")
-	(setq f_temp (strcat fileuser ".pdf"))
-	(setq f_temp (strcat f_temp "?" fileuser ".pdf"))
+      (if (equal f_temp "") 
+        (setq f_temp (strcat fileuser ".pdf"))
+        (setq f_temp (strcat f_temp "?" fileuser ".pdf"))
       )
-      
-      (if (equal ris_temp "")
-	(if (/= nil nameris)
-	(setq ris_temp (strcat fileuser ".pdf" "?"  nameris "?" list_n1))
-	(setq ris_temp (strcat fileuser ".pdf" "?"  "" "?" list_n1))
-	  )
-	(if (/= nil nameris)
-	(setq ris_temp (strcat ris_temp "|" fileuser ".pdf" "?" nameris "?" list_n1))
-	(setq ris_temp (strcat ris_temp "|" fileuser ".pdf" "?" "" "?" list_n1))
-	  )
+
+      (if (equal ris_temp "") 
+        (if (/= nil nameris) 
+          (setq ris_temp (strcat fileuser ".pdf" "?" nameris "?" list_n1))
+          (setq ris_temp (strcat fileuser ".pdf" "?" "" "?" list_n1))
+        )
+        (if (/= nil nameris) 
+          (setq ris_temp (strcat ris_temp "|" fileuser ".pdf" "?" nameris "?" list_n1))
+          (setq ris_temp (strcat ris_temp "|" fileuser ".pdf" "?" "" "?" list_n1))
+        )
       )
-					;утварэнне пути с файлом
+      ;СѓС‚РІР°СЂСЌРЅРЅРµ РїСѓС‚Рё СЃ С„Р°Р№Р»РѕРј
       (SETQ fileuser (STRCAT (GETVAR "dwgprefix") fileuser ".pdf"))
 
-  ;закрытие файла если он открыт тут (на этом компе
-  (if (= (setq fi0 (open fileuser "w")) nil)
-    (exit_pdf)
-    (close fi0)
-    )
-      
-      (if (= (setq fi0 (open fileuser "w")) nil)
-	(progn
-	  (print
-	    "Файл ужо адчыненны іншай праграмай,\nабо немагчыма запісаць у гэты каталог (няма праў)"
-	  )
-	  (princ)			; тихий выход
-	)				;канец прогона
-	(progn
-	  (close fi0)
-	  (if (or (wcmatch format "А0х2*") (wcmatch format "А0х3*")) (alert "Даннй формат(А0х2 или А0х2) будет перевен в pdf,\n но технически его невозможно будет распечатать"))
-	  (vl-file-delete fileuser)
-	  (setq cmd (GETVAR "cmdecho"))
-	  (SETVAR "cmdecho" 0)
-	  (if (/= model "Model")
-	    (command "_plot"		;Сама команда	
-		     "_y"		;Выполнить детальное задание конфигурации?:	
-		     ""			;Имя листа или <печать>:	
-		     "_DWG в PDF ЭТО.pc3" ;Имя устройства вывода:	
-		     format		;Формат листа бумаги
-		     "_Millimeters"
-		     ;;Единицы измерения размеров листа :
-		     poloz
-		     ;;Ориентация чертежа [Книжная/Альбомная]: 
-		     "_N"
-		     ;;Перевернуть чертеж? :
-		     "Рамка"
-		     ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
-		     x1
-		     ;;першая коордыната
-		     x2
-		     ;;другая коордяната
-		     mash
-		     ;;Масштаб печати :
-		     "_center"
-		     ;;Смещение от начала(x,y)или[Центрировать]:
-		     "_y"
-		     ;;Учитывать стили печати? [Да/Нет]:
-		     "monochrome.ctb"
-		     ;;Имя таблицы стилей печати: 
-		     "_y"
-		     ;;Учитывать веса линий? [Да/Нет]:
-		     "_N"
-		     ;;Масштабировать веса линий?:
-		     "_N"
-		     ;;Печатать объекты листа первыми?:
-		     "_N"
-		     ;;Скрывать объекты листа?:
-		     fileuser
-		     ;;Введите имя файла : 
-		     "_n"
-		     ;;Сохранить изменения параметров листа
-		     "_y"
-		     ;;Перейти к печати [Да/Нет]
-		    )
-	    ;;калі модель
-	    (command "_plot"		;Сама команда	
-		     "_y"		;Выполнить детальное задание конфигурации?:	
-		     ""			;Имя листа или <печать>:	
-		     "_DWG в PDF ЭТО.pc3" ;Имя устройства вывода:	
-		     format		;Формат листа бумаги
-		     "_Millimeters"
-		     ;;Единицы измерения размеров листа :
-		     poloz
-		     ;;Ориентация чертежа [Книжная/Альбомная]: 
-		     "_N"
-		     ;;Перевернуть чертеж? :
-		     "Рамка"
-		     ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
-		     x1
-		     ;;першая коордыната
-		     x2
-		     ;;другая коордяната
-		     mash
-		     ;;Масштаб печати :
-		     "_center"
-		     ;;Смещение от начала(x,y)или[Центрировать]:
-		     "_y"
-		     ;;Учитывать стили печати? [Да/Нет]:
-		     "monochrome.ctb"
-		     ;;Имя таблицы стилей печати: 
-		     "_y"
-		     ;;Учитывать веса линий? [Да/Нет]:
-		     "_N"
-		     ;;Режим вывода тонированных ВЭ:
-		     fileuser
-		     ;;Введите имя файла : 
-		     "_n"
-		     ;;Сохранить изменения параметров листа
-		     "_y"
-		     ;;Перейти к печати [Да/Нет]
-		    )
+      ;Р·Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° РµСЃР»Рё РѕРЅ РѕС‚РєСЂС‹С‚ С‚СѓС‚ (РЅР° СЌС‚РѕРј РєРѕРјРїРµ
+      (if (= (setq fi0 (open fileuser "w")) nil) 
+        (exit_pdf)
+        (close fi0)
+      )
 
-	  )
-	  (SETVAR "cmdecho" cmd)
-	  (princ (STRCAT "Файл захаваны:" fileuser))
-	  (PRINC
-	    "\n-----------------------------------------------------------\n"
-	  )
-	  (princ)
-	)
+      (if (= (setq fi0 (open fileuser "w")) nil) 
+        (progn 
+          (print 
+            "Р¤Р°Р№Р» СѓР¶Рѕ Р°РґС‡С‹РЅРµРЅРЅС‹ С–РЅС€Р°Р№ РїСЂР°РіСЂР°РјР°Р№,\nР°Р±Рѕ РЅРµРјР°РіС‡С‹РјР° Р·Р°РїС–СЃР°С†СЊ Сѓ РіСЌС‚С‹ РєР°С‚Р°Р»РѕРі (РЅСЏРјР° РїСЂР°Сћ)"
+          )
+          (princ) ; С‚РёС…РёР№ РІС‹С…РѕРґ
+        ) ;РєР°РЅРµС† РїСЂРѕРіРѕРЅР°
+        (progn 
+          (close fi0)
+          (if (or (wcmatch format "Рђ0С…2*") (wcmatch format "Рђ0С…3*")) 
+            (alert "Р”Р°РЅРЅР№ С„РѕСЂРјР°С‚(Рђ0С…2 РёР»Рё Рђ0С…2) Р±СѓРґРµС‚ РїРµСЂРµРІРµРЅ РІ pdf,\n РЅРѕ С‚РµС…РЅРёС‡РµСЃРєРё РµРіРѕ РЅРµРІРѕР·РјРѕР¶РЅРѕ Р±СѓРґРµС‚ СЂР°СЃРїРµС‡Р°С‚Р°С‚СЊ")
+          )
+          (vl-file-delete fileuser)
+          (setq cmd (GETVAR "cmdecho"))
+          (SETVAR "cmdecho" 0)
+          (if (/= model "Model") 
+            (command "_plot" ;РЎР°РјР° РєРѕРјР°РЅРґР°
+                     "_y" ;Р’С‹РїРѕР»РЅРёС‚СЊ РґРµС‚Р°Р»СЊРЅРѕРµ Р·Р°РґР°РЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё?:
+                     "" ;РРјСЏ Р»РёСЃС‚Р° РёР»Рё <РїРµС‡Р°С‚СЊ>:
+                     "_DWG РІ PDF Р­РўРћ.pc3" ;РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°:
+                     format ;Р¤РѕСЂРјР°С‚ Р»РёСЃС‚Р° Р±СѓРјР°РіРё
+                     "_Millimeters" 
+                     ;;Р•РґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ Р»РёСЃС‚Р° :
+                     poloz 
+                     ;;РћСЂРёРµРЅС‚Р°С†РёСЏ С‡РµСЂС‚РµР¶Р° [РљРЅРёР¶РЅР°СЏ/РђР»СЊР±РѕРјРЅР°СЏ]:
+                     "_N" 
+                     ;;РџРµСЂРµРІРµСЂРЅСѓС‚СЊ С‡РµСЂС‚РµР¶? :
+                     "Р Р°РјРєР°" 
+                     ;;РџРµС‡Р°С‚Р°РµРјР°СЏ РѕР±Р»Р°СЃС‚СЊ [Р­РєСЂР°РЅ/Р“СЂР°РЅРёС†С‹/Р›РёСЃС‚/Р’РёРґ/Р Р°РјРєР°]:
+                     x1 
+                     ;;РїРµСЂС€Р°СЏ РєРѕРѕСЂРґС‹РЅР°С‚Р°
+                     x2 
+                     ;;РґСЂСѓРіР°СЏ РєРѕРѕСЂРґСЏРЅР°С‚Р°
+                     mash 
+                     ;;РњР°СЃС€С‚Р°Р± РїРµС‡Р°С‚Рё :
+                     "_center" 
+                     ;;РЎРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р°(x,y)РёР»Рё[Р¦РµРЅС‚СЂРёСЂРѕРІР°С‚СЊ]:
+                     "_y" 
+                     ;;РЈС‡РёС‚С‹РІР°С‚СЊ СЃС‚РёР»Рё РїРµС‡Р°С‚Рё? [Р”Р°/РќРµС‚]:
+                     ctb_file 
+                     ;;РРјСЏ С‚Р°Р±Р»РёС†С‹ СЃС‚РёР»РµР№ РїРµС‡Р°С‚Рё:
+                     "_y" 
+                     ;;РЈС‡РёС‚С‹РІР°С‚СЊ РІРµСЃР° Р»РёРЅРёР№? [Р”Р°/РќРµС‚]:
+                     "_N" 
+                     ;;РњР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ РІРµСЃР° Р»РёРЅРёР№?:
+                     "_N" 
+                     ;;РџРµС‡Р°С‚Р°С‚СЊ РѕР±СЉРµРєС‚С‹ Р»РёСЃС‚Р° РїРµСЂРІС‹РјРё?:
+                     "_N" 
+                     ;;РЎРєСЂС‹РІР°С‚СЊ РѕР±СЉРµРєС‚С‹ Р»РёСЃС‚Р°?:
+                     fileuser 
+                     ;;Р’РІРµРґРёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° :
+                     "_n" 
+                     ;;РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Р»РёСЃС‚Р°
+                     "_y" 
+                     ;;РџРµСЂРµР№С‚Рё Рє РїРµС‡Р°С‚Рё [Р”Р°/РќРµС‚]
+            )
+            ;;РєР°Р»С– РјРѕРґРµР»СЊ
+            (command "_plot" ;РЎР°РјР° РєРѕРјР°РЅРґР°
+                     "_y" ;Р’С‹РїРѕР»РЅРёС‚СЊ РґРµС‚Р°Р»СЊРЅРѕРµ Р·Р°РґР°РЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё?:
+                     "" ;РРјСЏ Р»РёСЃС‚Р° РёР»Рё <РїРµС‡Р°С‚СЊ>:
+                     "_DWG РІ PDF Р­РўРћ.pc3" ;РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°:
+                     format ;Р¤РѕСЂРјР°С‚ Р»РёСЃС‚Р° Р±СѓРјР°РіРё
+                     "_Millimeters" 
+                     ;;Р•РґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ Р»РёСЃС‚Р° :
+                     poloz 
+                     ;;РћСЂРёРµРЅС‚Р°С†РёСЏ С‡РµСЂС‚РµР¶Р° [РљРЅРёР¶РЅР°СЏ/РђР»СЊР±РѕРјРЅР°СЏ]:
+                     "_N" 
+                     ;;РџРµСЂРµРІРµСЂРЅСѓС‚СЊ С‡РµСЂС‚РµР¶? :
+                     "Р Р°РјРєР°" 
+                     ;;РџРµС‡Р°С‚Р°РµРјР°СЏ РѕР±Р»Р°СЃС‚СЊ [Р­РєСЂР°РЅ/Р“СЂР°РЅРёС†С‹/Р›РёСЃС‚/Р’РёРґ/Р Р°РјРєР°]:
+                     x1 
+                     ;;РїРµСЂС€Р°СЏ РєРѕРѕСЂРґС‹РЅР°С‚Р°
+                     x2 
+                     ;;РґСЂСѓРіР°СЏ РєРѕРѕСЂРґСЏРЅР°С‚Р°
+                     mash 
+                     ;;РњР°СЃС€С‚Р°Р± РїРµС‡Р°С‚Рё :
+                     "_center" 
+                     ;;РЎРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р°(x,y)РёР»Рё[Р¦РµРЅС‚СЂРёСЂРѕРІР°С‚СЊ]:
+                     "_y" 
+                     ;;РЈС‡РёС‚С‹РІР°С‚СЊ СЃС‚РёР»Рё РїРµС‡Р°С‚Рё? [Р”Р°/РќРµС‚]:
+                     ctb_file 
+                     ;;РРјСЏ С‚Р°Р±Р»РёС†С‹ СЃС‚РёР»РµР№ РїРµС‡Р°С‚Рё:
+                     "_y" 
+                     ;;РЈС‡РёС‚С‹РІР°С‚СЊ РІРµСЃР° Р»РёРЅРёР№? [Р”Р°/РќРµС‚]:
+                     "_N" 
+                     ;;Р РµР¶РёРј РІС‹РІРѕРґР° С‚РѕРЅРёСЂРѕРІР°РЅРЅС‹С… Р’Р­:
+                     fileuser 
+                     ;;Р’РІРµРґРёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° :
+                     "_n" 
+                     ;;РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Р»РёСЃС‚Р°
+                     "_y" 
+                     ;;РџРµСЂРµР№С‚Рё Рє РїРµС‡Р°С‚Рё [Р”Р°/РќРµС‚]
+            )
+          )
+          (SETVAR "cmdecho" cmd)
+          (princ (STRCAT "Р¤Р°Р№Р» Р·Р°С…Р°РІР°РЅС‹:" fileuser))
+          (PRINC 
+            "\n-----------------------------------------------------------\n"
+          )
+          (princ)
+        )
       )
     )
-  )					;канец ифа
+  ) ;РєР°РЅРµС† РёС„Р°
 
-  (setvar "ctab" temp_lm)		;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+  (setvar "ctab" temp_lm) ;РїРµСЂР°С…РѕРґ РЅР° РїР°РїСЏСЂСЌРґРЅС– Р»С–СЃС‚ РґР·Рµ Р·РЅР°С…РѕРґР·С–СѓСЃСЏ РєР°СЂС‹СЃС‚Р°Р»СЊРЅС–Рє
 
-  ;закрытие пдф
-      (exit_pdf)
-
-  
-);канец принта
+  ;Р·Р°РєСЂС‹С‚РёРµ РїРґС„
+  (exit_pdf)
+);РєР°РЅРµС† РїСЂРёРЅС‚Р°
 
 
-;------------------------ПЕЧАТЬ---------------------------------
-(defun peshat (/ list_n1)
-  (if (and (/= druk_v nil) (= (length druk_v) 1))
-    (progn
-      (if (= (setq list_n1 (caar druk_v)) nil)
-	(setq list_n1 "")
-       )
-     (setq druk_v (list (cons nil (cdr (car druk_v)))))
-  ))
-  (if (/= druk_v nil)
-    (if	(/= (last druk_v) nil)
-      (progn
-	(while (and (/= druk_v nil) (/= (last druk_v) nil))
-	  (print_s (car druk_v))
-	  (setq druk_v (cdr druk_v))
-	)				;end while
-	(if (and (/= druk_v nil) (= (last druk_v) nil))
-	  (progn
-	    (print_s druk_v)
-	    (setq druk_v nil)
-	  )
-	)
-      )					;end progn
+;------------------------РџР•Р§РђРўР¬---------------------------------
+(defun peshat (/ list_n1) 
+  (if (and (/= druk_v nil) (= (length druk_v) 1)) 
+    (progn 
+      (if (= (setq list_n1 (caar druk_v)) nil) 
+        (setq list_n1 "")
+      )
+      (setq druk_v (list (cons nil (cdr (car druk_v)))))
+    )
+  )
+  (if (/= druk_v nil) 
+    (if (/= (last druk_v) nil) 
+      (progn 
+        (while (and (/= druk_v nil) (/= (last druk_v) nil)) 
+          (print_s (car druk_v))
+          (setq druk_v (cdr druk_v))
+        ) ;end while
+        (if (and (/= druk_v nil) (= (last druk_v) nil)) 
+          (progn 
+            (print_s druk_v)
+            (setq druk_v nil)
+          )
+        )
+      ) ;end progn
       (print_s druk_v)
-    )					;end if
-  )					;end if
-
+    ) ;end if
+  ) ;end if
 )
 
-;------------------------параунанне каардынат--------------------------
-(defun kordinat (x1 x2 x4 x5 / xtemp)
+;------------------------РїР°СЂР°СѓРЅР°РЅРЅРµ РєР°Р°СЂРґС‹РЅР°С‚--------------------------
+(defun kordinat (x1 x2 x4 x5 / xtemp) 
 
-  ;нармалізація групп каардынат
-    (if (and (= 3 (length x1)) (= 3 (length x2)) (/= 0 (length x1)))
-    (progn
+  ;РЅР°СЂРјР°Р»С–Р·Р°С†С–СЏ РіСЂСѓРїРї РєР°Р°СЂРґС‹РЅР°С‚
+  (if (and (= 3 (length x1)) (= 3 (length x2)) (/= 0 (length x1))) 
+    (progn 
       (setq x1 (list (car x1) (nth 1 x1)))
       (setq x2 (list (car x2) (nth 1 x2)))
     )
   )
 
-  (if (> (last x2) (last x1))
-    (progn
+  (if (> (last x2) (last x1)) 
+    (progn 
       (setq xtemp (last x1))
       (setq x1 (list (car x1) (last x2)))
       (setq x2 (list (car x2) xtemp))
     )
   )
 
-      (if (and (= 3 (length x4)) (= 3 (length x5)) (/= 0 (length x4)))
-    (progn
+  (if (and (= 3 (length x4)) (= 3 (length x5)) (/= 0 (length x4))) 
+    (progn 
       (setq x4 (list (car x4) (nth 1 x4)))
       (setq x5 (list (car x5) (nth 1 x5)))
     )
   )
 
-  (if (> (last x5) (last x4))
-    (progn
+  (if (> (last x5) (last x4)) 
+    (progn 
       (setq xtemp (last x4))
       (setq x4 (list (car x4) (last x5)))
       (setq x5 (list (car x5) xtemp))
     )
   )
-;сканчэнне нармалізаціі
-  
-  (if (and (equal (car x1) (car x4) 0.0001) (equal (last x1) (last x4) 0.0001) (equal (car x2) (car x5) 0.0001) (equal (last x2) (last x5) 0.0001))
-(princ T)
-(princ nil)
- )
-  
-  )
-;number list
-(defun len (lst / q)
-  (if (AND (/= lst nil) (listp druk_n))
-   (cond ((null lst) 0)
-         (t (+ 1 (len (cdr lst)))))
-    (setq q 0)
-    ))
+  ;СЃРєР°РЅС‡СЌРЅРЅРµ РЅР°СЂРјР°Р»С–Р·Р°С†С–С–
 
-;------------------------знішчэнне дулікатау--------------------------
-(defun del_dubl (/ temp_car temp1 temp2 temp3 druk1 druk2)
-    (print (strcat "Колькасць да знішчэнне дулікатаў рысункаў: " (rtos (+ (len druk_n) (len druk_v)))))
-    (print)
-  ;апрацоука нявызначанных
-(while (/= nil druk_n)
-  (setq temp_car (car druk_n))
-  (setq temp1 (cdr druk_n))
-  (while (/= nil temp1)
-    (if (and (kordinat (nth 1 temp_car) (nth 2 temp_car) (nth 1 (car temp1)) (nth 2 (car temp1))) (= (nth 6 (car temp1)) (nth 6 temp_car)))
-      (setq temp1 (cdr temp1))
-      (progn
-	(if (= nil temp2)
-	  (setq temp2 (list (car temp1)))
-	  (setq temp2 (append temp2 (list (car temp1))))
-	  );end if
-	(setq temp1 (cdr temp1))
-	);end progn
-      )
-    );end pod while
-
-  ;перанос каров в масів
-  	(if (= nil temp3)
-	  (setq temp3 (list temp_car))
-	  (setq temp3 (append temp3 (list temp_car)))
-	  );end if
-  
-  ;сброс значэннеу
-  (setq druk_n temp2)
-  (setq temp1 nil temp2 nil)
-  
-  );end while
-  (setq druk_n temp3)
-  (setq temp1 nil temp2 nil temp3 nil)
-
-    ;апрацоука вызначанных
-(while (/= nil druk_v)
-  (setq temp_car (car druk_v))
-  (setq temp1 (cdr druk_v))
-  (while (/= nil temp1)
-    (if (and (kordinat (nth 1 temp_car) (nth 2 temp_car) (nth 1 (car temp1)) (nth 2 (car temp1))) (= (nth 6 (car temp1)) (nth 6 temp_car)))
-      (setq temp1 (cdr temp1))
-      (progn
-	(if (= nil temp2)
-	  (setq temp2 (list (car temp1)))
-	  (setq temp2 (append temp2 (list (car temp1))))
-	  );end if
-	(setq temp1 (cdr temp1))
-	);end progn
-      )
-    );end pod while
-
-  ;перанос каров в масів
-  	(if (= nil temp3)
-	  (setq temp3 (list temp_car))
-	  (setq temp3 (append temp3 (list temp_car)))
-	  );end if
-  
-  ;сброс значэннеу
-  (setq druk_v temp2)
-  (setq temp1 nil temp2 nil)
-  
-  );end while
-  (setq druk_v temp3)
-  (setq temp1 nil temp2 nil temp3 nil)
-
-  ;удаленіе еслі в ненумерованном спіске совпадает в нумерованным
-  (setq druk1 druk_n druk2 druk_v bool nil)
-  (while (and (/= nil druk1) (/= nil druk2))
-  (setq temp_car (car druk1))
-  (setq temp1 druk2)
-  (while (/= nil temp1)
-    (if (and (= bool nil) (kordinat (nth 1 temp_car) (nth 2 temp_car) (nth 1 (car temp1)) (nth 2 (car temp1))) (= (nth 6 (car temp1)) (nth 6 temp_car)))
-      (setq bool T)
-      (setq temp1 (cdr temp1))
-      )
-    );end pod while
-
-  (if (= bool nil)
-  ;перанос каров в масів
-  	(if (= nil temp3)
-	  (setq temp3 (list temp_car))
-	  (setq temp3 (append temp3 (list temp_car)))
-	  );end if
+  (if 
+    (and (equal (car x1) (car x4) 0.0001) 
+         (equal (last x1) (last x4) 0.0001)
+         (equal (car x2) (car x5) 0.0001)
+         (equal (last x2) (last x5) 0.0001)
     )
-  
-  ;сброс значэннеу
-  (setq druk1 (cdr druk1))
-  (setq temp1 nil bool nil)
-  
+    (princ T)
+    (princ nil)
+  )
+)
+;number list
+(defun len (lst / q) 
+  (if (AND (/= lst nil) (listp druk_n)) 
+    (cond 
+      ((null lst) 0)
+      (t (+ 1 (len (cdr lst))))
+    )
+    (setq q 0)
+  )
+)
+
+;------------------------Р·РЅС–С€С‡СЌРЅРЅРµ РґСѓР»С–РєР°С‚Р°Сѓ--------------------------
+(defun del_dubl (/ temp_car temp1 temp2 temp3 druk1 druk2) 
+  (print 
+    (strcat "РљРѕР»СЊРєР°СЃС†СЊ РґР° Р·РЅС–С€С‡СЌРЅРЅРµ РґСѓР»С–РєР°С‚Р°Сћ СЂС‹СЃСѓРЅРєР°Сћ: " 
+            (rtos (+ (len druk_n) (len druk_v)))
+    )
+  )
+  (print)
+  ;Р°РїСЂР°С†РѕСѓРєР° РЅСЏРІС‹Р·РЅР°С‡Р°РЅРЅС‹С…
+  (while (/= nil druk_n) 
+    (setq temp_car (car druk_n))
+    (setq temp1 (cdr druk_n))
+    (while (/= nil temp1) 
+      (if 
+        (and 
+          (kordinat 
+            (nth 1 temp_car)
+            (nth 2 temp_car)
+            (nth 1 (car temp1))
+            (nth 2 (car temp1))
+          )
+          (= (nth 6 (car temp1)) (nth 6 temp_car))
+        )
+        (setq temp1 (cdr temp1))
+        (progn 
+          (if (= nil temp2) 
+            (setq temp2 (list (car temp1)))
+            (setq temp2 (append temp2 (list (car temp1))))
+          ) ;end if
+          (setq temp1 (cdr temp1))
+        ) ;end progn
+      )
+    ) ;end pod while
+
+    ;РїРµСЂР°РЅРѕСЃ РєР°СЂРѕРІ РІ РјР°СЃС–РІ
+    (if (= nil temp3) 
+      (setq temp3 (list temp_car))
+      (setq temp3 (append temp3 (list temp_car)))
+    ) ;end if
+
+    ;СЃР±СЂРѕСЃ Р·РЅР°С‡СЌРЅРЅРµСѓ
+    (setq druk_n temp2)
+    (setq temp1 nil
+          temp2 nil
+    )
+  ) ;end while
+  (setq druk_n temp3)
+  (setq temp1 nil
+        temp2 nil
+        temp3 nil
   )
 
-  (if (/= temp3 nil)
-  (setq druk_n temp3))
-  
-    (print (strcat "Колькасць пасля знішчэнне дулікатаў рысункаў: " (rtos (+ (len druk_n) (len druk_v)))))
-    (print)
+  ;Р°РїСЂР°С†РѕСѓРєР° РІС‹Р·РЅР°С‡Р°РЅРЅС‹С…
+  (while (/= nil druk_v) 
+    (setq temp_car (car druk_v))
+    (setq temp1 (cdr druk_v))
+    (while (/= nil temp1) 
+      (if 
+        (and 
+          (kordinat 
+            (nth 1 temp_car)
+            (nth 2 temp_car)
+            (nth 1 (car temp1))
+            (nth 2 (car temp1))
+          )
+          (= (nth 6 (car temp1)) (nth 6 temp_car))
+        )
+        (setq temp1 (cdr temp1))
+        (progn 
+          (if (= nil temp2) 
+            (setq temp2 (list (car temp1)))
+            (setq temp2 (append temp2 (list (car temp1))))
+          ) ;end if
+          (setq temp1 (cdr temp1))
+        ) ;end progn
+      )
+    ) ;end pod while
+
+    ;РїРµСЂР°РЅРѕСЃ РєР°СЂРѕРІ РІ РјР°СЃС–РІ
+    (if (= nil temp3) 
+      (setq temp3 (list temp_car))
+      (setq temp3 (append temp3 (list temp_car)))
+    ) ;end if
+
+    ;СЃР±СЂРѕСЃ Р·РЅР°С‡СЌРЅРЅРµСѓ
+    (setq druk_v temp2)
+    (setq temp1 nil
+          temp2 nil
+    )
+  ) ;end while
+  (setq druk_v temp3)
+  (setq temp1 nil
+        temp2 nil
+        temp3 nil
+  )
+
+  ;СѓРґР°Р»РµРЅС–Рµ РµСЃР»С– РІ РЅРµРЅСѓРјРµСЂРѕРІР°РЅРЅРѕРј СЃРїС–СЃРєРµ СЃРѕРІРїР°РґР°РµС‚ РІ РЅСѓРјРµСЂРѕРІР°РЅРЅС‹Рј
+  (setq druk1 druk_n
+        druk2 druk_v
+        bool  nil
+  )
+  (while (and (/= nil druk1) (/= nil druk2)) 
+    (setq temp_car (car druk1))
+    (setq temp1 druk2)
+    (while (/= nil temp1) 
+      (if 
+        (and (= bool nil) 
+             (kordinat 
+               (nth 1 temp_car)
+               (nth 2 temp_car)
+               (nth 1 (car temp1))
+               (nth 2 (car temp1))
+             )
+             (= (nth 6 (car temp1)) (nth 6 temp_car))
+        )
+        (setq bool T)
+        (setq temp1 (cdr temp1))
+      )
+    ) ;end pod while
+
+    (if (= bool nil) 
+      ;РїРµСЂР°РЅРѕСЃ РєР°СЂРѕРІ РІ РјР°СЃС–РІ
+      (if (= nil temp3) 
+        (setq temp3 (list temp_car))
+        (setq temp3 (append temp3 (list temp_car)))
+      ) ;end if
+    )
+
+    ;СЃР±СЂРѕСЃ Р·РЅР°С‡СЌРЅРЅРµСѓ
+    (setq druk1 (cdr druk1))
+    (setq temp1 nil
+          bool  nil
+    )
+  )
+
+  (if (/= temp3 nil) 
+    (setq druk_n temp3)
+  )
+
+  (print 
+    (strcat "РљРѕР»СЊРєР°СЃС†СЊ РїР°СЃР»СЏ Р·РЅС–С€С‡СЌРЅРЅРµ РґСѓР»С–РєР°С‚Р°Сћ СЂС‹СЃСѓРЅРєР°Сћ: " 
+            (rtos (+ (len druk_n) (len druk_v)))
+    )
+  )
+  (print)
 )
 
 
-;;---------------------утварэнне списау druk_v druk_n----------------------
-(defun utvar (numa0 / numa)
-(normal_points)
-;;;  (if (= numar 1)			;калі не вызначаны нумар
-    (if	(and (/= numa0 nil) (/= numa0 0) (/= numa0 "0"))
-      (setq numa numa0)
-      (setq numa (numar_s))
-    )
-;сканчэнне нармализации каардынат
-  (if (and (OR (= nameris "") (= nameris nil)) (/= zapret_name T))
+;;---------------------СѓС‚РІР°СЂСЌРЅРЅРµ СЃРїРёСЃР°Сѓ druk_v druk_n----------------------
+(defun utvar (numa0 / numa) 
+  (normal_points)
+  ;;;  (if (= numar 1)			;РєР°Р»С– РЅРµ РІС‹Р·РЅР°С‡Р°РЅС‹ РЅСѓРјР°СЂ
+  (if (and (/= numa0 nil) (/= numa0 0) (/= numa0 "0")) 
+    (setq numa numa0)
+    (setq numa (numar_s))
+  )
+  ;СЃРєР°РЅС‡СЌРЅРЅРµ РЅР°СЂРјР°Р»РёР·Р°С†РёРё РєР°Р°СЂРґС‹РЅР°С‚
+  (if (and (OR (= nameris "") (= nameris nil)) (/= zapret_name T)) 
     (setq nameris (namelist))
-   )
-;end if
-;;;    (setq numa 0)
-;;;  )
-  (if (or (= numa nil) (= numa 0))
-    (if	(/= druk_n nil)
-      (setq druk_n
-	     (cons (list 0 x1 x2 format mash poloz model nameris nil) druk_n)
-      )
+  )
+  ;end if
+  ;;;    (setq numa 0)
+  ;;;  )
+  (if (or (= numa nil) (= numa 0)) 
+    (if (/= druk_n nil) 
+      (setq druk_n (cons (list 0 x1 x2 format mash poloz model nameris nil) druk_n))
       (setq druk_n (list (list 0 x1 x2 format mash poloz model nameris nil)))
-    )					;end if
-    (if	(/= druk_v nil)
-      (setq druk_v (cons (list numa x1 x2 format mash poloz model nameris nil)
-			 druk_v
-		   )
+    ) ;end if
+    (if (/= druk_v nil) 
+      (setq druk_v (cons (list numa x1 x2 format mash poloz model nameris nil) 
+                         druk_v
+                   )
       )
       (setq druk_v (list (list numa x1 x2 format mash poloz model nameris nil)))
-    )					;end if
+    ) ;end if
   )
 )
 
 
-;------------------------утварэнне спісау друку іх нумерацыя,ад дыялогу---------------------------------
-(defun zapusk_druk (/ f_temp ris_temp)
-  
-;друк полилиний-блокау-спдс
-	(poli)
-	(blocks)
-	(spds1)
-  
-;знішчэнне дублікатау
+;------------------------СѓС‚РІР°СЂСЌРЅРЅРµ СЃРїС–СЃР°Сѓ РґСЂСѓРєСѓ С–С… РЅСѓРјРµСЂР°С†С‹СЏ,Р°Рґ РґС‹СЏР»РѕРіСѓ---------------------------------
+(defun zapusk_druk (/ f_temp ris_temp color_indices temp_druk_v idx item old_cdr 
+                    updated_cdr
+                   ) 
+
+  ;РґСЂСѓРє РїРѕР»РёР»РёРЅРёР№-Р±Р»РѕРєР°Сѓ-СЃРїРґСЃ
+  (poli)
+  (blocks)
+  (spds1)
+
+  ;Р·РЅС–С€С‡СЌРЅРЅРµ РґСѓР±Р»С–РєР°С‚Р°Сѓ
 
   (del_dubl)
-  (prin_numar);прастаука нумароу вызначанага спису
-  (zad_n);прастаука нумароу невызначанага спису
+  (prin_numar) ;РїСЂР°СЃС‚Р°СѓРєР° РЅСѓРјР°СЂРѕСѓ РІС‹Р·РЅР°С‡Р°РЅР°РіР° СЃРїРёСЃСѓ
+  (zad_n) ;РїСЂР°СЃС‚Р°СѓРєР° РЅСѓРјР°СЂРѕСѓ РЅРµРІС‹Р·РЅР°С‡Р°РЅР°РіР° СЃРїРёСЃСѓ
+
+  (if (and (= acad_color 2) (/= druk_v nil)) 
+    (progn 
+      (setq color_indices (ShowSheetColorDialog druk_v))
+      (setq temp_druk_v nil)
+      (setq idx 0)
+      (foreach item druk_v 
+        (if (member idx color_indices) 
+          (progn 
+            (setq old_cdr (cdr item))
+            (setq updated_cdr (list 
+                                (nth 0 old_cdr)
+                                (nth 1 old_cdr)
+                                (nth 2 old_cdr)
+                                (nth 3 old_cdr)
+                                (nth 4 old_cdr)
+                                (nth 5 old_cdr)
+                                (nth 6 old_cdr)
+                                T
+                              )
+            )
+            (setq temp_druk_v (cons (cons (car item) updated_cdr) temp_druk_v))
+          )
+          (setq temp_druk_v (cons item temp_druk_v))
+        )
+        (setq idx (1+ idx))
+      )
+      (setq druk_v (reverse temp_druk_v))
+    )
+  )
 
   (setq f_temp "")
   (setq ris_temp "")
-  (peshat)palja
+  (peshat)
+  palja
 
-  (if (/= (vl-bb-ref 'file_ris) nil)
-    (vl-bb-set 'file_ris
-	     (strcat (vl-bb-ref 'file_ris) "&" ris_temp)
-  )
+  (if (/= (vl-bb-ref 'file_ris) nil) 
+    (vl-bb-set 
+      'file_ris
+      (strcat (vl-bb-ref 'file_ris) "&" ris_temp)
+    )
     (vl-bb-set 'file_ris ris_temp)
-   )
+  )
 
-  
-  (vl-bb-set 'file_all
-	     (strcat (vl-bb-ref 'file_all) "&" f_temp)
+
+  (vl-bb-set 
+    'file_all
+    (strcat (vl-bb-ref 'file_all) "&" f_temp)
   )
   (princ)
-
 );end function
 
 
-;------------------------апрацоука  палей диалогу---------------------------------
-(defun palja ()
-  ;теукщий чертеж или папку
-  (if (= (atoi (get_tile "Radio1")) 1)
-    (setq rys 1)
-    (setq rys 0)
-    )
-  ;склеить как
-  (if (= 0 (atoi (get_tile "sfile_merge")))
-	 (setq sfile 0 sfile_all 0)
-	 )
-    (if (= 1 (atoi (get_tile "sfile_merge")))
-	 (setq sfile 1 sfile_all 0)
-	 )
-  (if (= 2 (atoi (get_tile "sfile_merge")))
-	 (setq sfile 0 sfile_all 1)
-	 )
-   
+;------------------------Р°РїСЂР°С†РѕСѓРєР°  РїР°Р»РµР№ РґРёР°Р»РѕРіСѓ---------------------------------
+(defun PrintAutoDcl (/ dcl_file file_handle dcl_id) 
+  (setq dcl_file (vl-filename-mktemp "print_spds.dcl"))
+  (setq file_handle (open dcl_file "w"))
+  (write-line "prindcl: dialog{label=\"РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ РїРµС‡Р°С‚СЊ\";" file_handle)
+  (write-line ": boxed_column { label = \"РќР°СЃС‚СЂРѕР№РєР°:\";" file_handle)
+  (write-line ": radio_column {" file_handle)
+  (write-line ": radio_button {key = \"Radio1\"; label = \"С‚РµРєСѓС‰РёР№ С‡РµСЂС‚РµР¶\"; }" 
+              file_handle
+  )
+  (write-line ": radio_button {key = \"Radio2\"; label = \"С‚РµРєСѓС‰СѓСЋ РїР°РїРєСѓ С‡РµСЂС‚РµР¶Р°\"; value = 1;}" 
+              file_handle
+  )
+  (write-line "}" file_handle)
+  (write-line "}" file_handle)
+  (write-line ": popup_list {" file_handle)
+  (write-line "    label = \"Р¦РІРµС‚:\";" file_handle)
+  (write-line "    key = \"color_select\";" file_handle)
+  (write-line "    list = \"РјРѕРЅРѕС…СЂРѕРјРЅС‹Р№\\nРІСЃРµ РІ С†РІРµС‚Рµ\\nР·Р°РїСЂР°С€РёРІР°С‚СЊ С†РІРµС‚\";" 
+              file_handle
+  )
+  (write-line "    value = \"0\";" file_handle)
+  (write-line "  }" file_handle)
+  (write-line ":popup_list{label=\"\";" file_handle)
+  (write-line "list=\"РЅРµ СЃРєР»РµРёРІР°С‚СЊ\\nСЃРєР»РµРёС‚СЊ РїРѕ С„Р°Р№Р»Р°Рј\\nСЃРєР»РµРёС‚СЊ РІ РѕР±С‰РёР№ С„Р°Р№Р»\";value=\"2\";key=\"sfile_merge\";}" 
+              file_handle
+  )
+  (write-line "ok_cancel;" file_handle)
+  (write-line "}" file_handle)
+  (close file_handle)
+  (setq dcl_id (load_dialog dcl_file))
+  (vl-file-delete dcl_file)
+  dcl_id
 )
 
-;------------------------выклік діалогу---------------------------------
-(defun c:dil_spds (/	    dcl_id    pdf
-		   rys      ddi      druk_n
-		   druk_v   done     file_all sfile_all
-		   sfile  lik_open data stor data1 nameris
-		  );numar
+(defun palja () 
+  ;С‚РµСѓРєС‰РёР№ С‡РµСЂС‚РµР¶ РёР»Рё РїР°РїРєСѓ
+  (if (= (atoi (get_tile "Radio1")) 1) 
+    (setq rys 1)
+    (setq rys 0)
+  )
+  ;СЃРєР»РµРёС‚СЊ РєР°Рє
+  (if (= 0 (atoi (get_tile "sfile_merge"))) 
+    (setq sfile     0
+          sfile_all 0
+    )
+  )
+  (if (= 1 (atoi (get_tile "sfile_merge"))) 
+    (setq sfile     1
+          sfile_all 0
+    )
+  )
+  (if (= 2 (atoi (get_tile "sfile_merge"))) 
+    (setq sfile     0
+          sfile_all 1
+    )
+  )
+  (setq acad_color (atoi (get_tile "color_select")))
+)
+
+;------------------------РІС‹РєР»С–Рє РґС–Р°Р»РѕРіСѓ---------------------------------
+(defun c:dil_spds (/ dcl_id pdf rys ddi druk_n druk_v done file_all sfile_all sfile 
+                   lik_open data stor data1 nameris acad_color
+                  )  ;numar
+  (setq acad_color 0)
   (PRINC "\n---------------------------------------------------------------------------\n")
-  (PRINC "Праграмма распрацавана на lisp, prajdziswet-ам (Косаў Уладзімір) у 2014 годзе\n")
+  ; (PRINC "РџСЂР°РіСЂР°РјРјР° СЂР°СЃРїСЂР°С†Р°РІР°РЅР° РЅР° lisp, prajdziswet-Р°Рј (РљРѕСЃР°Сѓ РЈР»Р°РґР·РёРјРёСЂ) Сѓ 2014 РіРѕРґР·Рµ\n")
   (PRINC "-----------------------------------------------------------------------------\n")
   (PRINC "\n")
 
   ;----------------------------------------------------------------------
-  ;вызначэнне версии акада-трошки недакладна
-(setq vers (substr (vl-bb-ref 'dirpol) (+ (vl-string-search "AUTODESK" (strcase (vl-bb-ref 'dirpol))) 18) 4))
-  
-(vl-load-com)
+  ;РІС‹Р·РЅР°С‡СЌРЅРЅРµ РІРµСЂСЃРёРё Р°РєР°РґР°-С‚СЂРѕС€РєРё РЅРµРґР°РєР»Р°РґРЅР°
+  (setq vers (substr (vl-bb-ref 'dirpol) 
+                     (+ (vl-string-search "AUTODESK" (strcase (vl-bb-ref 'dirpol))) 
+                        18
+                     )
+                     4
+             )
+  )
+
+  (vl-load-com)
   (vl-bb-set 'lik_open 0)
   ;if auto
-  (if (/= auto T)
-    (progn
-  (setq done nil)
-  ;d:\\Косов\\prog\\_Програм\\_acad\\для панельки\\ручная и автом печать\\ h:\\prog\\_Програм\\_acad\\для панельки\\ручная и автом печать\\
-  ;(setq dcl_id (load_dialog "f:\\_Програм\\_acad\\для панельки\\ручная и автом печать\\print_spds7.dcl"))
-  ;F:\\Mega\\_Програм\\_acad\\для панельки\\ручная и автом печать\\print_spds7.DC h:\\praca-proect\\распрац\\для панельки\\ручная и автом печать\\
-  (setq dcl_id (load_dialog "print_spds8.DCL"))
-  (if (not (new_dialog "prindcl" dcl_id))
-    (exit)
-  )
-  (action_tile "accept" "(palja)(done_dialog 1)")
-  (action_tile "cancel" "(done_dialog 0)")
-  (setq ddi (start_dialog))
-  (unload_dialog dcl_id)
-  )
-    ;progn auto
-    (progn
-     (setq rys 1 sfile_all 1 sfile 0 ddi 1);numar 1 pdf 1
-     )
-    );end if auto
-  
-  (if (= ddi 1)
-    (progn
-					;усталека первічных параметрау
-      (vl-bb-set 'file_all
-		 (strcat (GETVAR "dwgprefix")
-			 "&"
-			 (if (equal sfile 1)
-			   (princ "true")
-			   (princ "false")
-			 )
-			 "&"
-			 (if (equal sfile_all 1)
-			   (princ "true")
-			   (princ "false")
-			 )
-		 )
+  (if (/= auto T) 
+    (progn 
+      (setq done nil)
+      ;d:\\РљРѕСЃРѕРІ\\prog\\_РџСЂРѕРіСЂР°Рј\\_acad\\РґР»СЏ РїР°РЅРµР»СЊРєРё\\СЂСѓС‡РЅР°СЏ Рё Р°РІС‚РѕРј РїРµС‡Р°С‚СЊ\\ h:\\prog\\_РџСЂРѕРіСЂР°Рј\\_acad\\РґР»СЏ РїР°РЅРµР»СЊРєРё\\СЂСѓС‡РЅР°СЏ Рё Р°РІС‚РѕРј РїРµС‡Р°С‚СЊ\\
+      ;(setq dcl_id (load_dialog "f:\\_РџСЂРѕРіСЂР°Рј\\_acad\\РґР»СЏ РїР°РЅРµР»СЊРєРё\\СЂСѓС‡РЅР°СЏ Рё Р°РІС‚РѕРј РїРµС‡Р°С‚СЊ\\print_spds7.dcl"))
+      ;F:\\Mega\\_РџСЂРѕРіСЂР°Рј\\_acad\\РґР»СЏ РїР°РЅРµР»СЊРєРё\\СЂСѓС‡РЅР°СЏ Рё Р°РІС‚РѕРј РїРµС‡Р°С‚СЊ\\print_spds7.DC h:\\praca-proect\\СЂР°СЃРїСЂР°С†\\РґР»СЏ РїР°РЅРµР»СЊРєРё\\СЂСѓС‡РЅР°СЏ Рё Р°РІС‚РѕРј РїРµС‡Р°С‚СЊ\\
+      (setq dcl_id (PrintAutoDcl))
+      (if (not (new_dialog "prindcl" dcl_id)) 
+        (exit)
       )
-      (vl-bb-set 'file_ris nil);обнуление
-      (zapusk_druk)
-      (if (= rys 0)
-	(peshat-spds-file)
+      (action_tile "accept" "(palja)(done_dialog 1)")
+      (action_tile "cancel" "(done_dialog 0)")
+      (setq ddi (start_dialog))
+      (unload_dialog dcl_id)
+    )
+    ;progn auto
+    (progn 
+      (setq rys       1
+            sfile_all 1
+            sfile     0
+            ddi       1
+      ) ;numar 1 pdf 1
+    )
+  ) ;end if auto
+
+  (if (= ddi 1) 
+    (progn 
+      (vl-bb-set 'acad_color acad_color)
+      ;СѓСЃС‚Р°Р»РµРєР° РїРµСЂРІС–С‡РЅС‹С… РїР°СЂР°РјРµС‚СЂР°Сѓ
+      (vl-bb-set 
+        'file_all
+        (strcat (GETVAR "dwgprefix") 
+                "&"
+                (if (equal sfile 1) 
+                  (princ "true")
+                  (princ "false")
+                )
+                "&"
+                (if (equal sfile_all 1) 
+                  (princ "true")
+                  (princ "false")
+                )
+        )
+      )
+      (vl-bb-set 'file_ris nil) ;РѕР±РЅСѓР»РµРЅРёРµ
+      (if (or (/= rys 0) (peshat-spds-file-prepare)) 
+        (progn 
+          (zapusk_druk)
+          (if (= rys 0) 
+            (peshat-spds-file-run)
+          )
+        )
       )
       (if (= needAdd nil) (setq needAdd 0))
-      
-(if (OR (equal sfile_all 1) (equal sfile 1))
-	    ;адпраука файлау на сліяніе пдф
-	  (if (boundp 'add_edit)
-;;;  (progn
-   ;(bookmark (vl-bb-ref 'file_ris))
-   (add_edit needAdd (vl-bb-ref 'file_all))
-;;;   )
-   (progn
-    (startapp "__prog\\exe\\FormMerge\\FormMergeExe.exe" (strcat "\"" (vl-bb-ref 'file_all)"\""))
-    (command)
-     )
-  ) 
-	)
 
-
-      
+      (if (OR (equal sfile_all 1) (equal sfile 1)) 
+        ;Р°РґРїСЂР°СѓРєР° С„Р°Р№Р»Р°Сѓ РЅР° СЃР»С–СЏРЅС–Рµ РїРґС„
+        (if (boundp 'add_edit) 
+          ;;;  (progn
+          ;(bookmark (vl-bb-ref 'file_ris))
+          (add_edit needAdd (vl-bb-ref 'file_all))
+          ;;;   )
+          (progn 
+            (startapp 
+              "__prog\\exe\\FormMerge\\FormMergeExe.exe"
+              (strcat "\"" (vl-bb-ref 'file_all) "\"")
+            )
+            (command)
+          )
+        )
+      )
     )
-  )					;end if
+  ) ;end if
   (vl-bb-set 'lik_open nil)
-
 )
 ;
-(print "загружена автоматічская печать") (princ)
+(print "Р·Р°РіСЂСѓР¶РµРЅР° Р°РІС‚РѕРјР°С‚С–С‡СЃРєР°СЏ РїРµС‡Р°С‚СЊ")
+(princ)
 
-;------------------------выклік діалогу з рэдактара---------------------------------
-;stor убрана, оставлена для совемстимости верстий
-(defun dil_spds_new (needAdd stor / auto)
+(defun peshat-spds-file-prepare (/ peshat-files result selected_files color_mode) 
+  ;РїРµСЂР°РґР°С‡Р° Р°СЂРіСѓРјРµРЅС‚Р°Сѓ РґС‹СЏР»РѕРіСѓ
+  (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;РІС‹Р±Р°СЂ С„Р°Р№Р»Р°Сѓ
+
+  (if (and (= rys 0) (= acad_color 2) (> (length peshat-files) 1)) 
+    (progn 
+      (setq result (ShowFileListDialog peshat-files))
+      (if result 
+        (progn 
+          (setq selected_files (car result))
+          (setq color_mode (cdr result))
+          (vl-bb-set 'folder_color_mode color_mode)
+          (vl-bb-set 'folder_color_files selected_files)
+          T
+        )
+        nil
+      )
+    )
+    (progn 
+      (vl-bb-set 'folder_color_mode acad_color)
+      (vl-bb-set 'folder_color_files nil)
+      T
+    )
+  )
+)
+
+
+(defun peshat-spds-file-run (/ peshat-files peshat-file selected_files color_mode 
+                             current_color
+                            ) 
+  (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;РІС‹Р±Р°СЂ С„Р°Р№Р»Р°Сѓ
+  (setq selected_files (vl-bb-ref 'folder_color_files))
+  (setq color_mode (vl-bb-ref 'folder_color_mode))
+  (if (= color_mode nil) (setq color_mode acad_color))
+
+  (if peshat-files 
+    (progn 
+      (while (/= peshat-files nil) 
+        (if (/= (GETVAR "dwgname") (car peshat-files)) 
+          (progn 
+            (if (member (car peshat-files) selected_files) 
+              (setq current_color color_mode)
+              (setq current_color 0)
+            )
+            (vl-bb-set 'acad_color current_color)
+            (vl-bb-set 'directory-p 1) ;Р·Р°РїСѓСЃРє Сѓ С–РЅС€С‹С… Р°РґС‡С‹РЅСЏРµРј РґР°РєСѓРјРµРЅС‚
+            (setq peshat-file (strcat (GETVAR "dwgprefix") (car peshat-files))) ;Р°РґС‡С‹РЅСЏРµРјС‹ С„Р°Р№Р»
+            (setq peshat-files (cdr peshat-files)) ;РѕР±СЂРµР·РєР°
+            (setq peshat-file (vla-Open 
+                                (vla-get-Documents (vlax-get-acad-object))
+                                peshat-file
+                                :flax-true
+                                ""
+                              )
+            ) ;Р°РґС‡С‹РЅРµРЅРЅРµ
+            (vla-Close peshat-file :vlax-false) ;Р·Р°С‡С‹РЅРµРЅРЅРµ
+          ) ;end progn
+          (setq peshat-files (cdr peshat-files)) ;РѕР±СЂРµР·РєР°
+        )
+      ) ;end while
+      (vl-bb-set 'directory-p nil) ;Р·Р°Р±Р°СЂРѕРЅР° РґСЂСѓРєСѓ Сѓ С–РЅС€С‹С… С„Р°Р№Р»Р°С…
+    )
+  )
+)
+
+;------------------------РІС‹РєР»С–Рє РґС–Р°Р»РѕРіСѓ Р· СЂСЌРґР°РєС‚Р°СЂР°---------------------------------
+;stor СѓР±СЂР°РЅР°, РѕСЃС‚Р°РІР»РµРЅР° РґР»СЏ СЃРѕРІРµРјСЃС‚РёРјРѕСЃС‚Рё РІРµСЂСЃС‚РёР№
+(defun dil_spds_new (needAdd stor / auto) 
   (setq auto T)
   (c:dil_spds)
-  )
-
-
+)
 
 
 ;============================================================================
-;------------------------друк у іншых файлах---------------------------------
+;------------------------РґСЂСѓРє Сѓ С–РЅС€С‹С… С„Р°Р№Р»Р°С…---------------------------------
 ;============================================================================
-(defun open-p ();numar
-					;задаванне параметрау выбару
-  (if (= (vl-bb-ref 'directory-p) 1)
-    (progn
+(defun open-p ()  ;numar
+  ;Р·Р°РґР°РІР°РЅРЅРµ РїР°СЂР°РјРµС‚СЂР°Сѓ РІС‹Р±Р°СЂСѓ
+  (if (= (vl-bb-ref 'directory-p) 1) 
+    (progn 
       (vl-bb-set 'directory-p nil)
-
-      ;друк
+      (if (vl-bb-ref 'acad_color) 
+        (setq acad_color (vl-bb-ref 'acad_color))
+      )
+      ;РґСЂСѓРє
       (zapusk_druk)
     )
   )
 )
-					;запуск в открываемых файлах
-(if (/= (vl-bb-ref 'directory-p) nil)
+					;Р·Р°РїСѓСЃРє РІ РѕС‚РєСЂС‹РІР°РµРјС‹С… С„Р°Р№Р»Р°С…
+(if (/= (vl-bb-ref 'directory-p) nil) 
   (open-p)
 )
 
-;------------------------перадача друку у іншых файлах(адчынене файлау)---------------------------------
-(defun peshat-spds-file	(/ peshat-files peshat-file)
-					;перадача аргументау дыялогу
-  (setq	peshat-files
-	 (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)
-  )					;выбар файлау
-  (while (/= peshat-files nil)
-    (if	(/= (GETVAR "dwgname") (car peshat-files))
-      (progn
-	(vl-bb-set 'directory-p 1)	;запуск у іншых адчыняем дакумент  
-	(setq peshat-file
-	       (strcat (GETVAR "dwgprefix") (car peshat-files))
-	)				;адчыняемы файл
-	(setq peshat-files (cdr peshat-files)) ;обрезка
-	(setq peshat-file
-	       (vla-Open
-		 (vla-get-Documents (vlax-get-acad-object))
-		 peshat-file
-		 :flax-true
-		 ""
-	       )
-	)				;адчыненне
-	(vla-Close peshat-file :vlax-false) ;зачыненне
-      )					;end progn
-      (setq peshat-files (cdr peshat-files)) ;обрезка
+(defun ShowSheetColorDialog (sheets / dcl_file file_handle dcl_id result 
+                             selected_indices selected_sheets read_list index item 
+                             display_list name
+                            ) 
+  (setq dcl_file (vl-filename-mktemp "sheet_color.dcl"))
+  (setq file_handle (open dcl_file "w"))
+  (write-line "sheet_color_dcl : dialog {" file_handle)
+  (write-line "  label = \"РџРµС‡Р°С‚СЊ РІ С†РІРµС‚Рµ\";" file_handle)
+  (write-line "  : text { label = \"Р’С‹Р±РµСЂРёС‚Рµ С‡РµСЂС‚РµР¶Рё РґР»СЏ РїРµС‡Р°С‚Рё РІ С†РІРµС‚Рµ:\"; }" 
+              file_handle
+  )
+  (write-line "  : text { label = \"Рї.СЃ. РїРѕРґСЃРєР°Р·РєР°: РЅРµСЃРєРѕР»СЊРєРѕ С‡РµСЂС‚РµР¶РµР№ РІС‹Р±РёСЂР°СЋС‚СЃСЏ С‡РµСЂРµР· Ctrl\"; }" 
+              file_handle
+  )
+  (write-line "  : list_box {" file_handle)
+  (write-line "    key = \"sheets_list\";" file_handle)
+  (write-line "    width = 60;" file_handle)
+  (write-line "    height = 15;" file_handle)
+  (write-line "    multiple_select = true;" file_handle)
+  (write-line "  }" file_handle)
+  (write-line "  ok_cancel;" file_handle)
+  (write-line "}" file_handle)
+  (close file_handle)
+
+  (setq display_list nil)
+  (foreach item sheets 
+    (setq name (nth 6 (cdr item)))
+    (if (and name (/= name "")) 
+      (setq display_list (cons (strcat (car item) " - " name) display_list))
+      (setq display_list (cons (car item) display_list))
     )
-  )					;end while and if
-  (vl-bb-set 'directory-p nil)		;забарона друку у іншых файлах
+  )
+  (setq display_list (reverse display_list))
+
+  (setq dcl_id (load_dialog dcl_file))
+  (if (not (new_dialog "sheet_color_dcl" dcl_id)) 
+    (setq result 0)
+    (progn 
+      (start_list "sheets_list")
+      (foreach item display_list 
+        (add_list item)
+      )
+      (end_list)
+      (action_tile "accept" 
+                   "(setq selected_indices (get_tile \"sheets_list\")) (done_dialog 1)"
+      )
+      (action_tile "cancel" "(done_dialog 0)")
+      (setq result (start_dialog))
+      (unload_dialog dcl_id)
+      (vl-file-delete dcl_file)
+    )
+  )
+  (if (= result 1) 
+    (if (and selected_indices (/= selected_indices "")) 
+      (read (strcat "(" selected_indices ")"))
+      nil
+    )
+    nil
+  )
+)
+
+
+(defun ShowFileListDialog (file_list / dcl_file file_handle dcl_id result 
+                           selected_indices selected_files read_list color_mode
+                          ) 
+  (setq dcl_file (vl-filename-mktemp "file_list.dcl"))
+  (setq file_handle (open dcl_file "w"))
+  (write-line "file_list_dcl : dialog {" file_handle)
+  (write-line "  label = \"РЎРїРёСЃРѕРє С„Р°Р№Р»РѕРІ РґР»СЏ РїРµС‡Р°С‚Рё\";" file_handle)
+  (write-line "  : boxed_column { label = \"Р§С‚Рѕ РґРµР»Р°С‚СЊ СЃ РІС‹Р±СЂР°РЅС‹РјРё:\";" 
+              file_handle
+  )
+  (write-line "    : radio_column {" file_handle)
+  (write-line "      : radio_button {key = \"file_color_all\"; label = \"РІСЃРµ С†РІРµС‚РЅС‹Рµ С‡РµСЂС‚РµР¶Рё РІ С„Р°Р№Р»Р°С…\"; value = 1;}" 
+              file_handle
+  )
+  (write-line "      : radio_button {key = \"file_color_ask\"; label = \"Р·Р°РїСЂР°С€РёРІР°С‚СЊ С†РІРµС‚ С‡РµСЂС‚РµР¶РµР№ РІ С„Р°Р№Р»Рµ\";}" 
+              file_handle
+  )
+  (write-line "    }" file_handle)
+  (write-line "  }" file_handle)
+  (write-line "  : text { label = \"Р’С‹Р±РµСЂРёС‚Рµ, РєР°РєРёРµ С„Р°Р№Р»С‹ СЃРїСЂР°С€РёРІР°С‚СЊ РёР»Рё РїРµС‡Р°С‚Р°С‚СЊ РІ С†РІРµС‚Рµ:\"; }" 
+              file_handle
+  )
+  (write-line "  : text { label = \"Рї.СЃ. РЅРµ РІС‹Р±СЂР°РЅРЅС‹Рµ СЂР°СЃРїРµС‡Р°С‚Р°СЋС‚СЃСЏ РІ РјРѕРЅРѕС…СЂРѕРјРµ...\"; }" 
+              file_handle
+  )
+  (write-line "  : text { label = \"РџРѕРґСЃРєР°Р·РєР°: РЅРµСЃРєРѕР»СЊРєРѕ С‡РµСЂС‚РµР¶РµР№ РІС‹Р±РёСЂР°СЋС‚СЃСЏ С‡РµСЂРµР· Ctrl\"; }" 
+              file_handle
+  )
+  (write-line "  : list_box {" file_handle)
+  (write-line "    key = \"files_list\";" file_handle)
+  (write-line "    width = 50;" file_handle)
+  (write-line "    height = 12;" file_handle)
+  (write-line "    multiple_select = true;" file_handle)
+  (write-line "  }" file_handle)
+  (write-line "  ok_cancel;" file_handle)
+  (write-line "}" file_handle)
+  (close file_handle)
+
+  (setq dcl_id (load_dialog dcl_file))
+  (if (not (new_dialog "file_list_dcl" dcl_id)) 
+    (setq result 0)
+    (progn 
+      (start_list "files_list")
+      (foreach item file_list 
+        (add_list item)
+      )
+      (end_list)
+      (action_tile "accept" 
+                   "(setq selected_indices (get_tile \"files_list\")) (setq color_mode (if (= (atoi (get_tile \"file_color_all\")) 1) 1 2)) (done_dialog 1)"
+      )
+      (action_tile "cancel" "(done_dialog 0)")
+      (setq result (start_dialog))
+      (unload_dialog dcl_id)
+      (vl-file-delete dcl_file)
+    )
+  )
+  (if (= result 1) 
+    (progn 
+      (setq selected_files nil)
+      (if (and selected_indices (/= selected_indices "")) 
+        (progn 
+          (setq read_list (read (strcat "(" selected_indices ")")))
+          (foreach idx read_list 
+            (setq selected_files (cons (nth idx file_list) selected_files))
+          )
+          (setq selected_files (reverse selected_files))
+        )
+      )
+      (cons selected_files color_mode)
+    )
+    nil
+  )
+)
+
+
+(defun peshat-spds-file (/ peshat-files peshat-file files_to_print) 
+  ;РїРµСЂР°РґР°С‡Р° Р°СЂРіСѓРјРµРЅС‚Р°Сѓ РґС‹СЏР»РѕРіСѓ
+  (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;РІС‹Р±Р°СЂ С„Р°Р№Р»Р°Сѓ
+
+  (if (and (= rys 0) (= acad_color 2) (> (length peshat-files) 1)) 
+    (setq files_to_print (ShowFileListDialog peshat-files))
+    (setq files_to_print peshat-files)
+  )
+
+  (if files_to_print 
+    (progn 
+      (while (/= files_to_print nil) 
+        (if (/= (GETVAR "dwgname") (car files_to_print)) 
+          (progn 
+            (vl-bb-set 'directory-p 1) ;Р·Р°РїСѓСЃРє Сѓ С–РЅС€С‹С… Р°РґС‡С‹РЅСЏРµРј РґР°РєСѓРјРµРЅС‚
+            (setq peshat-file (strcat (GETVAR "dwgprefix") (car files_to_print))) ;Р°РґС‡С‹РЅСЏРµРјС‹ С„Р°Р№Р»
+            (setq files_to_print (cdr files_to_print)) ;РѕР±СЂРµР·РєР°
+            (setq peshat-file (vla-Open 
+                                (vla-get-Documents (vlax-get-acad-object))
+                                peshat-file
+                                :flax-true
+                                ""
+                              )
+            ) ;Р°РґС‡С‹РЅРµРЅРЅРµ
+            (vla-Close peshat-file :vlax-false) ;Р·Р°С‡С‹РЅРµРЅРЅРµ
+          ) ;end progn
+          (setq files_to_print (cdr files_to_print)) ;РѕР±СЂРµР·РєР°
+        )
+      ) ;end while and if
+      (vl-bb-set 'directory-p nil) ;Р·Р°Р±Р°СЂРѕРЅР° РґСЂСѓРєСѓ Сѓ С–РЅС€С‹С… С„Р°Р№Р»Р°С…
+    )
+  )
 )					;--
