@@ -1,8 +1,10 @@
 ;вяртанне назову рысунка
-(defun namelist (/ x_temp1 x_temp2 nabor_s temp_all text n len i text) 
+(defun namelist (/ x_temp1 x_temp2 nabor_s temp_all text n len i text temp_lm) 
   (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
   (setq x_temp2 (list (- (car x2) (/ 55 mash)) (+ (last x2) (/ 5 mash))))
   (setq text "")
+  (setq temp_lm (getvar "ctab"))
+  (if (and model (/= model temp_lm)) (setvar "ctab" model))
   (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
   (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*EXT"))))
   (if (and (/= nil nabor_s) (= (sslength nabor_s) 1)) 
@@ -41,12 +43,13 @@
     )
   ) ;end if
   (command "_u")
+  (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
   (if (= text nil) (setq text ""))
   (setq text text)
 );end defun
 
 ;вяртанне шифру
-(defun nameshifr (temp / x_temp1 x_temp2 nabor_s temp_all text n len i text)  ;temp nil-верхняя шапка, инакш-нижняя
+(defun nameshifr (temp / x_temp1 x_temp2 nabor_s temp_all text n len i text temp_lm)  ;temp nil-верхняя шапка, инакш-нижняя
   (if (/= nil temp) 
     (progn 
       (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
@@ -58,6 +61,8 @@
     )
   ) ;сканчэнне вызначэнне каардынат
   (setq text "")
+  (setq temp_lm (getvar "ctab"))
+  (if (and model (/= model temp_lm)) (setvar "ctab" model))
   (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
   (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*EXT"))))
   (if (and (/= nil nabor_s) (= (sslength nabor_s) 1)) 
@@ -96,6 +101,7 @@
     )
   ) ;end if
   (command "_u")
+  (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
   (setq text text)
 )
 ;сканчэнне вяртанне шифру
@@ -181,7 +187,9 @@
 ;----------------------------------------------------
 
 ;--------------функция атрыманне с дин.блоку тексту----------------
-(defun get-block-att (name_bl / vla-nameobj spis atts x1temp y1temp x2temp y2temp) 
+(defun get-block-att (name_bl / vla-nameobj spis atts x1temp y1temp x2temp y2temp 
+                      point tag copy_obj exploded_objs catchit catchbox minpt maxpt
+                     ) 
   (if (= 'LIST (type name_bl)) 
     (progn 
       (setq name_bl (car name_bl))
@@ -191,46 +199,155 @@
   (setq vla-nameobj (vlax-ename->vla-object name_bl))
 
   ;получение атрибутов
-  (setq atts (vlax-safearray->list 
-               (vlax-variant-value 
-                 (vla-getattributes vla-nameobj)
+  (if (= (vla-get-HasAttributes vla-nameobj) :vlax-true) 
+    (progn 
+      (setq atts (vlax-safearray->list (vlax-variant-value (vla-getattributes vla-nameobj))))
+      (foreach tag atts 
+        (if (= (vla-get-visible tag) :vlax-true) 
+          (progn 
+            (setq point (cdr (assoc 11 (entget (vlax-vla-object->ename tag)))))
+            (setq x1temp (nth 0 point)
+                  y1temp (nth 1 point)
+            )
+            (setq x2temp (nth 0 x2)
+                  y2temp (nth 1 x2)
+            )
+            (cond 
+              ((and (< (- x2temp (* mash 40)) x1temp) 
+                    (> (- x2temp (* mash 25)) x1temp)
+                    (> y1temp (+ (* mash 20) y2temp))
+                    (< y1temp (+ (* mash 30) y2temp))
                )
-             )
+               (setq numa (vla-get-TextString tag))
+              )
+              ((and (< (- x2temp (* mash 15)) x1temp) 
+                    (> (- x2temp (* mash 5)) x1temp)
+                    (> y1temp (+ (* mash 5) y2temp))
+                    (< y1temp (+ (* mash 13) y2temp))
+               )
+               (setq numa (vla-get-TextString tag))
+              )
+              ((and (< (- x2temp (* mash 125)) x1temp) 
+                    (> (- x2temp (* mash 55)) x1temp)
+                    (> y1temp (+ (* mash 5) y2temp))
+                    (< y1temp (+ (* mash 20) y2temp))
+               )
+               (setq nameris (clear-mtext (vla-get-TextString tag)))
+              )
+            )
+          )
+        )
+      )
+    )
   )
-  ;(vla-get-tagstring tag)-название атрибута тут не будем проверять, возьмет сам атрибут
-  (foreach tag atts 
-    (if (= (vla-get-visible tag) :vlax-true) 
-      (progn 
-        (setq point (cdr (assoc 11 (entget (vlax-vla-object->ename tag)))))
-        (setq x1temp (nth 0 point)
-              y1temp (nth 1 point)
-        )
-        (setq x2temp (nth 0 x2)
-              y2temp (nth 1 x2)
-        )
-        (cond 
-          ((and (< (- x2temp (* mash 40)) x1temp) 
-                (> (- x2temp (* mash 25)) x1temp)
-                (> y1temp (+ (* mash 20) y2temp))
-                (< y1temp (+ (* mash 30) y2temp))
-           )
-           (setq numa (vla-get-TextString tag))
+
+  ; Если имя или номер не найдены в атрибутах, попробуем взорвать копию блока и найти обычный текст
+  (if (or (= numa nil) (= nameris nil)) 
+    (progn 
+      (setq copy_obj (vla-Copy vla-nameobj))
+      (setq catchit (vl-catch-all-apply 'vla-Explode (list copy_obj)))
+      (if (not (vl-catch-all-error-p catchit)) 
+        (progn 
+          (setq exploded_objs (vlax-safearray->list (vlax-variant-value catchit)))
+          (foreach tag exploded_objs 
+            (if 
+              (or (= (vla-get-ObjectName tag) "AcDbText") 
+                  (= (vla-get-ObjectName tag) "AcDbMText")
+              )
+              (progn 
+                (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
+                                                   (list tag 'minpt 'maxpt)
+                               )
+                )
+                (if (not (vl-catch-all-error-p catchbox)) 
+                  (progn 
+                    (setq point (vlax-safearray->list minpt))
+                    (setq x1temp (nth 0 point)
+                          y1temp (nth 1 point)
+                    )
+                    (setq x2temp (nth 0 x2)
+                          y2temp (nth 1 x2)
+                    )
+                    (cond 
+                      ((and (= numa nil) 
+                            (< (- x2temp (* mash 40)) x1temp)
+                            (> (- x2temp (* mash 25)) x1temp)
+                            (> y1temp (+ (* mash 20) y2temp))
+                            (< y1temp (+ (* mash 30) y2temp))
+                       )
+                       (setq numa (vla-get-TextString tag))
+                      )
+                      ((and (= numa nil) 
+                            (< (- x2temp (* mash 15)) x1temp)
+                            (> (- x2temp (* mash 5)) x1temp)
+                            (> y1temp (+ (* mash 5) y2temp))
+                            (< y1temp (+ (* mash 13) y2temp))
+                       )
+                       (setq numa (vla-get-TextString tag))
+                      )
+                      ((and (= nameris nil) 
+                            (< (- x2temp (* mash 125)) x1temp)
+                            (> (- x2temp (* mash 55)) x1temp)
+                            (> y1temp (+ (* mash 5) y2temp))
+                            (< y1temp (+ (* mash 20) y2temp))
+                       )
+                       (setq nameris (clear-mtext (vla-get-TextString tag)))
+                      )
+                    )
+                  )
+                )
+              )
+            )
+            (vla-Delete tag)
           )
-          ((and (< (- x2temp (* mash 15)) x1temp) 
-                (> (- x2temp (* mash 5)) x1temp)
-                (> y1temp (+ (* mash 5) y2temp))
-                (< y1temp (+ (* mash 13) y2temp))
-           )
-           (setq numa (vla-get-TextString tag))
-          )
-          ((and (< (- x2temp (* mash 125)) x1temp) 
-                (> (- x2temp (* mash 55)) x1temp)
-                (> y1temp (+ (* mash 5) y2temp))
-                (< y1temp (+ (* mash 20) y2temp))
-           )
-           (setq nameris (clear-mtext (vla-get-TextString tag)))
+        )
+      )
+      (vla-Delete copy_obj)
+    )
+  )
+)
+;-------------------------------
+(defun find-stamp-blocks (/ all_blocks iblk blk_name vla-blk minpt maxpt pt_min 
+                          pt_max bminX bminY bmaxX bmaxY sminX smaxX sminY smaxY 
+                          catchbox
+                         ) 
+  (setq all_blocks (ssget "_X" 
+                          (list (cons 0 "INSERT") 
+                                (cons 410 (if model model (getvar "ctab")))
+                          )
+                   )
+  )
+  (if all_blocks 
+    (progn 
+      (setq sminX (- (car x2) (* mash 190)))
+      (setq smaxX (+ (car x2) (* mash 10)))
+      (setq sminY (- (cadr x2) (* mash 10)))
+      (setq smaxY (+ (cadr x2) (* mash 60)))
+      (setq iblk 0)
+      (while (< iblk (sslength all_blocks)) 
+        (setq blk_name (ssname all_blocks iblk))
+        (setq vla-blk (vlax-ename->vla-object blk_name))
+        (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
+                                           (list vla-blk 'minpt 'maxpt)
+                       )
+        )
+        (if (not (vl-catch-all-error-p catchbox)) 
+          (progn 
+            (setq pt_min (vlax-safearray->list minpt))
+            (setq pt_max (vlax-safearray->list maxpt))
+            (setq bminX (car pt_min)
+                  bminY (cadr pt_min)
+            )
+            (setq bmaxX (car pt_max)
+                  bmaxY (cadr pt_max)
+            )
+            (if 
+              (and (< bminX smaxX) (> bmaxX sminX) (< bminY smaxY) (> bmaxY sminY))
+              (try 'get-block-att (list blk_name))
+            )
           )
         )
+        (setq iblk (1+ iblk))
       )
     )
   )
@@ -715,7 +832,14 @@
         )
 
         (if (/= format nil) 
-          (utvar nil)
+          (progn 
+            (find-stamp-blocks)
+            (utvar numa)
+            (setq nameris nil
+                  numa    nil
+                  format  nil
+            )
+          )
         )
       )
       ;;конец repeat
@@ -774,6 +898,7 @@
             (if (/= format nil) 
               (progn 
                 (try 'get-block-att (list name))
+                (find-stamp-blocks)
                 (utvar numa)
                 (setq nameris nil
                       numa    nil
@@ -793,8 +918,6 @@
 )					;канец дефана блокау
 
 
-
-;=================================================================
 
 ;=================================================================
 
@@ -1190,11 +1313,7 @@
             )
           )
           (SETVAR "cmdecho" cmd)
-          (princ (STRCAT "Файл захаваны:" fileuser))
-          (PRINC 
-            "\n-----------------------------------------------------------\n"
-          )
-          (princ)
+          (princ (STRCAT "\nФайл захаваны: " fileuser "\n"))
         )
       )
     )
@@ -1277,8 +1396,8 @@
          (equal (car x2) (car x5) 0.0001)
          (equal (last x2) (last x5) 0.0001)
     )
-    (princ T)
-    (princ nil)
+    T
+    nil
   )
 )
 ;number list
@@ -1294,12 +1413,11 @@
 
 ;------------------------знішчэнне дулікатау--------------------------
 (defun del_dubl (/ temp_car temp1 temp2 temp3 druk1 druk2) 
-  (print 
-    (strcat "Колькасць да знішчэнне дулікатаў рысункаў: " 
+  (princ 
+    (strcat "\nКолькасць да знішчэнне дулікатаў рысункаў: " 
             (rtos (+ (len druk_n) (len druk_v)))
     )
   )
-  (print)
   ;апрацоука нявызначанных
   (while (/= nil druk_n) 
     (setq temp_car (car druk_n))
@@ -1431,12 +1549,12 @@
     (setq druk_n temp3)
   )
 
-  (print 
-    (strcat "Колькасць пасля знішчэнне дулікатаў рысункаў: " 
+  (princ 
+    (strcat "\nКолькасць пасля знішчэнне дулікатаў рысункаў: " 
             (rtos (+ (len druk_n) (len druk_v)))
+            "\n___________________________________________________________\n"
     )
   )
-  (print)
 )
 
 
@@ -1473,7 +1591,7 @@
 
 ;------------------------утварэнне спісау друку іх нумерацыя,ад дыялогу---------------------------------
 (defun zapusk_druk (/ f_temp ris_temp color_indices temp_druk_v idx item old_cdr 
-                    updated_cdr
+                    updated_cdr skip_print
                    ) 
 
   ;друк полилиний-блокау-спдс
@@ -1487,53 +1605,65 @@
   (prin_numar) ;прастаука нумароу вызначанага спису
   (zad_n) ;прастаука нумароу невызначанага спису
 
+  (setq skip_print nil)
   (if (and (= acad_color 2) (/= druk_v nil)) 
     (progn 
-      (setq color_indices (ShowSheetColorDialog druk_v))
-      (setq temp_druk_v nil)
-      (setq idx 0)
-      (foreach item druk_v 
-        (if (member idx color_indices) 
-          (progn 
-            (setq old_cdr (cdr item))
-            (setq updated_cdr (list 
-                                (nth 0 old_cdr)
-                                (nth 1 old_cdr)
-                                (nth 2 old_cdr)
-                                (nth 3 old_cdr)
-                                (nth 4 old_cdr)
-                                (nth 5 old_cdr)
-                                (nth 6 old_cdr)
-                                T
-                              )
-            )
-            (setq temp_druk_v (cons (cons (car item) updated_cdr) temp_druk_v))
-          )
-          (setq temp_druk_v (cons item temp_druk_v))
-        )
-        (setq idx (1+ idx))
+      (if (> (length druk_v) 1) 
+        (setq color_indices (ShowSheetColorDialog druk_v))
+        (setq color_indices (list 0))
       )
-      (setq druk_v (reverse temp_druk_v))
+      (if (= color_indices 'cancel) 
+        (setq skip_print T)
+        (progn 
+          (setq temp_druk_v nil)
+          (setq idx 0)
+          (foreach item druk_v 
+            (if (member idx color_indices) 
+              (progn 
+                (setq old_cdr (cdr item))
+                (setq updated_cdr (list 
+                                    (nth 0 old_cdr)
+                                    (nth 1 old_cdr)
+                                    (nth 2 old_cdr)
+                                    (nth 3 old_cdr)
+                                    (nth 4 old_cdr)
+                                    (nth 5 old_cdr)
+                                    (nth 6 old_cdr)
+                                    T
+                                  )
+                )
+                (setq temp_druk_v (cons (cons (car item) updated_cdr) temp_druk_v))
+              )
+              (setq temp_druk_v (cons item temp_druk_v))
+            )
+            (setq idx (1+ idx))
+          )
+          (setq druk_v (reverse temp_druk_v))
+        )
+      )
     )
   )
 
-  (setq f_temp "")
-  (setq ris_temp "")
-  (peshat)
-  palja
+  (if (not skip_print) 
+    (progn 
+      (setq f_temp "")
+      (setq ris_temp "")
+      (peshat)
 
-  (if (/= (vl-bb-ref 'file_ris) nil) 
-    (vl-bb-set 
-      'file_ris
-      (strcat (vl-bb-ref 'file_ris) "&" ris_temp)
+      (if (/= (vl-bb-ref 'file_ris) nil) 
+        (vl-bb-set 
+          'file_ris
+          (strcat (vl-bb-ref 'file_ris) "&" ris_temp)
+        )
+        (vl-bb-set 'file_ris ris_temp)
+      )
+
+
+      (vl-bb-set 
+        'file_all
+        (strcat (vl-bb-ref 'file_all) "&" f_temp)
+      )
     )
-    (vl-bb-set 'file_ris ris_temp)
-  )
-
-
-  (vl-bb-set 
-    'file_all
-    (strcat (vl-bb-ref 'file_all) "&" f_temp)
   )
   (princ)
 );end function
@@ -1670,23 +1800,44 @@
           (if (= rys 0) 
             (peshat-spds-file-run)
           )
-        )
-      )
-      (if (= needAdd nil) (setq needAdd 0))
 
-      (if (OR (equal sfile_all 1) (equal sfile 1)) 
-        ;адпраука файлау на сліяніе пдф
-        (progn 
-          (startapp 
-            "__prog\\exe\\FormMerge\\FormMergeExe.exe"
-            (strcat "\"" (vl-bb-ref 'file_all) "\"")
+          (if (= needAdd nil) (setq needAdd 0))
+
+          (if (OR (equal sfile_all 1) (equal sfile 1)) 
+            ;адпраука файлау на сліяніе пдф
+            (progn 
+              (setq count_pdf 0)
+              (setq temp_str (strcase (vl-bb-ref 'file_all)))
+              (while (vl-string-search ".PDF" temp_str) 
+                (setq count_pdf (1+ count_pdf))
+                (setq temp_str (substr temp_str 
+                                       (+ (vl-string-search ".PDF" temp_str) 5)
+                               )
+                )
+              )
+              (if (> count_pdf 1) 
+                (progn 
+                  (princ 
+                    (strcat "\n___________________________________________________________\nПередано в программу слияния: " 
+                            (vl-bb-ref 'file_all)
+                            "\n"
+                    )
+                  )
+                  (startapp 
+                    "__prog\\exe\\FormMerge\\FormMergeExe.exe"
+                    (strcat "\"" (vl-bb-ref 'file_all) "\"")
+                  )
+                  (command)
+                )
+              )
+            )
           )
-          (command)
         )
       )
     )
   ) ;end if
   (vl-bb-set 'lik_open nil)
+  (princ)
 )
 ;
 (print "загружена автоматичская печать")
@@ -1705,6 +1856,10 @@
           (setq color_mode (cdr result))
           (vl-bb-set 'folder_color_mode color_mode)
           (vl-bb-set 'folder_color_files selected_files)
+          (if (member (GETVAR "dwgname") selected_files) 
+            (setq acad_color color_mode)
+            (setq acad_color 0)
+          )
           T
         )
         nil
@@ -1712,7 +1867,7 @@
     )
     (progn 
       (vl-bb-set 'folder_color_mode acad_color)
-      (vl-bb-set 'folder_color_files nil)
+      (vl-bb-set 'folder_color_files peshat-files)
       T
     )
   )
@@ -1781,11 +1936,6 @@
     )
   )
 )
-					;запуск в открываемых файлах
-(if (/= (vl-bb-ref 'directory-p) nil) 
-  (open-p)
-)
-
 (defun ShowSheetColorDialog (sheets / dcl_file file_handle dcl_id result 
                              selected_indices selected_sheets read_list index item 
                              display_list name
@@ -1797,7 +1947,10 @@
   (write-line "  : text { label = \"Выберите чертежи для печати в цвете:\"; }" 
               file_handle
   )
-  (write-line "  : text { label = \"п.с. подсказка: несколько чертежей выбираются через Ctrl\"; }" 
+  (write-line "  : text { label = \"* Чертежи, которые НЕ выделены в списке, распечатаются в монохроме.\"; }" 
+              file_handle
+  )
+  (write-line "  : text { label = \"* Подсказка: используйте Ctrl/Shift (+мышь или ↑ ↓) для выделения нескольких чертежей.\"; }" 
               file_handle
   )
   (write-line "  : list_box {" file_handle)
@@ -1843,7 +1996,7 @@
       (read (strcat "(" selected_indices ")"))
       nil
     )
-    nil
+    'cancel
   )
 )
 
@@ -1855,25 +2008,25 @@
   (setq file_handle (open dcl_file "w"))
   (write-line "file_list_dcl : dialog {" file_handle)
   (write-line "  label = \"Список файлов для печати\";" file_handle)
-  (write-line "  : boxed_column { label = \"Что делать с выбраными:\";" 
+  (write-line "  : boxed_column { label = \"Режим цветной печати (для выбранных файлов):\";" 
               file_handle
   )
   (write-line "    : radio_column {" file_handle)
-  (write-line "      : radio_button {key = \"file_color_all\"; label = \"все цветные чертежи в файлах\"; value = 1;}" 
+  (write-line "      : radio_button {key = \"file_color_all\"; label = \"печать всех чертежей в файле/-ах в цвете\"; value = 1;}" 
               file_handle
   )
-  (write-line "      : radio_button {key = \"file_color_ask\"; label = \"запрашивать цвет чертежей в файле\";}" 
+  (write-line "      : radio_button {key = \"file_color_ask\"; label = \"запросить конкретные чертежи в файле/ах\";}" 
               file_handle
   )
   (write-line "    }" file_handle)
   (write-line "  }" file_handle)
-  (write-line "  : text { label = \"Выберите, какие файлы спрашивать или печатать в цвете:\"; }" 
+  (write-line "  : text { label = \"Выберите файлы для цветной печати:\"; }" 
               file_handle
   )
-  (write-line "  : text { label = \"п.с. не выбранные распечатаются в монохроме...\"; }" 
+  (write-line "  : text { label = \"* Файлы, которые НЕ выделены в списке, распечатаются в монохроме.\"; }" 
               file_handle
   )
-  (write-line "  : text { label = \"Подсказка: несколько чертежей выбираются через Ctrl\"; }" 
+  (write-line "  : text { label = \"* Подсказка: используйте Ctrl/Shift (+мышь или ↑ ↓) для выделения нескольких файлов.\"; }" 
               file_handle
   )
   (write-line "  : list_box {" file_handle)
@@ -1956,3 +2109,8 @@
     )
   )
 )					;--
+
+					;запуск в открываемых файлах
+(if (/= (vl-bb-ref 'directory-p) nil) 
+  (open-p)
+)
