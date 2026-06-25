@@ -1676,18 +1676,12 @@
 
       (if (OR (equal sfile_all 1) (equal sfile 1)) 
         ;адпраука файлау на сліяніе пдф
-        (if (boundp 'add_edit) 
-          ;;;  (progn
-          ;(bookmark (vl-bb-ref 'file_ris))
-          (add_edit needAdd (vl-bb-ref 'file_all))
-          ;;;   )
-          (progn 
-            (startapp 
-              "__prog\\exe\\FormMerge\\FormMergeExe.exe"
-              (strcat "\"" (vl-bb-ref 'file_all) "\"")
-            )
-            (command)
+        (progn 
+          (startapp 
+            "__prog\\exe\\FormMerge\\FormMergeExe.exe"
+            (strcat "\"" (vl-bb-ref 'file_all) "\"")
           )
+          (command)
         )
       )
     )
