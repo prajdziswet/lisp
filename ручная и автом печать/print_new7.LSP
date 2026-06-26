@@ -3,7 +3,7 @@
   (if (boundp 'add_edit) 
     (command "new_edit")
     ;(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
-	(startapp "__prog\\exe\\FormMerge\\FormMergeExe.exe")
+	(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
   )
 )
 
@@ -613,7 +613,7 @@
         (progn 
           (startapp 
             ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-			"__prog\\exe\\FormMerge\\FormMergeExe.exe"
+			"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
             (strcat "\"" filereturn "\"")
           )
           (command)
