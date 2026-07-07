@@ -3,7 +3,8 @@
   (if (boundp 'add_edit) 
     (command "new_edit")
     ;(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
-	(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
+	;(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
+	(startapp "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe")
   )
 )
 
@@ -613,7 +614,8 @@
         (progn 
           (startapp 
             ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-			"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
+			;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
+			"e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
             (strcat "\"" filereturn "\"")
           )
           (command)
