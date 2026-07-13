@@ -3,8 +3,10 @@
   (if (boundp 'add_edit) 
     (command "new_edit")
     ;(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
-	;(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
-	(startapp "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe")
+    ;(startapp "__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe")
+    (startapp 
+      "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+    )
   )
 )
 
@@ -339,18 +341,25 @@
     (setq mashrus mash1)
   )
 
-  (setq nameris nil numa nil shifr nil is-big nil)
-  (if (and point1 point2)
-    (progn
-      (setq x2 (list (max (car point1) (car point2)) (min (cadr point1) (cadr point2))))
+  (setq nameris nil
+        numa    nil
+        shifr   nil
+        is-big  nil
+  )
+  (if (and point1 point2) 
+    (progn 
+      (setq x2 (list (max (car point1) (car point2)) 
+                     (min (cadr point1) (cadr point2))
+               )
+      )
       (setq mash mashrus)
-      (if (boundp 'find-stamp-blocks)
-        (progn
-          (if (boundp 'is-big-stamp-p)
+      (if (boundp 'find-stamp-blocks) 
+        (progn 
+          (if (boundp 'is-big-stamp-p) 
             (setq is-big (is-big-stamp-p))
           )
           (find-stamp-blocks)
-          (if (boundp 'get-shifr-from-blocks)
+          (if (boundp 'get-shifr-from-blocks) 
             (setq shifr (get-shifr-from-blocks is-big))
           )
         )
@@ -377,8 +386,8 @@
                       )
         )
       )
-      (if (= struser nil)
-        (progn
+      (if (= struser nil) 
+        (progn 
           (SETVAR "cmdecho" cmd)
           (princ "\nОтменено пользователем.")
           (exit)
@@ -521,12 +530,18 @@
               (princ)
             )
           )
-          
-          (setq single-ret (strcat pure_filename ".pdf"
+
+          (setq single-ret (strcat pure_filename 
+                                   ".pdf"
                                    (if shifr (strcat ">" shifr) ">")
                                    (if nameris (strcat ">" nameris) ">")
-                                   (if numa (strcat ">" (vl-princ-to-string numa)) ">")
-                                   "<"))
+                                   (if numa 
+                                     (strcat ">" (vl-princ-to-string numa))
+                                     ">"
+                                   )
+                                   "<"
+                           )
+          )
           (setq single-ret (strcat (GETVAR "dwgprefix") "&false&true&" single-ret))
           (if (boundp 'add_edit) 
             (add_edit nil single-ret)
@@ -575,8 +590,8 @@
 
 
 (defun pri_new (AddDwgBool / temp_start sufix filereturn filename namememory dcl_id 
-                ddi colordwg printtrue mash1 spislist mod vers proc 
-                shifr nameris numa is-big
+                ddi colordwg printtrue mash1 spislist mod vers proc shifr nameris numa 
+                is-big
                ) 
   ;----------------------------------------------------------------------
   (setq temp_start T
@@ -629,18 +644,30 @@
 
         (if (/= filereturn nil) 
           (if (/= printtrue nil) 
-            (setq filereturn (strcat filereturn "?" namememory ".pdf"
+            (setq filereturn (strcat filereturn 
+                                     "?"
+                                     namememory
+                                     ".pdf"
                                      (if shifr (strcat ">" shifr) ">")
                                      (if nameris (strcat ">" nameris) ">")
-                                     (if numa (strcat ">" (vl-princ-to-string numa)) ">")
-                             ))
+                                     (if numa 
+                                       (strcat ">" (vl-princ-to-string numa))
+                                       ">"
+                                     )
+                             )
+            )
           )
           (if (/= printtrue nil) 
-            (setq filereturn (strcat namememory ".pdf"
+            (setq filereturn (strcat namememory 
+                                     ".pdf"
                                      (if shifr (strcat ">" shifr) ">")
                                      (if nameris (strcat ">" nameris) ">")
-                                     (if numa (strcat ">" (vl-princ-to-string numa)) ">")
-                             ))
+                                     (if numa 
+                                       (strcat ">" (vl-princ-to-string numa))
+                                       ">"
+                                     )
+                             )
+            )
           )
         )
       )
@@ -659,8 +686,8 @@
         (progn 
           (startapp 
             ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-			;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-			"e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+            ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
+            "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
             (strcat "\"" filereturn "\"")
           )
           (command)
