@@ -339,6 +339,25 @@
     (setq mashrus mash1)
   )
 
+  (setq nameris nil numa nil shifr nil is-big nil)
+  (if (and point1 point2)
+    (progn
+      (setq x2 (list (max (car point1) (car point2)) (min (cadr point1) (cadr point2))))
+      (setq mash mashrus)
+      (if (boundp 'find-stamp-blocks)
+        (progn
+          (if (boundp 'is-big-stamp-p)
+            (setq is-big (is-big-stamp-p))
+          )
+          (find-stamp-blocks)
+          (if (boundp 'get-shifr-from-blocks)
+            (setq shifr (get-shifr-from-blocks is-big))
+          )
+        )
+      )
+    )
+  )
+
   (vformat)
 
   (if (and (/= format nil) (/= (GETVAR "LOCALE") "ENG")) 
@@ -352,7 +371,7 @@
 
       ;задаванне назова малюнка
       (if (= AddDwgBool nil) 
-        (SETQ struser (ask_pdf_print ""))
+        (SETQ struser (ask_pdf_print (if nameris nameris "")))
         (setq struser (strcat (if (= colordwg 1) (princ "+") (princ "")) 
                               namememory
                       )
@@ -400,6 +419,7 @@
         (T (SETQ fileuser struser))
       )
 
+      (setq pure_filename fileuser)
       (setq filename2 (STRCAT (GETVAR "dwgprefix") fileuser "+1.pdf"))
       (SETQ fileuser (STRCAT (GETVAR "dwgprefix") fileuser ".pdf"))
 
@@ -501,6 +521,22 @@
               (princ)
             )
           )
+          
+          (setq single-ret (strcat pure_filename ".pdf"
+                                   (if shifr (strcat ">" shifr) ">")
+                                   (if nameris (strcat ">" nameris) ">")
+                                   (if numa (strcat ">" (vl-princ-to-string numa)) ">")
+                                   "<"))
+          (setq single-ret (strcat (GETVAR "dwgprefix") "&false&true&" single-ret))
+          (if (boundp 'add_edit) 
+            (add_edit nil single-ret)
+            (progn 
+              (startapp 
+                "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+                (strcat "\"" single-ret "\"")
+              )
+            )
+          )
         )
         ;(alert "пдф-нанадрукован, глядзі у тэчке")
       )
@@ -539,7 +575,8 @@
 
 
 (defun pri_new (AddDwgBool / temp_start sufix filereturn filename namememory dcl_id 
-                ddi colordwg printtrue mash1 spislist mod vers proc
+                ddi colordwg printtrue mash1 spislist mod vers proc 
+                shifr nameris numa is-big
                ) 
   ;----------------------------------------------------------------------
   (setq temp_start T
@@ -592,10 +629,18 @@
 
         (if (/= filereturn nil) 
           (if (/= printtrue nil) 
-            (setq filereturn (strcat filereturn "?" namememory ".pdf"))
+            (setq filereturn (strcat filereturn "?" namememory ".pdf"
+                                     (if shifr (strcat ">" shifr) ">")
+                                     (if nameris (strcat ">" nameris) ">")
+                                     (if numa (strcat ">" (vl-princ-to-string numa)) ">")
+                             ))
           )
           (if (/= printtrue nil) 
-            (setq filereturn (strcat namememory ".pdf"))
+            (setq filereturn (strcat namememory ".pdf"
+                                     (if shifr (strcat ">" shifr) ">")
+                                     (if nameris (strcat ">" nameris) ">")
+                                     (if numa (strcat ">" (vl-princ-to-string numa)) ">")
+                             ))
           )
         )
       )
@@ -605,7 +650,7 @@
 
   (if (/= filereturn nil) 
     (progn 
-      (SETQ filereturn (STRCAT (GETVAR "dwgprefix") "&false&true&" filereturn))
+      (SETQ filereturn (STRCAT (GETVAR "dwgprefix") "&false&true&" filereturn "<"))
 
       (alert "пдф-надрукаваны, праверце тэчку")
       ;адпраука файлау у редактор
