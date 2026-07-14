@@ -1,7 +1,9 @@
 ;вяртанне назову рысунка
 (defun namelist (/ x_temp1 x_temp2 nabor_s temp_all text n len i text temp_lm) 
-  (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
-  (setq x_temp2 (list (- (car x2) (/ 55 mash)) (+ (last x2) (/ 5 mash))))
+  (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (cadr x2) (/ 20 mash))))
+  (setq x_temp2 (list (- (car x2) (/ 55 mash)) (+ (cadr x2) (/ 5 mash))))
+
+
   (setq text "")
   (setq temp_lm (getvar "ctab"))
   (if (and model (/= model temp_lm)) (setvar "ctab" model))
@@ -51,20 +53,39 @@
 ;вяртанне шифру
 (defun nameshifr (temp / x_temp1 x_temp2 nabor_s temp_all text n len i text temp_lm)  ;temp nil-верхняя шапка, инакш-нижняя
   (if (/= nil temp) 
-    (progn 
-      (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
-      (setq x_temp2 (list (- (car x2) (/ 15 mash)) (+ (last x2) (/ 5 mash))))
+    (progn  ; --- БОЛЬШОЙ ШТАМП (Шифр сверху) ---
+           (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 60 mash))))
+           (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 50 mash))))
     )
-    (progn 
-      (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 60 mash))))
-      (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 50 mash))))
+    (progn  ; --- МАЛЫЙ ШТАМП (Шифр снизу) ---
+           (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 20 mash))))
+           (setq x_temp2 (list (- (car x2) (/ 15 mash)) (+ (last x2) (/ 5 mash))))
     )
   ) ;сканчэнне вызначэнне каардынат
   (setq text "")
   (setq temp_lm (getvar "ctab"))
   (if (and model (/= model temp_lm)) (setvar "ctab" model))
-  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
-  (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*EXT"))))
+
+  (princ 
+    (strcat "\n[nameshifr] Зона поиска шифра: dX: " 
+            (rtos (- (car x_temp1) (car x2)) 2 2)
+            ".."
+            (rtos (- (car x_temp2) (car x2)) 2 2)
+            ", dY: "
+            (rtos (- (cadr x_temp1) (cadr x2)) 2 2)
+            ".."
+            (rtos (- (cadr x_temp2) (cadr x2)) 2 2)
+    )
+  )
+  ;(getstring "\nНажмите Пробел или Enter, чтобы продолжить (посмотрите на зеленую рамку поиска шифра)...")
+
+  (setq nabor_s (ssget "_C" 
+                       (trans x_temp1 0 1)
+                       (trans x_temp2 0 1)
+                       '((0 . "*EXT"))
+                )
+  )
+
   (if (and (/= nil nabor_s) (= (sslength nabor_s) 1)) 
     ;progn
     (progn 
@@ -108,161 +129,288 @@
 
 ; Возвращает T если большой штамп, nil если малый.
 ; Зависит от внешних переменных: x2, mash, model.
-(defun is-big-stamp-p (/ det-min det-max nabor_s i ename edata etype txt
-                         ins-x ins-y sx sy rot blk-defname cur-ent cur-data
-                         lx ly wx wy temp_lm cur-ename found)
+(defun is-big-stamp-p (/ det-min det-max nabor_s i ename edata etype txt ins-x ins-y 
+                       sx sy rot blk-defname cur-ent cur-data lx ly wx wy temp_lm 
+                       cur-ename found
+                      ) 
 
-  ; --- Координаты зоны обнаружения ---
-  (setq det-min (list (- (car x2)  (/ 60 mash))
-                      (+ (cadr x2) (/ 40 mash))))
-  (setq det-max (list (- (car x2)  (/ 5  mash))
-                      (+ (cadr x2) (/ 52 mash))))
+  ; Вычисленные пользователем координаты: от +28 до +40
+  (setq det-min (list (- (car x2) (/ 60 mash)) 
+                      (+ (cadr x2) (/ 28 mash))
+                )
+  )
+  (setq det-max (list (- (car x2) (/ 5 mash)) 
+                      (+ (cadr x2) (/ 40 mash))
+                )
+  )
 
   ; --- Переключиться на нужный лист ---
   (setq temp_lm (getvar "ctab"))
   (if (and model (/= model temp_lm)) (setvar "ctab" model))
 
-  (vl-cmdf "_zoom" "_W" det-min det-max)
-  ; Секущая рамка — захватываем ВСЁ что пересекает зону (TEXT, MTEXT, INSERT)
-  (setq nabor_s (ssget "_C" det-min det-max '((0 . "TEXT,MTEXT,INSERT"))))
-  (command "_u")
+  (princ 
+    (strcat "\n[is-big-stamp-p] Отладка масштаба: MASH = " 
+            (rtos mash 2 4)
+            ", Ширина рамки: "
+            (rtos (- (car x2) (car x1)) 2 2)
+            ", Высота рамки: "
+            (rtos (- (cadr x2) (cadr x1)) 2 2)
+    )
+  )
 
+  ;(setq mid_pt (list (/ (+ (car det-min) (car det-max)) 2.0)
+  ;                   (/ (+ (cadr det-min) (cadr det-max)) 2.0)))
+  ;(vl-cmdf "_zoom" "_C" mid_pt (* 150 mash))
+
+  ; Красная диагональ больше не нужна, убираем её
+
+
+  ; Секущая рамка — захватываем ВСЁ что пересекает зону (TEXT, MTEXT, INSERT)
+  (setq nabor_s (ssget "_C" 
+                       (trans det-min 0 1)
+                       (trans det-max 0 1)
+                       '((0 . "TEXT,MTEXT,INSERT"))
+                )
+  )
+
+  ;(command "_u")
+
+  (princ 
+    (strcat "\n[is-big-stamp-p] Зона поиска от X2,Y2 (правый нижний угол):" 
+            "\n   dX: "
+            (rtos (- (car det-min) (car x2)) 2 2)
+            " .. "
+            (rtos (- (car det-max) (car x2)) 2 2)
+            "\n   dY: "
+            (rtos (- (cadr det-min) (cadr x2)) 2 2)
+            " .. "
+            (rtos (- (cadr det-max) (cadr x2)) 2 2)
+    )
+  )
+  (if nabor_s 
+    (princ 
+      (strcat "\n[is-big-stamp-p] Найдено объектов: " (itoa (sslength nabor_s)))
+    )
+    (princ "\n[is-big-stamp-p] Объекты в зоне не найдены!")
+  )
+
+  (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
   (setq found nil)
 
-  (if nabor_s
-    (progn
+  (if nabor_s 
+    (progn 
       (setq i 0)
-      (while (and (< i (sslength nabor_s)) (not found))
+      (while (and (< i (sslength nabor_s)) (not found)) 
         (setq ename (ssname nabor_s i))
         (setq edata (entget ename))
         (setq etype (cdr (assoc 0 edata)))
 
-        (cond
+        (cond 
 
           ; --- TEXT или MTEXT: проверяем текст напрямую ---
           ((or (= etype "TEXT") (= etype "MTEXT"))
            (setq txt (strcase (cdr (assoc 1 edata))))
-           (if (or (vl-string-search "СТАДИЯ" txt)
-                   (vl-string-search "ЛИСТОВ" txt))
-             (setq found T)))
+           (if 
+             (or (vl-string-search "ТАДИЯ" txt) 
+                 (vl-string-search "ИСТОВ" txt)
+             )
+             (setq found T)
+           )
+          )
 
           ; --- INSERT: без взрыва — идём в определение блока ---
           ((= etype "INSERT")
-           (setq ins-x (car  (cdr (assoc 10 edata)))
+           (setq ins-x (car (cdr (assoc 10 edata)))
                  ins-y (cadr (cdr (assoc 10 edata)))
                  sx    (cdr (assoc 41 edata))
                  sy    (cdr (assoc 42 edata))
-                 rot   (cdr (assoc 50 edata)))
-           (if (not sx)  (setq sx 1.0))
-           (if (not sy)  (setq sy 1.0))
+                 rot   (cdr (assoc 50 edata))
+           )
+           (if (not sx) (setq sx 1.0))
+           (if (not sy) (setq sy 1.0))
            (if (not rot) (setq rot 0.0))
 
            ; 1) ATTRIBs вставки (мировые координаты — группа 11)
            (setq cur-ename (entnext ename))
-           (while (and cur-ename (not found))
+           (while (and cur-ename (not found)) 
              (setq cur-data (entget cur-ename))
-             (if (= (cdr (assoc 0 cur-data)) "SEQEND")
+             (if (= (cdr (assoc 0 cur-data)) "SEQEND") 
                (setq cur-ename nil)
-               (progn
-                 (if (= (cdr (assoc 0 cur-data)) "ATTRIB")
-                   (progn
-                     (setq lx (car  (cdr (assoc 11 cur-data)))
-                           ly (cadr (cdr (assoc 11 cur-data))))
-                     (if (and (>= lx (car det-min)) (<= lx (car det-max))
-                              (>= ly (cadr det-min)) (<= ly (cadr det-max)))
-                       (progn
-                         (setq txt (strcase (cdr (assoc 1 cur-data))))
-                         (if (or (vl-string-search "СТАДИЯ" txt)
-                                 (vl-string-search "ЛИСТОВ" txt))
-                           (setq found T))))))
-                 (setq cur-ename (entnext cur-ename)))))
+               (progn 
+                 (if (= (cdr (assoc 0 cur-data)) "ATTRIB") 
+                   (progn 
+                     (setq txt (strcase (cdr (assoc 1 cur-data))))
+                     (setq pt (cdr (assoc 11 cur-data)))
+                     (if (and (= (car pt) 0.0) (= (cadr pt) 0.0)) 
+                       (setq pt (cdr (assoc 10 cur-data)))
+                     )
+                     (setq wx (car pt)
+                           wy (cadr pt)
+                     )
+                     (if 
+                       (and (>= wx (car det-min)) 
+                            (<= wx (car det-max))
+                            (>= wy (cadr det-min))
+                            (<= wy (cadr det-max))
+                       )
+                       (progn 
+                         (if 
+                           (or (vl-string-search "ТАДИЯ" txt) 
+                               (vl-string-search "ИСТОВ" txt)
+                           )
+                           (setq found T)
+                         )
+                       )
+                     )
+                   )
+                 )
+                 (setq cur-ename (entnext cur-ename))
+               )
+             )
+           )
 
            ; 2) Определение блока (TEXT, MTEXT, ATTDEF) — с трансформацией
            (setq blk-defname (tblobjname "BLOCK" (cdr (assoc 2 edata))))
-           (if blk-defname
-             (progn
+           (if blk-defname 
+             (progn 
                (setq cur-ent (entnext blk-defname))
-               (while (and cur-ent (not found))
+               (while (and cur-ent (not found)) 
                  (setq cur-data (entget cur-ent))
-                 (setq etype    (cdr (assoc 0 cur-data)))
-                 (if (member etype '("TEXT" "MTEXT" "ATTDEF"))
-                   (progn
-                     ; локальные координаты (группа 10)
-                     (setq lx (car  (cdr (assoc 10 cur-data)))
-                           ly (cadr (cdr (assoc 10 cur-data))))
-                     ; пересчёт в мировые
-                     (setq wx (+ ins-x (* sx lx (cos rot)) (- (* sy ly (sin rot))))
-                           wy (+ ins-y (* sx lx (sin rot))    (* sy ly (cos rot))))
-                     ; попадает в зону?
-                     (if (and (>= wx (car det-min)) (<= wx (car det-max))
-                              (>= wy (cadr det-min)) (<= wy (cadr det-max)))
-                       (progn
+                 (setq etype (cdr (assoc 0 cur-data)))
+                 (if (member etype '("TEXT" "MTEXT" "ATTDEF")) 
+                   (progn 
+                     ; Проверяем группу 60 (0 = видим, 1 = невидим, nil = видим по умолчанию)
+                     (if 
+                       (not 
+                         (and (assoc 60 cur-data) (= (cdr (assoc 60 cur-data)) 1))
+                       )
+                       (progn 
                          (setq txt (strcase (cdr (assoc 1 cur-data))))
-                         (if (or (vl-string-search "СТАДИЯ" txt)
-                                 (vl-string-search "ЛИСТОВ" txt))
-                           (setq found T))))))
-                 (if (= (cdr (assoc 0 cur-data)) "ENDBLK")
+                         (setq lx (car (cdr (assoc 10 cur-data))))
+                         (setq ly (cadr (cdr (assoc 10 cur-data))))
+                         (setq wx (+ ins-x 
+                                     (* sx lx (cos rot))
+                                     (- (* sy ly (sin rot)))
+                                  )
+                         )
+                         (setq wy (+ ins-y (* sx lx (sin rot)) (* sy ly (cos rot))))
+                         (if 
+                           (and (>= wx (car det-min)) 
+                                (<= wx (car det-max))
+                                (>= wy (cadr det-min))
+                                (<= wy (cadr det-max))
+                           )
+                           (progn 
+                             (if 
+                               (or (vl-string-search "ТАДИЯ" txt) 
+                                   (vl-string-search "ИСТОВ" txt)
+                               )
+                               (setq found T)
+                             )
+                           )
+                         )
+                       )
+                     )
+                   )
+                 )
+                 (if (= (cdr (assoc 0 cur-data)) "ENDBLK") 
                    (setq cur-ent nil)
-                   (setq cur-ent (entnext cur-ent))))))))
+                   (setq cur-ent (entnext cur-ent))
+                 )
+               )
+             )
+           )
+          )
+        )
 
-        (setq i (1+ i))))
+        (setq i (1+ i))
+      )
+    )
   )
 
   (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
-  found  ; T = большой штамп, nil = малый
+  found ; T = большой штамп, nil = малый
 )
 
-(defun get-shifr-from-blocks (is-big / shifr-found all_blocks iblk blk_name vla-blk
-                               minpt maxpt pt_min pt_max catchbox
-                               sminX smaxX sminY smaxY bminX bminY bmaxX bmaxY
-                               pt x1t y1t x2t y2t in-zone tag)
+(defun get-shifr-from-blocks (is-big / shifr-found all_blocks iblk blk_name vla-blk 
+                              minpt maxpt pt_min pt_max catchbox sminX smaxX sminY 
+                              smaxY bminX bminY bmaxX bmaxY pt x1t y1t x2t y2t in-zone 
+                              tag
+                             ) 
   (setq shifr-found nil)
-  (setq all_blocks (ssget "_X"
-    (list (cons 0 "INSERT") (cons 410 (if model model (getvar "ctab"))))))
-  (if all_blocks
-    (progn
+  (setq all_blocks (ssget "_X" 
+                          (list (cons 0 "INSERT") 
+                                (cons 410 (if model model (getvar "ctab")))
+                          )
+                   )
+  )
+  (if all_blocks 
+    (progn 
       (setq sminX (- (car x2) (* mash 190)))
       (setq smaxX (+ (car x2) (* mash 10)))
       (setq sminY (- (cadr x2) (* mash 10)))
       (setq smaxY (+ (cadr x2) (* mash 70)))
       (setq iblk 0)
-      (while (and (< iblk (sslength all_blocks)) (= shifr-found nil))
+      (while (and (< iblk (sslength all_blocks)) (= shifr-found nil)) 
         (setq blk_name (ssname all_blocks iblk))
         (setq vla-blk (vlax-ename->vla-object blk_name))
-        (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox
-                         (list vla-blk 'minpt 'maxpt)))
-        (if (not (vl-catch-all-error-p catchbox))
-          (progn
+        (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
+                                           (list vla-blk 'minpt 'maxpt)
+                       )
+        )
+        (if (not (vl-catch-all-error-p catchbox)) 
+          (progn 
             (setq pt_min (vlax-safearray->list minpt))
             (setq pt_max (vlax-safearray->list maxpt))
-            (setq bminX (car pt_min) bminY (cadr pt_min))
-            (setq bmaxX (car pt_max) bmaxY (cadr pt_max))
-            (if (and (< bminX smaxX) (> bmaxX sminX) (< bminY smaxY) (> bmaxY sminY))
+            (setq bminX (car pt_min)
+                  bminY (cadr pt_min)
+            )
+            (setq bmaxX (car pt_max)
+                  bmaxY (cadr pt_max)
+            )
+            (if 
+              (and (< bminX smaxX) (> bmaxX sminX) (< bminY smaxY) (> bmaxY sminY))
               ; блок попал в зону штампа — ищем атрибуты
-              (if (= (vla-get-HasAttributes vla-blk) :vlax-true)
-                (progn
-                  (foreach tag (vlax-safearray->list
-                                 (vlax-variant-value (vla-getattributes vla-blk)))
-                    (if (and (= shifr-found nil) (= (vla-get-visible tag) :vlax-true))
-                      (progn
-                        (setq pt (cdr (assoc 11 (entget (vlax-vla-object->ename tag)))))
-                        (setq x1t (nth 0 pt) y1t (nth 1 pt))
-                        (setq x2t (nth 0 x2) y2t (nth 1 x2))
-                        
-                        (setq in-zone nil)
-                        (if is-big
-                          ; Зона большого штампа
-                          (setq in-zone (and (< (- x2t (* mash 125)) x1t)
-                                             (> (- x2t (* mash 5))   x1t)
-                                             (> y1t (+ (* mash 5)  y2t))
-                                             (< y1t (+ (* mash 65) y2t))))
-                          ; Зона малого штампа
-                          (setq in-zone (and (< (- x2t (* mash 125)) x1t)
-                                             (> (- x2t (* mash 15))  x1t)
-                                             (> y1t (+ (* mash 5)  y2t))
-                                             (< y1t (+ (* mash 25) y2t))))
+              (if (= (vla-get-HasAttributes vla-blk) :vlax-true) 
+                (progn 
+                  (foreach tag 
+                    (vlax-safearray->list 
+                      (vlax-variant-value (vla-getattributes vla-blk))
+                    )
+                    (if 
+                      (and (= shifr-found nil) 
+                           (= (vla-get-visible tag) :vlax-true)
+                      )
+                      (progn 
+                        (setq pt (cdr 
+                                   (assoc 11 (entget (vlax-vla-object->ename tag)))
+                                 )
                         )
-                        (if in-zone
+                        (setq x1t (nth 0 pt)
+                              y1t (nth 1 pt)
+                        )
+                        (setq x2t (nth 0 x2)
+                              y2t (nth 1 x2)
+                        )
+
+                        (setq in-zone nil)
+                        (if is-big 
+                          ; Зона большого штампа (шифр наверху)
+                          (setq in-zone (and (< (- x2t (* mash 125)) x1t) 
+                                             (> (- x2t (* mash 5)) x1t)
+                                             (> y1t (+ (* mash 50) y2t))
+                                             (< y1t (+ (* mash 60) y2t))
+                                        )
+                          )
+                          ; Зона малого штампа
+                          (setq in-zone (and (< (- x2t (* mash 125)) x1t) 
+                                             (> (- x2t (* mash 15)) x1t)
+                                             (> y1t (+ (* mash 5) y2t))
+                                             (< y1t (+ (* mash 20) y2t))
+                                        )
+                          )
+                        )
+                        (if in-zone 
                           (setq shifr-found (vla-get-TextString tag))
                         )
                       )
@@ -281,81 +429,71 @@
 )
 
 ; для выбранного многострочного текста очищает форматирование.=============================================================================|;
-(defun clear-mtext1 (string-to-normalize / sub_string sub_pos left_string 
-                     right_string
-                    ) 
-  (if 
-    (or 
-      (setq sub_pos (vl-string-search "{f" string-to-normalize))
-      (setq sub_pos (vl-string-search "{\\" string-to-normalize))
-      (setq sub_pos (vl-string-search "\\f" string-to-normalize))
-      (setq sub_pos (vl-string-search "{\\f" string-to-normalize))
-    ) ;_ end of or
+(defun clear-mtext (str / pos temp end) 
+  (if (and str (= (type str) 'STR)) 
     (progn 
-      (setq left_string ;все, что до "{"
-                        (vl-string-trim 
-                          "{"
-                          (substr 
-                            string-to-normalize
-                            1
-                            (vl-string-position 
-                              (ascii "\\")
-                              string-to-normalize
-                              sub_pos
-                            ) ;_ end of vl-string-position
-                          ) ;_ end of substr
-                        ) ;_ end of vl-string-trim
-      ) ;_ end of setq
-      ;; Вот здесь была ошибка при некоторых условиях
-      (if 
-        (vl-string-position 
-          (ascii ";")
-          string-to-normalize
-          sub_pos
-        ) ;_ end of vl-string-position
-        (setq right_string ;все, что между {f и ;
-                           (substr 
-                             string-to-normalize
-                             (+ 
-                               (vl-string-position 
-                                 (ascii ";")
-                                 string-to-normalize
-                                 sub_pos
-                               ) ;_ end of vl-string-position
-                               2
-                             ) ;_ end of +
-                           ) ;_ end of substr
-        ) ;_ end of setq
-        (setq right_string "")
-      ) ;_ end of if
-      (clear-mtext1 (strcat left_string right_string))
-    ) ;_ end of progn
-    ;; Старый вариант попытки снесения "}"
-    ;;(vl-string-trim "}" string-to-normalize)
-    ;; Новый вариант снесения "}"
-    (vl-list->string 
-      (vl-remove 
-        (ascii "}")
-        (vl-string->list string-to-normalize)
-      ) ;_ end of vl-remove
-    ) ;_ end of vl-list->string
-  ) ;_ end of if
-) ;_ end of defun
-(defun clear-mtext (string-to-normalize / poz) 
-  (setq string-to-normalize (clear-mtext1 string-to-normalize))
-  (if (wcmatch string-to-normalize "\\*;*") 
-    (progn 
-      (setq poz (+ 
-                  (vl-string-search ";" 
-                                    string-to-normalize
-                                    (vl-string-search "\\" string-to-normalize 0)
-                  )
-                  2
-                )
+      ;; Замена \P на пробел
+      (while (setq pos (vl-string-search "\\P" (strcase str))) 
+        (setq str (strcat (substr str 1 pos) " " (substr str (+ pos 3))))
       )
-      (substr string-to-normalize poz (- (strlen string-to-normalize) poz -1))
+      (setq pos 0)
+      (while (< pos (strlen str)) 
+        (setq temp (substr str (1+ pos) 2))
+        (cond 
+          ;; Escaped characters: \\, \{, \}
+          ((member (strcase temp) '("\\\\" "\\{" "\\}"))
+           (setq str (strcat (substr str 1 pos) 
+                             (substr temp 2 1)
+                             (substr str (+ pos 3))
+                     )
+                 pos (1+ pos)
+           )
+          )
+          ;; Toggle codes: \L, \l, \O, \o, \K, \k
+          ((member (strcase temp) '("\\L" "\\O" "\\K"))
+           (setq str (strcat (substr str 1 pos) (substr str (+ pos 3))))
+          )
+          ;; Non-breaking space \~
+          ((= temp "\\~")
+           (setq str (strcat (substr str 1 pos) " " (substr str (+ pos 3)))
+                 pos (1+ pos)
+           )
+          )
+          ;; Stacking \S...; keep the content
+          ((= (strcase temp) "\\S")
+           (if (setq end (vl-string-position 59 str pos))  ; 59 is ";"
+             (setq str (strcat (substr str 1 pos) 
+                               (substr str (+ pos 3) (- end pos 2))
+                               (substr str (+ end 2))
+                       )
+             )
+             (setq pos (1+ pos))
+           )
+          )
+          ;; Formatting codes ending with ";" e.g., \fArial; \A1; \C1; \H1.5; \T1; \Q15; \W1; \p;
+          ((and (= (substr temp 1 1) "\\") 
+                (member (strcase (substr temp 2 1)) 
+                        '("F" "A" "C" "H" "T" "Q" "W" "P")
+                )
+           )
+           (if (setq end (vl-string-position 59 str pos))  ; 59 is ";"
+             (setq str (strcat (substr str 1 pos) (substr str (+ end 2))))
+             (setq pos (1+ pos)) ; fallback if no ';' found
+           )
+          )
+          ;; Unescaped braces { and }
+          ((= (substr temp 1 1) "{")
+           (setq str (strcat (substr str 1 pos) (substr str (+ pos 2))))
+          )
+          ((= (substr temp 1 1) "}")
+           (setq str (strcat (substr str 1 pos) (substr str (+ pos 2))))
+          )
+          (t (setq pos (1+ pos)))
+        )
+      )
+      (vl-string-trim " \t\r\n" str)
     )
-    (setq string-to-normalize string-to-normalize)
+    ""
   )
 )
 ;----------------------------------------------------
@@ -776,7 +914,7 @@
 ;=================================================================
 
 ;;---------------------вызначэнне фармату----------------------
-(defun v_formats (/ dis1 dis2 mash) 
+(defun v_formats (/ dis1 dis2) 
   ;нормализация координат
   (normal_points)
 
@@ -1348,6 +1486,8 @@
   )
 
   (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
+  (setq x1 (trans x1 0 1))
+  (setq x2 (trans x2 0 1))
 
   (if (and (/= format nil) (/= (GETVAR "LOCALE") "ENG")) 
     (progn 
@@ -1371,11 +1511,17 @@
       (setq shifr (nth 8 spis))
       (if (= shifr nil) (setq shifr ""))
       ; Формируем: имяфайла.pdf>шифр>название>номер
-      (setq entry (strcat fileuser ".pdf"
-                          ">" shifr
-                          ">" (if nameris nameris "")
-                          ">" (if list_n1 list_n1 "")))
-      (if (equal f_temp "")
+      (setq entry (strcat fileuser 
+                          ".pdf"
+                          ">"
+                          shifr
+                          ">"
+                          (if nameris nameris "")
+                          ">"
+                          (if list_n1 list_n1 "")
+                  )
+      )
+      (if (equal f_temp "") 
         (setq f_temp entry)
         (setq f_temp (strcat f_temp "?" entry))
       )
@@ -1403,84 +1549,87 @@
           (vl-file-delete fileuser)
           (setq cmd (GETVAR "cmdecho"))
           (SETVAR "cmdecho" 0)
-          (if (/= model "Model") 
-            (command "_plot" ;Сама команда
-                     "_y" ;Выполнить детальное задание конфигурации?:
-                     "" ;Имя листа или <печать>:
-                     "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
-                     format ;Формат листа бумаги
-                     "_Millimeters" 
-                     ;;Единицы измерения размеров листа :
-                     poloz 
-                     ;;Ориентация чертежа [Книжная/Альбомная]:
-                     "_N" 
-                     ;;Перевернуть чертеж? :
-                     "Рамка" 
-                     ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
-                     x1 
-                     ;;першая коордыната
-                     x2 
-                     ;;другая коордяната
-                     mash 
-                     ;;Масштаб печати :
-                     "_center" 
-                     ;;Смещение от начала(x,y)или[Центрировать]:
-                     "_y" 
-                     ;;Учитывать стили печати? [Да/Нет]:
-                     ctb_file 
-                     ;;Имя таблицы стилей печати:
-                     "_y" 
-                     ;;Учитывать веса линий? [Да/Нет]:
-                     "_N" 
-                     ;;Масштабировать веса линий?:
-                     "_N" 
-                     ;;Печатать объекты листа первыми?:
-                     "_N" 
-                     ;;Скрывать объекты листа?:
-                     fileuser 
-                     ;;Введите имя файла :
-                     "_n" 
-                     ;;Сохранить изменения параметров листа
-                     "_y" 
-                     ;;Перейти к печати [Да/Нет]
+          (if nil  ; [ОТЛАДКА] Отключено реальное печатание
+            (if (/= model "Model") 
+              (command "_plot" ;Сама команда
+                       "_y" ;Выполнить детальное задание конфигурации?:
+                       "" ;Имя листа или <печать>:
+                       "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
+                       format ;Формат листа бумаги
+                       "_Millimeters" 
+                       ;;Единицы измерения размеров листа :
+                       poloz 
+                       ;;Ориентация чертежа [Книжная/Альбомная]:
+                       "_N" 
+                       ;;Перевернуть чертеж? :
+                       "Рамка" 
+                       ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
+                       x1 
+                       ;;першая коордыната
+                       x2 
+                       ;;другая коордяната
+                       mash 
+                       ;;Масштаб печати :
+                       "_center" 
+                       ;;Смещение от начала(x,y)или[Центрировать]:
+                       "_y" 
+                       ;;Учитывать стили печати? [Да/Нет]:
+                       ctb_file 
+                       ;;Имя таблицы стилей печати:
+                       "_y" 
+                       ;;Учитывать веса линий? [Да/Нет]:
+                       "_N" 
+                       ;;Масштабировать веса линий?:
+                       "_N" 
+                       ;;Печатать объекты листа первыми?:
+                       "_N" 
+                       ;;Скрывать объекты листа?:
+                       fileuser 
+                       ;;Введите имя файла :
+                       "_n" 
+                       ;;Сохранить изменения параметров листа
+                       "_y" 
+                       ;;Перейти к печати [Да/Нет]
+              )
+              ;;калі модель
+              (command "_plot" ;Сама команда
+                       "_y" ;Выполнить детальное задание конфигурации?:
+                       "" ;Имя листа или <печать>:
+                       "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
+                       format ;Формат листа бумаги
+                       "_Millimeters" 
+                       ;;Единицы измерения размеров листа :
+                       poloz 
+                       ;;Ориентация чертежа [Книжная/Альбомная]:
+                       "_N" 
+                       ;;Перевернуть чертеж? :
+                       "Рамка" 
+                       ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
+                       x1 
+                       ;;першая коордыната
+                       x2 
+                       ;;другая коордяната
+                       mash 
+                       ;;Масштаб печати :
+                       "_center" 
+                       ;;Смещение от начала(x,y)или[Центрировать]:
+                       "_y" 
+                       ;;Учитывать стили печати? [Да/Нет]:
+                       ctb_file 
+                       ;;Имя таблицы стилей печати:
+                       "_y" 
+                       ;;Учитывать веса линий? [Да/Нет]:
+                       "_N" 
+                       ;;Режим вывода тонированных ВЭ:
+                       fileuser 
+                       ;;Введите имя файла :
+                       "_n" 
+                       ;;Сохранить изменения параметров листа
+                       "_y" 
+                       ;;Перейти к печати [Да/Нет]
+              )
             )
-            ;;калі модель
-            (command "_plot" ;Сама команда
-                     "_y" ;Выполнить детальное задание конфигурации?:
-                     "" ;Имя листа или <печать>:
-                     "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
-                     format ;Формат листа бумаги
-                     "_Millimeters" 
-                     ;;Единицы измерения размеров листа :
-                     poloz 
-                     ;;Ориентация чертежа [Книжная/Альбомная]:
-                     "_N" 
-                     ;;Перевернуть чертеж? :
-                     "Рамка" 
-                     ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
-                     x1 
-                     ;;першая коордыната
-                     x2 
-                     ;;другая коордяната
-                     mash 
-                     ;;Масштаб печати :
-                     "_center" 
-                     ;;Смещение от начала(x,y)или[Центрировать]:
-                     "_y" 
-                     ;;Учитывать стили печати? [Да/Нет]:
-                     ctb_file 
-                     ;;Имя таблицы стилей печати:
-                     "_y" 
-                     ;;Учитывать веса линий? [Да/Нет]:
-                     "_N" 
-                     ;;Режим вывода тонированных ВЭ:
-                     fileuser 
-                     ;;Введите имя файла :
-                     "_n" 
-                     ;;Сохранить изменения параметров листа
-                     "_y" 
-                     ;;Перейти к печати [Да/Нет]
-            )
+            (princ "\n[ОТЛАДКА] Функция _plot отключена.\n")
           )
           (SETVAR "cmdecho" cmd)
           (princ (STRCAT "\nФайл захаваны: " fileuser "\n"))
@@ -1739,21 +1888,45 @@
   (if (and (OR (= nameris "") (= nameris nil)) (/= zapret_name T)) 
     (setq nameris (namelist))
   )
-  
+
   (setq is-big (is-big-stamp-p))
+  (if (not is-big) (setq nameris ""))
   (setq shifr "")
   (setq shifr (nameshifr is-big))
   (if (= shifr nil) (setq shifr ""))
-  (if (= shifr "")
-    (progn
+  (if (= shifr "") 
+    (progn 
       (setq shifr (get-shifr-from-blocks is-big))
       (if (= shifr nil) (setq shifr ""))
     )
   )
 
+  ; Очистка текста от форматирования MTEXT
+  (if (and nameris (= (type nameris) 'STR)) (setq nameris (clear-mtext nameris)))
+  (if (and shifr (= (type shifr) 'STR)) (setq shifr (clear-mtext shifr)))
+  (if (and numa (= (type numa) 'STR)) (setq numa (clear-mtext numa)))
+
+  ; [ОТЛАДКА] Вывод диагностики
+  (princ 
+    (strcat "\n--- ДИАГНОСТИКА ШТАМПА ---" 
+            "\nШтамп: "
+            (if is-big "Большой" "Малый")
+            "\nНазвание (nameris): "
+            (if nameris nameris "nil")
+            "\nШифр (shifr): "
+            (if shifr shifr "nil")
+            "\nНомер (numa): "
+            (if numa (vl-princ-to-string numa) "nil")
+            "\n--------------------------\n"
+    )
+  )
+
   (if (or (= numa nil) (= numa 0)) 
     (if (/= druk_n nil) 
-      (setq druk_n (cons (list 0 x1 x2 format mash poloz model nameris nil shifr) druk_n))
+      (setq druk_n (cons (list 0 x1 x2 format mash poloz model nameris nil shifr) 
+                         druk_n
+                   )
+      )
       (setq druk_n (list (list 0 x1 x2 format mash poloz model nameris nil shifr)))
     ) ;end if
     (if (/= druk_v nil) 
@@ -1986,17 +2159,18 @@
               (if (> count_pdf 1) 
                 (progn 
                   (princ 
-                    (strcat "\n___________________________________________________________\nПередано в программу слияния: " 
+                    (strcat "\n___________________________________________________________\n[ОТЛАДКА] Сформированная строка file_all:\n" 
                             (vl-bb-ref 'file_all)
                             "\n"
                     )
                   )
-                  (startapp 
-                    ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-                    "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
-                    (strcat "\"" (vl-bb-ref 'file_all) "\"")
-                  )
-                  (command)
+                  ;(startapp
+                  ;  ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
+                  ;  "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+                  ;  (strcat "\"" (vl-bb-ref 'file_all) "\"")
+                  ;)
+                  ;(command)
+                  (princ "\n[ОТЛАДКА] Вызов WPFMergeExe отключен.\n")
                 )
               )
             )
