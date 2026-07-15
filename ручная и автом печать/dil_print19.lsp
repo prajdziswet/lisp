@@ -151,10 +151,14 @@
   (princ 
     (strcat "\n[is-big-stamp-p] Отладка масштаба: MASH = " 
             (rtos mash 2 4)
-            ", Ширина рамки: "
-            (rtos (- (car x2) (car x1)) 2 2)
-            ", Высота рамки: "
-            (rtos (- (cadr x2) (cadr x1)) 2 2)
+            (if x1 
+              (strcat ", Ширина рамки: " 
+                      (rtos (abs (- (car x2) (car x1))) 2 2)
+                      ", Высота рамки: "
+                      (rtos (abs (- (cadr x2) (cadr x1))) 2 2)
+              )
+              ""
+            )
     )
   )
 
@@ -711,14 +715,14 @@
 
   (setq x_temp1 (list (- (car x2) (/ 40 mash)) (+ (last x2) (/ 30 mash))))
   (setq x_temp2 (list (- (car x2) (/ 25 mash)) (+ (last x2) (/ 20 mash))))
-  (if (/= model temp_lm) 
+  (if (and model (/= model temp_lm)) 
     (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
   )
   (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
   (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
   (command "_u")
   ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-  (if (/= model temp_lm) 
+  (if (and model (/= model temp_lm)) 
     (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
   )
 
@@ -731,14 +735,14 @@
                     )
       )
       (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 20 mash))))
-      (if (/= model temp_lm) 
+      (if (and model (/= model temp_lm)) 
         (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
       )
       (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
       (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
       (command "_u")
       ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-      (if (/= model temp_lm) 
+      (if (and model (/= model temp_lm)) 
         (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
       )
 
@@ -757,14 +761,14 @@
           )
           (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 5 mash))))
 
-          (if (/= model temp_lm) 
+          (if (and model (/= model temp_lm)) 
             (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
           )
           (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
           (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*ext"))))
           (command "_u")
           ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-          (if (/= model temp_lm) 
+          (if (and model (/= model temp_lm)) 
             (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
           )
 
