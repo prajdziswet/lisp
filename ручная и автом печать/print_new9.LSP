@@ -692,7 +692,12 @@
     (unload_dialog dcl_id)
     ;end dialog
     (if (>= listpp (length spislist)) (setq listpp 0))
-    (if (= pp T) (setvar "ctab" (setq mod (nth listpp spislist))))
+    (if (= pp T) 
+      (progn 
+        (setq mod (nth listpp spislist))
+        (if (/= (getvar "ctab") mod) (setvar "ctab" mod))
+      )
+    )
     (if (and (= temp_start T) (/= pp T)) 
       (progn 
         (setq sufix     (strcat "r" (itoa i))

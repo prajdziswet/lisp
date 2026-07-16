@@ -557,70 +557,6 @@
     )
   )
 
-  ; Если имя или номер не найдены в атрибутах, попробуем взорвать копию блока и найти обычный текст
-  (if (or (= numa nil) (= nameris nil)) 
-    (progn 
-      (setq copy_obj (vla-Copy vla-nameobj))
-      (setq catchit (vl-catch-all-apply 'vla-Explode (list copy_obj)))
-      (if (not (vl-catch-all-error-p catchit)) 
-        (progn 
-          (setq exploded_objs (vlax-safearray->list (vlax-variant-value catchit)))
-          (foreach tag exploded_objs 
-            (if 
-              (or (= (vla-get-ObjectName tag) "AcDbText") 
-                  (= (vla-get-ObjectName tag) "AcDbMText")
-              )
-              (progn 
-                (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
-                                                   (list tag 'minpt 'maxpt)
-                               )
-                )
-                (if (not (vl-catch-all-error-p catchbox)) 
-                  (progn 
-                    (setq point (vlax-safearray->list minpt))
-                    (setq x1temp (nth 0 point)
-                          y1temp (nth 1 point)
-                    )
-                    (setq x2temp (nth 0 x2)
-                          y2temp (nth 1 x2)
-                    )
-                    (cond 
-                      ((and (= numa nil) 
-                            (< (- x2temp (* mash 40)) x1temp)
-                            (> (- x2temp (* mash 25)) x1temp)
-                            (> y1temp (+ (* mash 20) y2temp))
-                            (< y1temp (+ (* mash 30) y2temp))
-                       )
-                       (setq numa (vla-get-TextString tag))
-                      )
-                      ((and (= numa nil) 
-                            (< (- x2temp (* mash 15)) x1temp)
-                            (> (- x2temp (* mash 5)) x1temp)
-                            (> y1temp (+ (* mash 5) y2temp))
-                            (< y1temp (+ (* mash 13) y2temp))
-                       )
-                       (setq numa (vla-get-TextString tag))
-                      )
-                      ((and (= nameris nil) 
-                            (< (- x2temp (* mash 125)) x1temp)
-                            (> (- x2temp (* mash 55)) x1temp)
-                            (> y1temp (+ (* mash 5) y2temp))
-                            (< y1temp (+ (* mash 20) y2temp))
-                       )
-                       (setq nameris (clear-mtext (vla-get-TextString tag)))
-                      )
-                    )
-                  )
-                )
-              )
-            )
-            (vla-Delete tag)
-          )
-        )
-      )
-      (vla-Delete copy_obj)
-    )
-  )
 )
 ;-------------------------------
 (defun find-stamp-blocks (/ all_blocks iblk blk_name vla-blk minpt maxpt pt_min 
@@ -1489,7 +1425,7 @@
                  )
   )
 
-  (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
+  (if (and model (/= (getvar "ctab") model)) (setvar "ctab" model)) ;пераход на патрэбны ліст або мадель
   (setq x1 (trans x1 0 1))
   (setq x2 (trans x2 0 1))
 
@@ -1642,7 +1578,7 @@
     )
   ) ;канец ифа
 
-  (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+  (if (and temp_lm (/= (getvar "ctab") temp_lm)) (setvar "ctab" temp_lm)) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
 
   ;закрытие пдф
   (exit_pdf)
