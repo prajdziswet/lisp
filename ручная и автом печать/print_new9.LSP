@@ -291,7 +291,12 @@
 (DEFUN c:pri (/ formatfalse cmd dis1 dis2 mashrus point1 point2 color struser fi0 
               list1 data data1 filename2 file2
              ) 
-
+  (if (= (getvar "BLOCKEDITOR") 1)
+    (progn
+      (alert "Пожалуйста, закройте Редактор блоков перед печатью!")
+      (exit)
+    )
+  )
   (SETQ formatfalse nil)
   (setq nameris nil shifr nil numa nil)
   ; праверка даты и выхад если надо

@@ -2020,6 +2020,12 @@
 (defun c:dil_spds (/ dcl_id pdf rys ddi druk_n druk_v done file_all sfile_all sfile 
                    lik_open data stor data1 nameris acad_color
                   )  ;numar
+  (if (= (getvar "BLOCKEDITOR") 1)
+    (progn
+      (alert "Пожалуйста, закройте Редактор блоков перед автоматической печатью!")
+      (exit)
+    )
+  )
   (setq acad_color 0)
   (PRINC "\n---------------------------------------------------------------------------\n")
   ; (PRINC "Праграмма распрацавана на lisp, prajdziswet-ам (Косау Уладзимир) у 2014 годзе\n")
