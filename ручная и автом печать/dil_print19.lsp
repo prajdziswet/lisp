@@ -660,7 +660,7 @@
   )
   (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
   (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
-  (vl-cmdf "_zoom" "_p") ;вяртанне зумавання
+  (command "_u")
   (if (and model (/= model temp_lm)) 
     (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
   )
@@ -679,7 +679,7 @@
       )
       (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
       (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
-      (vl-cmdf "_zoom" "_p") ;вяртанне зумавання
+      (command "_u")
       (if (and model (/= model temp_lm)) 
         (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
       )
@@ -704,7 +704,7 @@
           )
           (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
           (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*ext"))))
-          (vl-cmdf "_zoom" "_p") ;вяртанне зумавання
+          (command "_u")
           (if (and model (/= model temp_lm)) 
             (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
           )
