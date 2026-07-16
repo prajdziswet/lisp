@@ -43,7 +43,8 @@
         )
       )
     )
-  )
+  ) ;end if
+  (command "_u")
   (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
   (if (= text nil) (setq text ""))
   (setq text text)
@@ -119,7 +120,8 @@
         )
       )
     )
-  )
+  ) ;end if
+  (command "_u")
   (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
   (setq text text)
 )
@@ -348,10 +350,10 @@
   )
   (if all_blocks 
     (progn 
-      (setq sminX (- (car x2) (/ 190 mash)))
-      (setq smaxX (+ (car x2) (/ 10 mash)))
-      (setq sminY (- (cadr x2) (/ 10 mash)))
-      (setq smaxY (+ (cadr x2) (/ 70 mash)))
+      (setq sminX (- (car x2) (* mash 190)))
+      (setq smaxX (+ (car x2) (* mash 10)))
+      (setq sminY (- (cadr x2) (* mash 10)))
+      (setq smaxY (+ (cadr x2) (* mash 70)))
       (setq iblk 0)
       (while (and (< iblk (sslength all_blocks)) (= shifr-found nil)) 
         (setq blk_name (ssname all_blocks iblk))
@@ -388,9 +390,6 @@
                                    (assoc 11 (entget (vlax-vla-object->ename tag)))
                                  )
                         )
-                        (if (and (= (car pt) 0.0) (= (cadr pt) 0.0))
-                          (setq pt (cdr (assoc 10 (entget (vlax-vla-object->ename tag)))))
-                        )
                         (setq x1t (nth 0 pt)
                               y1t (nth 1 pt)
                         )
@@ -401,17 +400,17 @@
                         (setq in-zone nil)
                         (if is-big 
                           ; Зона большого штампа (шифр наверху)
-                          (setq in-zone (and (< (- x2t (/ 125 mash)) x1t) 
-                                             (> (- x2t (/ 5 mash)) x1t)
-                                             (> y1t (+ (/ 50 mash) y2t))
-                                             (< y1t (+ (/ 60 mash) y2t))
+                          (setq in-zone (and (< (- x2t (* mash 125)) x1t) 
+                                             (> (- x2t (* mash 5)) x1t)
+                                             (> y1t (+ (* mash 50) y2t))
+                                             (< y1t (+ (* mash 60) y2t))
                                         )
                           )
                           ; Зона малого штампа
-                          (setq in-zone (and (< (- x2t (/ 125 mash)) x1t) 
-                                             (> (- x2t (/ 15 mash)) x1t)
-                                             (> y1t (+ (/ 5 mash) y2t))
-                                             (< y1t (+ (/ 20 mash) y2t))
+                          (setq in-zone (and (< (- x2t (* mash 125)) x1t) 
+                                             (> (- x2t (* mash 15)) x1t)
+                                             (> y1t (+ (* mash 5) y2t))
+                                             (< y1t (+ (* mash 20) y2t))
                                         )
                           )
                         )
@@ -523,9 +522,6 @@
         (if (= (vla-get-visible tag) :vlax-true) 
           (progn 
             (setq point (cdr (assoc 11 (entget (vlax-vla-object->ename tag)))))
-            (if (and (= (car point) 0.0) (= (cadr point) 0.0))
-              (setq point (cdr (assoc 10 (entget (vlax-vla-object->ename tag)))))
-            )
             (setq x1temp (nth 0 point)
                   y1temp (nth 1 point)
             )
@@ -533,24 +529,24 @@
                   y2temp (nth 1 x2)
             )
             (cond 
-              ((and (< (- x2temp (/ 40 mash)) x1temp) 
-                    (> (- x2temp (/ 25 mash)) x1temp)
-                    (> y1temp (+ (/ 20 mash) y2temp))
-                    (< y1temp (+ (/ 30 mash) y2temp))
+              ((and (< (- x2temp (* mash 40)) x1temp) 
+                    (> (- x2temp (* mash 25)) x1temp)
+                    (> y1temp (+ (* mash 20) y2temp))
+                    (< y1temp (+ (* mash 30) y2temp))
                )
                (setq numa (vla-get-TextString tag))
               )
-              ((and (< (- x2temp (/ 15 mash)) x1temp) 
-                    (> (- x2temp (/ 5 mash)) x1temp)
-                    (> y1temp (+ (/ 5 mash) y2temp))
-                    (< y1temp (+ (/ 13 mash) y2temp))
+              ((and (< (- x2temp (* mash 15)) x1temp) 
+                    (> (- x2temp (* mash 5)) x1temp)
+                    (> y1temp (+ (* mash 5) y2temp))
+                    (< y1temp (+ (* mash 13) y2temp))
                )
                (setq numa (vla-get-TextString tag))
               )
-              ((and (< (- x2temp (/ 125 mash)) x1temp) 
-                    (> (- x2temp (/ 55 mash)) x1temp)
-                    (> y1temp (+ (/ 5 mash) y2temp))
-                    (< y1temp (+ (/ 20 mash) y2temp))
+              ((and (< (- x2temp (* mash 125)) x1temp) 
+                    (> (- x2temp (* mash 55)) x1temp)
+                    (> y1temp (+ (* mash 5) y2temp))
+                    (< y1temp (+ (* mash 20) y2temp))
                )
                (setq nameris (clear-mtext (vla-get-TextString tag)))
               )
@@ -561,6 +557,70 @@
     )
   )
 
+  ; Если имя или номер не найдены в атрибутах, попробуем взорвать копию блока и найти обычный текст
+  (if (or (= numa nil) (= nameris nil)) 
+    (progn 
+      (setq copy_obj (vla-Copy vla-nameobj))
+      (setq catchit (vl-catch-all-apply 'vla-Explode (list copy_obj)))
+      (if (not (vl-catch-all-error-p catchit)) 
+        (progn 
+          (setq exploded_objs (vlax-safearray->list (vlax-variant-value catchit)))
+          (foreach tag exploded_objs 
+            (if 
+              (or (= (vla-get-ObjectName tag) "AcDbText") 
+                  (= (vla-get-ObjectName tag) "AcDbMText")
+              )
+              (progn 
+                (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
+                                                   (list tag 'minpt 'maxpt)
+                               )
+                )
+                (if (not (vl-catch-all-error-p catchbox)) 
+                  (progn 
+                    (setq point (vlax-safearray->list minpt))
+                    (setq x1temp (nth 0 point)
+                          y1temp (nth 1 point)
+                    )
+                    (setq x2temp (nth 0 x2)
+                          y2temp (nth 1 x2)
+                    )
+                    (cond 
+                      ((and (= numa nil) 
+                            (< (- x2temp (* mash 40)) x1temp)
+                            (> (- x2temp (* mash 25)) x1temp)
+                            (> y1temp (+ (* mash 20) y2temp))
+                            (< y1temp (+ (* mash 30) y2temp))
+                       )
+                       (setq numa (vla-get-TextString tag))
+                      )
+                      ((and (= numa nil) 
+                            (< (- x2temp (* mash 15)) x1temp)
+                            (> (- x2temp (* mash 5)) x1temp)
+                            (> y1temp (+ (* mash 5) y2temp))
+                            (< y1temp (+ (* mash 13) y2temp))
+                       )
+                       (setq numa (vla-get-TextString tag))
+                      )
+                      ((and (= nameris nil) 
+                            (< (- x2temp (* mash 125)) x1temp)
+                            (> (- x2temp (* mash 55)) x1temp)
+                            (> y1temp (+ (* mash 5) y2temp))
+                            (< y1temp (+ (* mash 20) y2temp))
+                       )
+                       (setq nameris (clear-mtext (vla-get-TextString tag)))
+                      )
+                    )
+                  )
+                )
+              )
+            )
+            (vla-Delete tag)
+          )
+        )
+      )
+      (vla-Delete copy_obj)
+    )
+  )
 )
 ;-------------------------------
 (defun find-stamp-blocks (/ all_blocks iblk blk_name vla-blk minpt maxpt pt_min 
@@ -575,10 +635,10 @@
   )
   (if all_blocks 
     (progn 
-      (setq sminX (- (car x2) (/ 190 mash)))
-      (setq smaxX (+ (car x2) (/ 10 mash)))
-      (setq sminY (- (cadr x2) (/ 10 mash)))
-      (setq smaxY (+ (cadr x2) (/ 60 mash)))
+      (setq sminX (- (car x2) (* mash 190)))
+      (setq smaxX (+ (car x2) (* mash 10)))
+      (setq sminY (- (cadr x2) (* mash 10)))
+      (setq smaxY (+ (cadr x2) (* mash 60)))
       (setq iblk 0)
       (while (< iblk (sslength all_blocks)) 
         (setq blk_name (ssname all_blocks iblk))
@@ -661,6 +721,7 @@
   (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
   (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
   (command "_u")
+  ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
   (if (and model (/= model temp_lm)) 
     (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
   )
@@ -680,6 +741,7 @@
       (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
       (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
       (command "_u")
+      ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
       (if (and model (/= model temp_lm)) 
         (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
       )
@@ -705,6 +767,7 @@
           (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
           (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*ext"))))
           (command "_u")
+          ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
           (if (and model (/= model temp_lm)) 
             (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
           )
@@ -1426,7 +1489,7 @@
                  )
   )
 
-  (if (and model (/= (getvar "ctab") model)) (setvar "ctab" model)) ;пераход на патрэбны ліст або мадель
+  (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
   (setq x1 (trans x1 0 1))
   (setq x2 (trans x2 0 1))
 
@@ -1579,7 +1642,7 @@
     )
   ) ;канец ифа
 
-  (if (and temp_lm (/= (getvar "ctab") temp_lm)) (setvar "ctab" temp_lm)) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+  (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
 
   ;закрытие пдф
   (exit_pdf)
@@ -2015,12 +2078,6 @@
 (defun c:dil_spds (/ dcl_id pdf rys ddi druk_n druk_v done file_all sfile_all sfile 
                    lik_open data stor data1 nameris acad_color
                   )  ;numar
-  (if (= (getvar "BLOCKEDITOR") 1)
-    (progn
-      (alert "Пожалуйста, закройте Редактор блоков перед автоматической печатью!")
-      (exit)
-    )
-  )
   (setq acad_color 0)
   (PRINC "\n---------------------------------------------------------------------------\n")
   ; (PRINC "Праграмма распрацавана на lisp, prajdziswet-ам (Косау Уладзимир) у 2014 годзе\n")
