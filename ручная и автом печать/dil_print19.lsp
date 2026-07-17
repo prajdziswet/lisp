@@ -9,42 +9,21 @@
   (if (and model (/= model temp_lm)) (setvar "ctab" model))
   (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
   (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*EXT"))))
-  (if (and (/= nil nabor_s) (= (sslength nabor_s) 1)) 
-    ;progn
+  (if (/= nil nabor_s) 
     (progn 
-      (setq temp_all (entget (ssname nabor_s 0)))
-      (if (= (cdr (assoc 0 temp_all)) "MTEXT") 
-        (progn 
-          (command "_.Explode" (ssname nabor_s 0)) ;получение текста
-          (setq temp_all (ssget "_p" '((0 . "TEXT"))))
-          (setq i   0
-                len (sslength temp_all)
-          )
-          (while (< i len) 
-            (setq text (strcat text (cdr (assoc 1 (entget (ssname temp_all i))))))
-            (setq i (+ 1 i))
-          )
-
-          (command "_u")
+      (setq i 0 len (sslength nabor_s))
+      (while (< i len) 
+        (setq cur-ent (entget (ssname nabor_s i)))
+        (setq etype (cdr (assoc 0 cur-ent)))
+        (if (= etype "MTEXT")
+          (setq txt-part (clear-mtext (vla-get-TextString (vlax-ename->vla-object (ssname nabor_s i)))))
+          (setq txt-part (cdr (assoc 1 cur-ent))) ; TEXT
         )
-        (if (= (cdr (assoc 0 temp_all)) "TEXT") 
-          (setq text (strcat text (cdr (assoc 1 temp_all))))
-        )
-      ) ;end if
-    ) ;end progn
-    (if (and (/= nil nabor_s) (> (sslength nabor_s) 1)) 
-      (progn 
-        (setq i   0
-              len (sslength nabor_s)
-        )
-        (while (< i len) 
-          (setq text (strcat text (cdr (assoc 1 (entget (ssname nabor_s i))))))
-          (setq i (+ 1 i))
-        )
+        (if txt-part (setq text (strcat text txt-part)))
+        (setq i (+ 1 i))
       )
     )
   ) ;end if
-  (command "_u")
   (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
   (if (= text nil) (setq text ""))
   (setq text text)
@@ -79,6 +58,7 @@
   )
   ;(getstring "\nНажмите Пробел или Enter, чтобы продолжить (посмотрите на зеленую рамку поиска шифра)...")
 
+  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2)
   (setq nabor_s (ssget "_C" 
                        (trans x_temp1 0 1)
                        (trans x_temp2 0 1)
@@ -86,42 +66,21 @@
                 )
   )
 
-  (if (and (/= nil nabor_s) (= (sslength nabor_s) 1)) 
-    ;progn
+  (if (/= nil nabor_s) 
     (progn 
-      (setq temp_all (entget (ssname nabor_s 0)))
-      (if (= (cdr (assoc 0 temp_all)) "MTEXT") 
-        (progn 
-          (command "_.Explode" (ssname nabor_s 0)) ;получение текста
-          (setq temp_all (ssget "_p" '((0 . "TEXT"))))
-          (setq i   0
-                len (sslength temp_all)
-          )
-          (while (< i len) 
-            (setq text (strcat text (cdr (assoc 1 (entget (ssname temp_all i))))))
-            (setq i (+ 1 i))
-          )
-
-          (command "_u")
+      (setq i 0 len (sslength nabor_s))
+      (while (< i len) 
+        (setq cur-ent (entget (ssname nabor_s i)))
+        (setq etype (cdr (assoc 0 cur-ent)))
+        (if (= etype "MTEXT")
+          (setq txt-part (clear-mtext (vla-get-TextString (vlax-ename->vla-object (ssname nabor_s i)))))
+          (setq txt-part (cdr (assoc 1 cur-ent))) ; TEXT
         )
-        (if (= (cdr (assoc 0 temp_all)) "TEXT") 
-          (setq text (strcat text (cdr (assoc 1 temp_all))))
-        )
-      ) ;end if
-    ) ;end progn
-    (if (and (/= nil nabor_s) (> (sslength nabor_s) 1)) 
-      (progn 
-        (setq i   0
-              len (sslength nabor_s)
-        )
-        (while (< i len) 
-          (setq text (strcat text (cdr (assoc 1 (entget (ssname nabor_s i))))))
-          (setq i (+ 1 i))
-        )
+        (if txt-part (setq text (strcat text txt-part)))
+        (setq i (+ 1 i))
       )
     )
   ) ;end if
-  (command "_u")
   (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
   (setq text text)
 )
@@ -170,6 +129,7 @@
 
 
   ; Секущая рамка — захватываем ВСЁ что пересекает зону (TEXT, MTEXT, INSERT)
+  (vl-cmdf "_zoom" "_W" det-min det-max)
   (setq nabor_s (ssget "_C" 
                        (trans det-min 0 1)
                        (trans det-max 0 1)
@@ -557,33 +517,45 @@
     )
   )
 
-  ; Если имя или номер не найдены в атрибутах, попробуем взорвать копию блока и найти обычный текст
+  ; Если имя или номер не найдены в атрибутах, ищем текст в определении блока
   (if (or (= numa nil) (= nameris nil)) 
     (progn 
-      (setq copy_obj (vla-Copy vla-nameobj))
-      (setq catchit (vl-catch-all-apply 'vla-Explode (list copy_obj)))
-      (if (not (vl-catch-all-error-p catchit)) 
+      (setq edata (entget name_bl))
+      (setq ins-x (car (cdr (assoc 10 edata)))
+            ins-y (cadr (cdr (assoc 10 edata)))
+            sx    (cdr (assoc 41 edata))
+            sy    (cdr (assoc 42 edata))
+            rot   (cdr (assoc 50 edata))
+      )
+      (if (not sx) (setq sx 1.0))
+      (if (not sy) (setq sy 1.0))
+      (if (not rot) (setq rot 0.0))
+      
+      (setq blk-defname (tblobjname "BLOCK" (cdr (assoc 2 edata))))
+      (if blk-defname 
         (progn 
-          (setq exploded_objs (vlax-safearray->list (vlax-variant-value catchit)))
-          (foreach tag exploded_objs 
-            (if 
-              (or (= (vla-get-ObjectName tag) "AcDbText") 
-                  (= (vla-get-ObjectName tag) "AcDbMText")
-              )
+          (setq cur-ent (entnext blk-defname))
+          (while cur-ent 
+            (setq cur-data (entget cur-ent))
+            (setq etype (cdr (assoc 0 cur-data)))
+            (if (member etype '("TEXT" "MTEXT" "ATTDEF")) 
               (progn 
-                (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
-                                                   (list tag 'minpt 'maxpt)
-                               )
-                )
-                (if (not (vl-catch-all-error-p catchbox)) 
+                ; Проверяем группу 60 (0 = видим, 1 = невидим, nil = видим по умолчанию)
+                (if (not (and (assoc 60 cur-data) (= (cdr (assoc 60 cur-data)) 1))) 
                   (progn 
-                    (setq point (vlax-safearray->list minpt))
-                    (setq x1temp (nth 0 point)
-                          y1temp (nth 1 point)
+                    (setq vla-obj (vlax-ename->vla-object cur-ent))
+                    (if (= etype "ATTDEF")
+                      (setq txt (cdr (assoc 1 cur-data)))
+                      (setq txt (vla-get-TextString vla-obj))
                     )
-                    (setq x2temp (nth 0 x2)
-                          y2temp (nth 1 x2)
-                    )
+                    (setq lx (car (cdr (assoc 10 cur-data))))
+                    (setq ly (cadr (cdr (assoc 10 cur-data))))
+                    ; пересчёт в мировые
+                    (setq wx (+ ins-x (* sx lx (cos rot)) (- (* sy ly (sin rot)))))
+                    (setq wy (+ ins-y (* sx lx (sin rot)) (* sy ly (cos rot))))
+                    (setq x1temp wx y1temp wy)
+                    (setq x2temp (nth 0 x2) y2temp (nth 1 x2))
+                    
                     (cond 
                       ((and (= numa nil) 
                             (< (- x2temp (* mash 40)) x1temp)
@@ -591,7 +563,7 @@
                             (> y1temp (+ (* mash 20) y2temp))
                             (< y1temp (+ (* mash 30) y2temp))
                        )
-                       (setq numa (vla-get-TextString tag))
+                       (setq numa (if (or (= etype "MTEXT") (= etype "ATTDEF")) (clear-mtext txt) txt))
                       )
                       ((and (= numa nil) 
                             (< (- x2temp (* mash 15)) x1temp)
@@ -599,7 +571,7 @@
                             (> y1temp (+ (* mash 5) y2temp))
                             (< y1temp (+ (* mash 13) y2temp))
                        )
-                       (setq numa (vla-get-TextString tag))
+                       (setq numa (if (or (= etype "MTEXT") (= etype "ATTDEF")) (clear-mtext txt) txt))
                       )
                       ((and (= nameris nil) 
                             (< (- x2temp (* mash 125)) x1temp)
@@ -607,18 +579,20 @@
                             (> y1temp (+ (* mash 5) y2temp))
                             (< y1temp (+ (* mash 20) y2temp))
                        )
-                       (setq nameris (clear-mtext (vla-get-TextString tag)))
+                       (setq nameris (clear-mtext txt))
                       )
                     )
                   )
                 )
               )
             )
-            (vla-Delete tag)
+            (if (= (cdr (assoc 0 cur-data)) "ENDBLK") 
+              (setq cur-ent nil)
+              (setq cur-ent (entnext cur-ent))
+            )
           )
         )
       )
-      (vla-Delete copy_obj)
     )
   )
 )
@@ -720,7 +694,6 @@
   )
   (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
   (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
-  (command "_u")
   ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
   (if (and model (/= model temp_lm)) 
     (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
@@ -740,7 +713,6 @@
       )
       (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
       (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
-      (command "_u")
       ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
       (if (and model (/= model temp_lm)) 
         (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
@@ -766,7 +738,6 @@
           )
           (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
           (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*ext"))))
-          (command "_u")
           ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
           (if (and model (/= model temp_lm)) 
             (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
@@ -2076,7 +2047,7 @@
 
 ;------------------------выклік діалогу---------------------------------
 (defun c:dil_spds (/ dcl_id pdf rys ddi druk_n druk_v done file_all sfile_all sfile 
-                   lik_open data stor data1 nameris acad_color
+                   lik_open data stor data1 nameris acad_color old_ctab old_viewctr old_viewsize
                   )  ;numar
   (setq acad_color 0)
   (PRINC "\n---------------------------------------------------------------------------\n")
@@ -2095,6 +2066,9 @@
   )
 
   (vl-load-com)
+  (setq old_ctab (getvar "ctab"))
+  (setq old_viewctr (getvar "viewctr"))
+  (setq old_viewsize (getvar "viewsize"))
   (vl-bb-set 'lik_open 0)
   ;if auto
   (if (/= auto T) 
@@ -2183,6 +2157,10 @@
       )
     )
   ) ;end if
+  (if old_ctab (setvar "ctab" old_ctab))
+  (if (and old_viewctr old_viewsize)
+      (vl-cmdf "_zoom" "_C" old_viewctr old_viewsize)
+  )
   (vl-bb-set 'lik_open nil)
   (princ)
 )
