@@ -129,7 +129,8 @@
 
 
   ; Секущая рамка — захватываем ВСЁ что пересекает зону (TEXT, MTEXT, INSERT)
-  (vl-cmdf "_zoom" "_W" det-min det-max)
+  ; (используем trans 0 1 так как _zoom требует координаты в текущей ПСК, а det-min вычислен в МСК)
+  (vl-cmdf "_zoom" "_W" (trans det-min 0 1) (trans det-max 0 1))
   (setq nabor_s (ssget "_C" 
                        (trans det-min 0 1)
                        (trans det-max 0 1)
