@@ -58,7 +58,7 @@
   )
   ;(getstring "\nНажмите Пробел или Enter, чтобы продолжить (посмотрите на зеленую рамку поиска шифра)...")
 
-  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2)
+  (vl-cmdf "_zoom" "_W" (trans x_temp1 0 1) (trans x_temp2 0 1))
   (setq nabor_s (ssget "_C" 
                        (trans x_temp1 0 1)
                        (trans x_temp2 0 1)
@@ -300,7 +300,8 @@
 (defun get-shifr-from-blocks (is-big / shifr-found all_blocks iblk blk_name vla-blk 
                               minpt maxpt pt_min pt_max catchbox sminX smaxX sminY 
                               smaxY bminX bminY bmaxX bmaxY pt x1t y1t x2t y2t in-zone 
-                              tag
+                              tag edata ins-x ins-y sx sy rot blk-defname cur-ent cur-data 
+                              etype vla-obj txt lx ly wx wy
                              ) 
   (setq shifr-found nil)
   (setq all_blocks (ssget "_X" 
@@ -333,51 +334,135 @@
             (setq bmaxX (car pt_max)
                   bmaxY (cadr pt_max)
             )
-            (if 
-              (and (< bminX smaxX) (> bmaxX sminX) (< bminY smaxY) (> bmaxY sminY))
-              ; блок попал в зону штампа — ищем атрибуты
-              (if (= (vla-get-HasAttributes vla-blk) :vlax-true) 
-                (progn 
-                  (foreach tag 
-                    (vlax-safearray->list 
-                      (vlax-variant-value (vla-getattributes vla-blk))
+          )
+          (progn
+            (setq pt_min (cdr (assoc 10 (entget blk_name))))
+            (setq bminX (- (car pt_min) 2000)
+                  bminY (- (cadr pt_min) 2000)
+            )
+            (setq bmaxX (+ (car pt_min) 2000)
+                  bmaxY (+ (cadr pt_min) 2000)
+            )
+          )
+        )
+        (if 
+          (and (< bminX smaxX) (> bmaxX sminX) (< bminY smaxY) (> bmaxY sminY))
+          (progn
+            ; блок попал в зону штампа — ищем атрибуты
+            (if (= (vla-get-HasAttributes vla-blk) :vlax-true) 
+              (progn 
+                (foreach tag 
+                  (vlax-safearray->list 
+                    (vlax-variant-value (vla-getattributes vla-blk))
+                  )
+                  (if 
+                    (and (= shifr-found nil) 
+                         (= (vla-get-visible tag) :vlax-true)
                     )
-                    (if 
-                      (and (= shifr-found nil) 
-                           (= (vla-get-visible tag) :vlax-true)
+                    (progn 
+                      (setq pt (cdr 
+                                 (assoc 11 (entget (vlax-vla-object->ename tag)))
+                               )
                       )
-                      (progn 
-                        (setq pt (cdr 
-                                   (assoc 11 (entget (vlax-vla-object->ename tag)))
-                                 )
-                        )
-                        (setq x1t (nth 0 pt)
-                              y1t (nth 1 pt)
-                        )
-                        (setq x2t (nth 0 x2)
-                              y2t (nth 1 x2)
-                        )
+                      (if (and (= (car pt) 0.0) (= (cadr pt) 0.0))
+                        (setq pt (cdr (assoc 10 (entget (vlax-vla-object->ename tag)))))
+                      )
+                      (setq x1t (nth 0 pt)
+                            y1t (nth 1 pt)
+                      )
+                      (setq x2t (nth 0 x2)
+                            y2t (nth 1 x2)
+                      )
 
-                        (setq in-zone nil)
-                        (if is-big 
-                          ; Зона большого штампа (шифр наверху)
-                          (setq in-zone (and (< (- x2t (* mash 125)) x1t) 
-                                             (> (- x2t (* mash 5)) x1t)
-                                             (> y1t (+ (* mash 50) y2t))
-                                             (< y1t (+ (* mash 60) y2t))
-                                        )
-                          )
-                          ; Зона малого штампа
-                          (setq in-zone (and (< (- x2t (* mash 125)) x1t) 
-                                             (> (- x2t (* mash 15)) x1t)
-                                             (> y1t (+ (* mash 5) y2t))
-                                             (< y1t (+ (* mash 20) y2t))
-                                        )
+                      (setq in-zone nil)
+                      (if is-big 
+                        ; Зона большого штампа (шифр наверху)
+                        (setq in-zone (and (<= (- x2t (* mash 126)) x1t) 
+                                           (>= (- x2t (* mash 4)) x1t)
+                                           (>= y1t (+ (* mash 49) y2t))
+                                           (<= y1t (+ (* mash 61) y2t))
+                                      )
+                        )
+                        ; Зона малого штампа
+                        (setq in-zone (and (<= (- x2t (* mash 126)) x1t) 
+                                           (>= (- x2t (* mash 14)) x1t)
+                                           (>= y1t (+ (* mash 4) y2t))
+                                           (<= y1t (+ (* mash 21) y2t))
+                                      )
+                        )
+                      )
+                      (setq txt (vla-get-TextString tag))
+                      (if in-zone 
+                        (setq shifr-found txt)
+                      )
+                    )
+                  )
+                )
+              )
+            )
+            
+            ; Если шифр не найден в атрибутах, ищем текст в определении блока (fallback)
+            (if (= shifr-found nil)
+              (progn
+                (setq edata (entget blk_name))
+                (setq ins-x (car (cdr (assoc 10 edata)))
+                      ins-y (cadr (cdr (assoc 10 edata)))
+                      sx    (cdr (assoc 41 edata))
+                      sy    (cdr (assoc 42 edata))
+                      rot   (cdr (assoc 50 edata))
+                )
+                (if (not sx) (setq sx 1.0))
+                (if (not sy) (setq sy 1.0))
+                (if (not rot) (setq rot 0.0))
+                
+                (setq blk-defname (tblobjname "BLOCK" (cdr (assoc 2 edata))))
+                (if blk-defname 
+                  (progn 
+                    (setq cur-ent (entnext blk-defname))
+                    (while (and cur-ent (= shifr-found nil))
+                      (setq cur-data (entget cur-ent))
+                      (setq etype (cdr (assoc 0 cur-data)))
+                      (if (member etype '("TEXT" "MTEXT" "ATTDEF")) 
+                        (progn 
+                          (if (not (and (assoc 60 cur-data) (= (cdr (assoc 60 cur-data)) 1))) 
+                            (progn 
+                              (setq vla-obj (vlax-ename->vla-object cur-ent))
+                              (if (= etype "ATTDEF")
+                                (setq txt (cdr (assoc 1 cur-data)))
+                                (setq txt (vla-get-TextString vla-obj))
+                              )
+                              (setq lx (car (cdr (assoc 10 cur-data))))
+                              (setq ly (cadr (cdr (assoc 10 cur-data))))
+                              (setq wx (+ ins-x (* sx lx (cos rot)) (- (* sy ly (sin rot)))))
+                              (setq wy (+ ins-y (* sx lx (sin rot)) (* sy ly (cos rot))))
+                              (setq x1t wx y1t wy)
+                              (setq x2t (nth 0 x2) y2t (nth 1 x2))
+                              
+                              (setq in-zone nil)
+                              (if is-big 
+                                (setq in-zone (and (<= (- x2t (* mash 126)) x1t) 
+                                                   (>= (- x2t (* mash 4)) x1t)
+                                                   (>= y1t (+ (* mash 49) y2t))
+                                                   (<= y1t (+ (* mash 61) y2t))
+                                              )
+                                )
+                                (setq in-zone (and (<= (- x2t (* mash 126)) x1t) 
+                                                   (>= (- x2t (* mash 14)) x1t)
+                                                   (>= y1t (+ (* mash 4) y2t))
+                                                   (<= y1t (+ (* mash 21) y2t))
+                                              )
+                                )
+                              )
+                              (if in-zone 
+                                (setq shifr-found (if (or (= etype "MTEXT") (= etype "ATTDEF")) (clear-mtext txt) txt))
+                              )
+                            )
                           )
                         )
-                        (if in-zone 
-                          (setq shifr-found (vla-get-TextString tag))
-                        )
+                      )
+                      (if (= (cdr (assoc 0 cur-data)) "ENDBLK") 
+                        (setq cur-ent nil)
+                        (setq cur-ent (entnext cur-ent))
                       )
                     )
                   )
