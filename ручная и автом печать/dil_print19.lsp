@@ -1525,7 +1525,7 @@
 
 ;---------------------print_s-------------------
 (defun print_s (spis / x1 x2 format mash poloz model temp_lm list_n fileuser fi0 cmd 
-                nameris ctb_file
+                nameris ctb_file shifr entry
                ) 
   ;
 

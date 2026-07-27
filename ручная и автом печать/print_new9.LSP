@@ -382,55 +382,47 @@
           (vl-cmdf "_zoom" "_W" point1 point2)
 
           (find-stamp-blocks)
-          (princ 
-            (strcat "\n[DEBUG] After find-stamp-blocks: nameris=" 
-                    (vl-princ-to-string nameris)
-                    ", numa="
-                    (vl-princ-to-string numa)
-            )
-          )
 
           (if (and is-big (= nameris nil) (boundp 'namelist)) 
-            (progn 
-              (setq nameris (namelist))
-              (princ 
-                (strcat "\n[DEBUG] After namelist: nameris=" 
-                        (vl-princ-to-string nameris)
-                )
-              )
-            )
+            (setq nameris (namelist))
           )
+          (if (not is-big) (setq nameris nil))
           (if (and (= numa nil) (boundp 'numar_s)) 
-            (progn 
-              (setq numa (numar_s))
-              (princ 
-                (strcat "\n[DEBUG] After numar_s: numa=" (vl-princ-to-string numa))
-              )
-            )
+            (setq numa (numar_s))
           )
           (setq shifr "")
           (if (boundp 'nameshifr) 
-            (progn 
-              (setq shifr (nameshifr is-big))
-              (princ 
-                (strcat "\n[DEBUG] After nameshifr: shifr=" 
-                        (vl-princ-to-string shifr)
-                )
-              )
-            )
+            (setq shifr (nameshifr is-big))
           )
           (if (= shifr nil) (setq shifr ""))
           (if (and (= shifr "") (boundp 'get-shifr-from-blocks)) 
-            (progn 
-              (setq shifr (get-shifr-from-blocks is-big))
-              (princ 
-                (strcat "\n[DEBUG] After get-shifr-from-blocks: shifr=" 
-                        (vl-princ-to-string shifr)
-                )
-              )
-            )
+            (setq shifr (get-shifr-from-blocks is-big))
           )
           (if (= shifr nil) (setq shifr ""))
+
+          ; Очистка текста от форматирования MTEXT (если функция доступна)
+          (if (boundp 'clear-mtext)
+            (progn
+              (if (and nameris (= (type nameris) 'STR)) (setq nameris (clear-mtext nameris)))
+              (if (and shifr (= (type shifr) 'STR)) (setq shifr (clear-mtext shifr)))
+              (if (and numa (= (type numa) 'STR)) (setq numa (clear-mtext numa)))
+            )
+          )
+
+          ; [ОТЛАДКА] Вывод диагностики
+          (princ 
+            (strcat "\n--- ДИАГНОСТИКА ШТАМПА ---" 
+                    "\nШтамп: "
+                    (if is-big "Большой" "Малый")
+                    "\nНазвание (nameris): "
+                    (if nameris nameris "nil")
+                    "\nШифр (shifr): "
+                    (if shifr shifr "nil")
+                    "\nНомер (numa): "
+                    (if numa (vl-princ-to-string numa) "nil")
+                    "\n--------------------------\n"
+            )
+          )
         )
       )
     )
