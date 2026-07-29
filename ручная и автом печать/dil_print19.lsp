@@ -1313,14 +1313,9 @@
 )					;канец дефана полі
 
 ;=================================================================
-
 ;=================================================================
-
 ;=================================================================
-
 ;вызначэнне параметрау блоку нумар-имя
-
-
 ;;-----------------------------друк блокау-------------------------
 (defun blocks (/ x3 len nabor_blocks list_pol x1 x2 x3 format mash poloz model 
                list_block i i1 model1 temp_lm true_explode obj len1 list_b1 list_b2 
@@ -1388,8 +1383,7 @@
 ;=================================================================
 
 ;;---------------------вызначэнне СПДС формат----------------------
-(defun v_format_spds (/ i z f_temp numa) 
-
+(defun v_format_spds (/ f_temp numa name1 name2 name3 is-big shifr xtemp) 
   (setq format nil)
   ;;вызначэнне маштабу
   (if (/= (assoc 40 list1) nil) 
@@ -1418,41 +1412,15 @@
     (SETQ poloz "А")
     (SETQ poloz "К")
   )
-  (setq i 0
-        z 0
-  )
-  (while (< i 10) 
-    (if (= "Info" (cdr (nth (+ 10 z) list1))) 
-      (progn 
-        (setq i 10)
-        (setq z (1+ z))
-      )
-      (progn 
-        (setq z (1+ z))
-        (setq i (1+ i))
-      )
-    )
-  ) ;end while
 
-  (if (/= z 10) 
+  ;вызначэнне нумару спдс
+  (setq numa (cdr (assoc 300 (member '(301 . "Sheet") list1))))
+  (if numa (setq numa (norma_n2 numa)))
+
+  ;получение формата
+  (setq f_temp (cdr (assoc 300 (member '(301 . "Format") list1))))
+  (if f_temp 
     (progn 
-      (setq f_temp (vl-string-trim " " (cdr (nth (+ 10 z) list1))))
-      (setq f_temp (substr f_temp 
-                           (+ (vl-string-search "\t" f_temp) 2)
-                           (strlen f_temp)
-                   )
-      )
-      (setq f_temp (substr f_temp 
-                           (+ (vl-string-search "\t" f_temp) 2)
-                           (strlen f_temp)
-                   )
-      )
-      ;вызначэнне нумару спдс
-      (setq numa (norma_n2 
-                   (substr f_temp (+ (vl-string-search "\t" f_temp) 2) 10)
-                 )
-      )
-      (setq f_temp (substr f_temp 1 (vl-string-search "\n" f_temp)))
       (setq f_temp (vl-string-subst "А" "A" f_temp))
       (setq f_temp (vl-string-subst "х" "x" f_temp))
     )
@@ -1517,25 +1485,111 @@
     )
     ;;закрывает иначе
   )
+
   (if (/= format nil) 
-    (utvar numa)
+    (progn 
+      ;; Большой или малый
+      (setq is-big (= 1 (cdr (assoc 290 (member '(301 . "First sheet") list1)))))
+
+      ;; Шифр
+      (setq shifr (cdr (assoc 300 (member '(301 . "Designation") list1))))
+      (if (not shifr) 
+        (setq shifr (cdr (assoc 300 (member '(301 . "Name") list1))))
+      )
+      (if shifr (setq shifr (vl-string-trim " " shifr)) (setq shifr ""))
+      (if (and shifr (= (type shifr) 'STR)) (setq shifr (clear-mtext shifr)))
+
+      ;; Fallback Шифр
+      (if (or (= shifr "") (= shifr nil)) 
+        (progn 
+          (normal_points)
+          (setq shifr (nameshifr is-big))
+          (if (= shifr "") (setq shifr (get-shifr-from-blocks is-big)))
+        )
+      )
+
+      ;; Название (только для большого штампа)
+      (if is-big 
+        (progn 
+          (setq nameris "")
+          (setq name1 (cdr (assoc 300 (member '(301 . "Drawing type") list1))))
+          (setq name2 (cdr (assoc 300 (member '(301 . "Drawing type1") list1))))
+          (setq name3 (cdr (assoc 300 (member '(301 . "Drawing type2") list1))))
+          (if name1 (setq nameris (strcat nameris name1)))
+          (if name2 (setq nameris (strcat nameris name2)))
+          (if name3 (setq nameris (strcat nameris name3)))
+          (setq nameris (vl-string-trim " " nameris))
+          (if (and nameris (= (type nameris) 'STR)) 
+            (setq nameris (clear-mtext nameris))
+          )
+
+          ;; Fallback Название
+          (if (or (= nameris "") (= nameris nil)) 
+            (progn 
+              (normal_points)
+              (setq nameris (namelist))
+            )
+          )
+        )
+        (setq nameris "")
+      )
+
+      ;; Fallback Номер (numa)
+      (if (or (= numa nil) (= numa 0) (= numa "") (= numa "0")) 
+        (progn 
+          (normal_points)
+          (setq numa (numar_s))
+        )
+      )
+
+      (princ 
+        (strcat "\n--- ДИАГНОСТИКА СПДС ШТАМПА ---" 
+                "\nШтамп: "
+                (if is-big "Большой" "Малый")
+                "\nНазвание (nameris): "
+                (if nameris nameris "nil")
+                "\nШифр (shifr): "
+                (if shifr shifr "nil")
+                "\nНомер (numa): "
+                (if numa (vl-princ-to-string numa) "nil")
+                "\n--------------------------\n"
+        )
+      )
+
+      (if (or (= numa nil) (= numa 0) (= numa "") (= numa "0")) 
+        (if (/= druk_n nil) 
+          (setq druk_n (cons (list 0 x1 x2 format mash poloz model nameris nil shifr) 
+                             druk_n
+                       )
+          )
+          (setq druk_n (list (list 0 x1 x2 format mash poloz model nameris nil shifr)))
+        )
+        (if (/= druk_v nil) 
+          (setq druk_v (cons 
+                         (list numa x1 x2 format mash poloz model nameris nil shifr)
+                         druk_v
+                       )
+          )
+          (setq druk_v (list 
+                         (list numa x1 x2 format mash poloz model nameris nil shifr)
+                       )
+          )
+        )
+      )
+    )
   )
 )
 ;канец вызначэнне формата
 
 ;------------------------СПДС вызначэнне-------------------------------
-(defun spds1 (/ x1 x2 format mash poloz model i1 i nabor len list1 list2 name1 name2 
-              name3
-             ) 
+(defun spds1 (/ x1 x2 format mash poloz model i1 i nabor len list1 list2) 
   (setq nabor (ssget "X"))
   (vl-load-com)
   (if (null nabor) 
-
     (progn 
       (princ "\nНе составлен список. ") ; сообщение об отсутствии
       (princ) ; тихий выход
     ) ; конец progn
-
     (progn 
       (setq i   -1
             len (sslength nabor)
@@ -1546,61 +1600,12 @@
         (setq list1 (entget (ssname nabor i)))
         (if (= "SPDSFORMAT" (strcase (cdr (assoc 0 list1)))) 
           (progn 
-            (setq nameris     nil
-                  zapret_name nil
-            )
             (setq list2 (vlax-ename->vla-object (ssname nabor i)))
             (vla-GetBoundingBox list2 'x1 'x2)
             (setq x1 (vlax-safearray->list x1))
             (setq x2 (vlax-safearray->list x2))
 
             (setq model (cdr (assoc 410 list1))) ;model-list
-            (if (<= (length list1) 95) 
-              (if (/= (vl-position (cons 301 "Drawing type") list1) nil) 
-                (setq zapret_name T
-                      nameris     nil
-                )
-                (setq zapret_name nil
-                      nameris     nil
-                )
-              )
-              (progn 
-                (setq name1 (cdr 
-                              (nth 
-                                (+ 1 (vl-position (cons 301 "Drawing type") list1))
-                                list1
-                              )
-                            )
-                )
-                (if (/= nil (vl-position (cons 301 "Drawing type1") list1)) 
-                  (setq name2 (cdr 
-                                (nth 
-                                  (+ 1 
-                                     (vl-position (cons 301 "Drawing type1") list1)
-                                  )
-                                  list1
-                                )
-                              )
-                  )
-                )
-                (if (/= nil (vl-position (cons 301 "Drawing type1") list1)) 
-                  (setq name3 (cdr 
-                                (nth 
-                                  (+ 1 
-                                     (vl-position (cons 301 "Drawing type2") list1)
-                                  )
-                                  list1
-                                )
-                              )
-                  )
-                )
-                (if (and (/= name2 nil) (/= name3 nil)) 
-                  (setq nameris (vl-string-trim " " (strcat name1 name2 name3)))
-                  (setq nameris (vl-string-trim " " name1))
-                )
-              )
-            ) ;nd progn if
-            ;вызначэнне назову рысынка
 
             (if (and (/= x1 nil) (/= x2 nil)) 
               (v_format_spds)
