@@ -1,36 +1,106 @@
-;вяртанне назову рысунка
-(defun namelist (/ x_temp1 x_temp2 nabor_s temp_all text n len i text temp_lm) 
-  (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (cadr x2) (/ 20 mash))))
-  (setq x_temp2 (list (- (car x2) (/ 55 mash)) (+ (cadr x2) (/ 5 mash))))
-
-
+; Функция для поиска текста в прямоугольной области (работает в фоновых документах без _zoom)
+(defun get-texts-in-box (tx1 ty1 tx2 ty2 / nabor_s text i len ename cur-ent etype pt 
+                         txt-part vla-obj minpt maxpt bminX bminY bmaxX bmaxY catchbox 
+                         in-zone tminX tminY tmaxX tmaxY
+                        ) 
   (setq text "")
-  (setq temp_lm (getvar "ctab"))
-  (if (and model (/= model temp_lm)) (setvar "ctab" model))
-  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
-  (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*EXT"))))
-  (if (/= nil nabor_s) 
+  (setq tminX (min tx1 tx2)
+        tmaxX (max tx1 tx2)
+  )
+  (setq tminY (min ty1 ty2)
+        tmaxY (max ty1 ty2)
+  )
+  (setq nabor_s (ssget "_X" 
+                       (list (cons 0 "TEXT,MTEXT") 
+                             (cons 410 (if model model (getvar "ctab")))
+                       )
+                )
+  )
+  (if nabor_s 
     (progn 
-      (setq i 0 len (sslength nabor_s))
+      (setq i   0
+            len (sslength nabor_s)
+      )
       (while (< i len) 
-        (setq cur-ent (entget (ssname nabor_s i)))
-        (setq etype (cdr (assoc 0 cur-ent)))
-        (if (= etype "MTEXT")
-          (setq txt-part (clear-mtext (vla-get-TextString (vlax-ename->vla-object (ssname nabor_s i)))))
-          (setq txt-part (cdr (assoc 1 cur-ent))) ; TEXT
+        (setq ename (ssname nabor_s i))
+        (setq vla-obj (vlax-ename->vla-object ename))
+        (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
+                                           (list vla-obj 'minpt 'maxpt)
+                       )
         )
-        (if txt-part (setq text (strcat text txt-part)))
+        (setq in-zone nil)
+        (if (not (vl-catch-all-error-p catchbox)) 
+          (progn 
+            (setq bminX (car (vlax-safearray->list minpt)))
+            (setq bminY (cadr (vlax-safearray->list minpt)))
+            (setq bmaxX (car (vlax-safearray->list maxpt)))
+            (setq bmaxY (cadr (vlax-safearray->list maxpt)))
+            ; Проверка на пересечение прямоугольников
+            (if 
+              (not 
+                (or (< bmaxX tminX) 
+                    (> bminX tmaxX)
+                    (< bmaxY tminY)
+                    (> bminY tmaxY)
+                )
+              )
+              (setq in-zone T)
+            )
+          )
+          (progn 
+            (setq cur-ent (entget ename))
+            (setq pt (cdr (assoc 10 cur-ent)))
+            (if 
+              (and (>= (car pt) tminX) 
+                   (<= (car pt) tmaxX)
+                   (>= (cadr pt) tminY)
+                   (<= (cadr pt) tmaxY)
+              )
+              (setq in-zone T)
+            )
+          )
+        )
+        (if in-zone 
+          (progn 
+            (setq cur-ent (entget ename))
+            (setq etype (cdr (assoc 0 cur-ent)))
+            (if (= etype "MTEXT") 
+              (setq txt-part (if (boundp 'clear-mtext) 
+                               (clear-mtext (vla-get-TextString vla-obj))
+                               (vla-get-TextString vla-obj)
+                             )
+              )
+              (setq txt-part (cdr (assoc 1 cur-ent))) ; TEXT
+            )
+            (if txt-part (setq text (strcat text txt-part)))
+          )
+        )
         (setq i (+ 1 i))
       )
     )
-  ) ;end if
-  (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
+  )
+  text
+)
+
+;вяртанне назову рысунка
+(defun namelist (/ x_temp1 x_temp2 text temp_lm) 
+  (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (cadr x2) (/ 20 mash))))
+  (setq x_temp2 (list (- (car x2) (/ 55 mash)) (+ (cadr x2) (/ 5 mash))))
+
+  (setq text "")
+  (setq text (get-texts-in-box 
+               (car x_temp1)
+               (cadr x_temp1)
+               (car x_temp2)
+               (cadr x_temp2)
+             )
+  )
   (if (= text nil) (setq text ""))
-  (setq text text)
-);end defun
+  text
+)
 
 ;вяртанне шифру
-(defun nameshifr (temp / x_temp1 x_temp2 nabor_s temp_all text n len i text temp_lm)  ;temp nil-верхняя шапка, инакш-нижняя
+(defun nameshifr (temp / x_temp1 x_temp2 text temp_lm)  ;temp nil-верхняя шапка, инакш-нижняя
   (if (/= nil temp) 
     (progn  ; --- БОЛЬШОЙ ШТАМП (Шифр сверху) ---
            (setq x_temp1 (list (- (car x2) (/ 125 mash)) (+ (last x2) (/ 60 mash))))
@@ -41,48 +111,17 @@
            (setq x_temp2 (list (- (car x2) (/ 15 mash)) (+ (last x2) (/ 5 mash))))
     )
   ) ;сканчэнне вызначэнне каардынат
+
   (setq text "")
-  (setq temp_lm (getvar "ctab"))
-  (if (and model (/= model temp_lm)) (setvar "ctab" model))
-
-  (princ 
-    (strcat "\n[nameshifr] Зона поиска шифра: dX: " 
-            (rtos (- (car x_temp1) (car x2)) 2 2)
-            ".."
-            (rtos (- (car x_temp2) (car x2)) 2 2)
-            ", dY: "
-            (rtos (- (cadr x_temp1) (cadr x2)) 2 2)
-            ".."
-            (rtos (- (cadr x_temp2) (cadr x2)) 2 2)
-    )
+  (setq text (get-texts-in-box 
+               (car x_temp1)
+               (cadr x_temp1)
+               (car x_temp2)
+               (cadr x_temp2)
+             )
   )
-  ;(getstring "\nНажмите Пробел или Enter, чтобы продолжить (посмотрите на зеленую рамку поиска шифра)...")
-
-  (vl-cmdf "_zoom" "_W" (trans x_temp1 0 1) (trans x_temp2 0 1))
-  (setq nabor_s (ssget "_C" 
-                       (trans x_temp1 0 1)
-                       (trans x_temp2 0 1)
-                       '((0 . "*EXT"))
-                )
-  )
-
-  (if (/= nil nabor_s) 
-    (progn 
-      (setq i 0 len (sslength nabor_s))
-      (while (< i len) 
-        (setq cur-ent (entget (ssname nabor_s i)))
-        (setq etype (cdr (assoc 0 cur-ent)))
-        (if (= etype "MTEXT")
-          (setq txt-part (clear-mtext (vla-get-TextString (vlax-ename->vla-object (ssname nabor_s i)))))
-          (setq txt-part (cdr (assoc 1 cur-ent))) ; TEXT
-        )
-        (if txt-part (setq text (strcat text txt-part)))
-        (setq i (+ 1 i))
-      )
-    )
-  ) ;end if
-  (if (and model (/= model temp_lm)) (setvar "ctab" temp_lm))
-  (setq text text)
+  (if (= text nil) (setq text ""))
+  text
 )
 ;сканчэнне вяртанне шифру
 
@@ -128,17 +167,13 @@
   ; Красная диагональ больше не нужна, убираем её
 
 
-  ; Секущая рамка — захватываем ВСЁ что пересекает зону (TEXT, MTEXT, INSERT)
-  ; (используем trans 0 1 так как _zoom требует координаты в текущей ПСК, а det-min вычислен в МСК)
-  (vl-cmdf "_zoom" "_W" (trans det-min 0 1) (trans det-max 0 1))
-  (setq nabor_s (ssget "_C" 
-                       (trans det-min 0 1)
-                       (trans det-max 0 1)
-                       '((0 . "TEXT,MTEXT,INSERT"))
+  ; Секущая рамка — заменяем на _X с проверкой BoundingBox!
+  (setq nabor_s (ssget "_X" 
+                       (list (cons 0 "TEXT,MTEXT,INSERT") 
+                             (cons 410 (if model model (getvar "ctab")))
+                       )
                 )
   )
-
-  ;(command "_u")
 
   (princ 
     (strcat "\n[is-big-stamp-p] Зона поиска от X2,Y2 (правый нижний угол):" 
@@ -170,121 +205,156 @@
         (setq edata (entget ename))
         (setq etype (cdr (assoc 0 edata)))
 
-        (cond 
-
-          ; --- TEXT или MTEXT: проверяем текст напрямую ---
-          ((or (= etype "TEXT") (= etype "MTEXT"))
-           (setq txt (strcase (cdr (assoc 1 edata))))
-           (if 
-             (or (vl-string-search "ТАДИЯ" txt) 
-                 (vl-string-search "ИСТОВ" txt)
-             )
-             (setq found T)
-           )
-          )
-
-          ; --- INSERT: без взрыва — идём в определение блока ---
-          ((= etype "INSERT")
-           (setq ins-x (car (cdr (assoc 10 edata)))
-                 ins-y (cadr (cdr (assoc 10 edata)))
-                 sx    (cdr (assoc 41 edata))
-                 sy    (cdr (assoc 42 edata))
-                 rot   (cdr (assoc 50 edata))
-           )
-           (if (not sx) (setq sx 1.0))
-           (if (not sy) (setq sy 1.0))
-           (if (not rot) (setq rot 0.0))
-
-           ; 1) ATTRIBs вставки (мировые координаты — группа 11)
-           (setq cur-ename (entnext ename))
-           (while (and cur-ename (not found)) 
-             (setq cur-data (entget cur-ename))
-             (if (= (cdr (assoc 0 cur-data)) "SEQEND") 
-               (setq cur-ename nil)
-               (progn 
-                 (if (= (cdr (assoc 0 cur-data)) "ATTRIB") 
-                   (progn 
-                     (setq txt (strcase (cdr (assoc 1 cur-data))))
-                     (setq pt (cdr (assoc 11 cur-data)))
-                     (if (and (= (car pt) 0.0) (= (cadr pt) 0.0)) 
-                       (setq pt (cdr (assoc 10 cur-data)))
-                     )
-                     (setq wx (car pt)
-                           wy (cadr pt)
-                     )
-                     (if 
-                       (and (>= wx (car det-min)) 
-                            (<= wx (car det-max))
-                            (>= wy (cadr det-min))
-                            (<= wy (cadr det-max))
+        ; Проверка попадания габаритного контейнера объекта в зону det-min .. det-max
+        (setq in-zone nil)
+        (setq catchbox (vl-catch-all-apply 'vla-GetBoundingBox 
+                                           (list (vlax-ename->vla-object ename) 
+                                                 'minpt
+                                                 'maxpt
+                                           )
                        )
-                       (progn 
-                         (if 
-                           (or (vl-string-search "ТАДИЯ" txt) 
-                               (vl-string-search "ИСТОВ" txt)
+        )
+        (if (not (vl-catch-all-error-p catchbox)) 
+          (progn 
+            (setq bminX (car (vlax-safearray->list minpt)))
+            (setq bminY (cadr (vlax-safearray->list minpt)))
+            (setq bmaxX (car (vlax-safearray->list maxpt)))
+            (setq bmaxY (cadr (vlax-safearray->list maxpt)))
+            (setq in-zone (not 
+                            (or (< bmaxX (car det-min)) 
+                                (> bminX (car det-max))
+                                (< bmaxY (cadr det-min))
+                                (> bminY (cadr det-max))
+                            )
+                          )
+            )
+          )
+          (setq in-zone T) ; fallback к проверке координат внутри cond
+        )
+
+        (if in-zone 
+          (cond 
+
+            ; --- TEXT или MTEXT: проверяем текст напрямую ---
+            ((or (= etype "TEXT") (= etype "MTEXT"))
+             (setq txt (strcase (cdr (assoc 1 edata))))
+             (if 
+               (or (vl-string-search "ТАДИЯ" txt) 
+                   (vl-string-search "ИСТОВ" txt)
+               )
+               (setq found T)
+             )
+            )
+
+            ; --- INSERT: без взрыва — идём в определение блока ---
+            ((= etype "INSERT")
+             (setq ins-x (car (cdr (assoc 10 edata)))
+                   ins-y (cadr (cdr (assoc 10 edata)))
+                   sx    (cdr (assoc 41 edata))
+                   sy    (cdr (assoc 42 edata))
+                   rot   (cdr (assoc 50 edata))
+             )
+             (if (not sx) (setq sx 1.0))
+             (if (not sy) (setq sy 1.0))
+             (if (not rot) (setq rot 0.0))
+
+             ; 1) ATTRIBs вставки (мировые координаты — группа 11)
+             (setq cur-ename (entnext ename))
+             (while (and cur-ename (not found)) 
+               (setq cur-data (entget cur-ename))
+               (if (= (cdr (assoc 0 cur-data)) "SEQEND") 
+                 (setq cur-ename nil)
+                 (progn 
+                   (if (= (cdr (assoc 0 cur-data)) "ATTRIB") 
+                     (progn 
+                       (setq txt (strcase (cdr (assoc 1 cur-data))))
+                       (setq pt (cdr (assoc 11 cur-data)))
+                       (if (and (= (car pt) 0.0) (= (cadr pt) 0.0)) 
+                         (setq pt (cdr (assoc 10 cur-data)))
+                       )
+                       (setq wx (car pt)
+                             wy (cadr pt)
+                       )
+                       (if 
+                         (and (>= wx (car det-min)) 
+                              (<= wx (car det-max))
+                              (>= wy (cadr det-min))
+                              (<= wy (cadr det-max))
+                         )
+                         (progn 
+                           (if 
+                             (or (vl-string-search "ТАДИЯ" txt) 
+                                 (vl-string-search "ИСТОВ" txt)
+                             )
+                             (setq found T)
                            )
-                           (setq found T)
                          )
                        )
                      )
                    )
+                   (setq cur-ename (entnext cur-ename))
                  )
-                 (setq cur-ename (entnext cur-ename))
                )
              )
-           )
 
-           ; 2) Определение блока (TEXT, MTEXT, ATTDEF) — с трансформацией
-           (setq blk-defname (tblobjname "BLOCK" (cdr (assoc 2 edata))))
-           (if blk-defname 
-             (progn 
-               (setq cur-ent (entnext blk-defname))
-               (while (and cur-ent (not found)) 
-                 (setq cur-data (entget cur-ent))
-                 (setq etype (cdr (assoc 0 cur-data)))
-                 (if (member etype '("TEXT" "MTEXT" "ATTDEF")) 
-                   (progn 
-                     ; Проверяем группу 60 (0 = видим, 1 = невидим, nil = видим по умолчанию)
-                     (if 
-                       (not 
-                         (and (assoc 60 cur-data) (= (cdr (assoc 60 cur-data)) 1))
-                       )
-                       (progn 
-                         (setq txt (strcase (cdr (assoc 1 cur-data))))
-                         (setq lx (car (cdr (assoc 10 cur-data))))
-                         (setq ly (cadr (cdr (assoc 10 cur-data))))
-                         (setq wx (+ ins-x 
-                                     (* sx lx (cos rot))
-                                     (- (* sy ly (sin rot)))
-                                  )
-                         )
-                         (setq wy (+ ins-y (* sx lx (sin rot)) (* sy ly (cos rot))))
-                         (if 
-                           (and (>= wx (car det-min)) 
-                                (<= wx (car det-max))
-                                (>= wy (cadr det-min))
-                                (<= wy (cadr det-max))
+             ; 2) Определение блока (TEXT, MTEXT, ATTDEF) — с трансформацией
+             (setq blk-defname (tblobjname "BLOCK" (cdr (assoc 2 edata))))
+             (if blk-defname 
+               (progn 
+                 (setq cur-ent (entnext blk-defname))
+                 (while (and cur-ent (not found)) 
+                   (setq cur-data (entget cur-ent))
+                   (setq etype (cdr (assoc 0 cur-data)))
+                   (if (member etype '("TEXT" "MTEXT" "ATTDEF")) 
+                     (progn 
+                       ; Проверяем группу 60 (0 = видим, 1 = невидим, nil = видим по умолчанию)
+                       (if 
+                         (not 
+                           (and (assoc 60 cur-data) 
+                                (= (cdr (assoc 60 cur-data)) 1)
                            )
-                           (progn 
-                             (if 
-                               (or (vl-string-search "ТАДИЯ" txt) 
-                                   (vl-string-search "ИСТОВ" txt)
+                         )
+                         (progn 
+                           (setq txt (strcase (cdr (assoc 1 cur-data))))
+                           (setq lx (car (cdr (assoc 10 cur-data))))
+                           (setq ly (cadr (cdr (assoc 10 cur-data))))
+                           (setq wx (+ ins-x 
+                                       (* sx lx (cos rot))
+                                       (- (* sy ly (sin rot)))
+                                    )
+                           )
+                           (setq wy (+ ins-y 
+                                       (* sx lx (sin rot))
+                                       (* sy ly (cos rot))
+                                    )
+                           )
+                           (if 
+                             (and (>= wx (car det-min)) 
+                                  (<= wx (car det-max))
+                                  (>= wy (cadr det-min))
+                                  (<= wy (cadr det-max))
+                             )
+                             (progn 
+                               (if 
+                                 (or (vl-string-search "ТАДИЯ" txt) 
+                                     (vl-string-search "ИСТОВ" txt)
+                                 )
+                                 (setq found T)
                                )
-                               (setq found T)
                              )
                            )
                          )
                        )
                      )
                    )
-                 )
-                 (if (= (cdr (assoc 0 cur-data)) "ENDBLK") 
-                   (setq cur-ent nil)
-                   (setq cur-ent (entnext cur-ent))
+                   (if (= (cdr (assoc 0 cur-data)) "ENDBLK") 
+                     (setq cur-ent nil)
+                     (setq cur-ent (entnext cur-ent))
+                   )
                  )
                )
              )
-           )
+            )
           )
         )
 
@@ -300,8 +370,8 @@
 (defun get-shifr-from-blocks (is-big / shifr-found all_blocks iblk blk_name vla-blk 
                               minpt maxpt pt_min pt_max catchbox sminX smaxX sminY 
                               smaxY bminX bminY bmaxX bmaxY pt x1t y1t x2t y2t in-zone 
-                              tag edata ins-x ins-y sx sy rot blk-defname cur-ent cur-data 
-                              etype vla-obj txt lx ly wx wy
+                              tag edata ins-x ins-y sx sy rot blk-defname cur-ent 
+                              cur-data etype vla-obj txt lx ly wx wy
                              ) 
   (setq shifr-found nil)
   (setq all_blocks (ssget "_X" 
@@ -335,7 +405,7 @@
                   bmaxY (cadr pt_max)
             )
           )
-          (progn
+          (progn 
             (setq pt_min (cdr (assoc 10 (entget blk_name))))
             (setq bminX (- (car pt_min) 2000)
                   bminY (- (cadr pt_min) 2000)
@@ -345,9 +415,8 @@
             )
           )
         )
-        (if 
-          (and (< bminX smaxX) (> bmaxX sminX) (< bminY smaxY) (> bmaxY sminY))
-          (progn
+        (if (and (< bminX smaxX) (> bmaxX sminX) (< bminY smaxY) (> bmaxY sminY)) 
+          (progn 
             ; блок попал в зону штампа — ищем атрибуты
             (if (= (vla-get-HasAttributes vla-blk) :vlax-true) 
               (progn 
@@ -364,8 +433,11 @@
                                  (assoc 11 (entget (vlax-vla-object->ename tag)))
                                )
                       )
-                      (if (and (= (car pt) 0.0) (= (cadr pt) 0.0))
-                        (setq pt (cdr (assoc 10 (entget (vlax-vla-object->ename tag)))))
+                      (if (and (= (car pt) 0.0) (= (cadr pt) 0.0)) 
+                        (setq pt (cdr 
+                                   (assoc 10 (entget (vlax-vla-object->ename tag)))
+                                 )
+                        )
                       )
                       (setq x1t (nth 0 pt)
                             y1t (nth 1 pt)
@@ -400,10 +472,10 @@
                 )
               )
             )
-            
+
             ; Если шифр не найден в атрибутах, ищем текст в определении блока (fallback)
-            (if (= shifr-found nil)
-              (progn
+            (if (= shifr-found nil) 
+              (progn 
                 (setq edata (entget blk_name))
                 (setq ins-x (car (cdr (assoc 10 edata)))
                       ins-y (cadr (cdr (assoc 10 edata)))
@@ -414,30 +486,47 @@
                 (if (not sx) (setq sx 1.0))
                 (if (not sy) (setq sy 1.0))
                 (if (not rot) (setq rot 0.0))
-                
+
                 (setq blk-defname (tblobjname "BLOCK" (cdr (assoc 2 edata))))
                 (if blk-defname 
                   (progn 
                     (setq cur-ent (entnext blk-defname))
-                    (while (and cur-ent (= shifr-found nil))
+                    (while (and cur-ent (= shifr-found nil)) 
                       (setq cur-data (entget cur-ent))
                       (setq etype (cdr (assoc 0 cur-data)))
                       (if (member etype '("TEXT" "MTEXT" "ATTDEF")) 
                         (progn 
-                          (if (not (and (assoc 60 cur-data) (= (cdr (assoc 60 cur-data)) 1))) 
+                          (if 
+                            (not 
+                              (and (assoc 60 cur-data) 
+                                   (= (cdr (assoc 60 cur-data)) 1)
+                              )
+                            )
                             (progn 
                               (setq vla-obj (vlax-ename->vla-object cur-ent))
-                              (if (= etype "ATTDEF")
+                              (if (= etype "ATTDEF") 
                                 (setq txt (cdr (assoc 1 cur-data)))
                                 (setq txt (vla-get-TextString vla-obj))
                               )
                               (setq lx (car (cdr (assoc 10 cur-data))))
                               (setq ly (cadr (cdr (assoc 10 cur-data))))
-                              (setq wx (+ ins-x (* sx lx (cos rot)) (- (* sy ly (sin rot)))))
-                              (setq wy (+ ins-y (* sx lx (sin rot)) (* sy ly (cos rot))))
-                              (setq x1t wx y1t wy)
-                              (setq x2t (nth 0 x2) y2t (nth 1 x2))
-                              
+                              (setq wx (+ ins-x 
+                                          (* sx lx (cos rot))
+                                          (- (* sy ly (sin rot)))
+                                       )
+                              )
+                              (setq wy (+ ins-y 
+                                          (* sx lx (sin rot))
+                                          (* sy ly (cos rot))
+                                       )
+                              )
+                              (setq x1t wx
+                                    y1t wy
+                              )
+                              (setq x2t (nth 0 x2)
+                                    y2t (nth 1 x2)
+                              )
+
                               (setq in-zone nil)
                               (if is-big 
                                 (setq in-zone (and (<= (- x2t (* mash 126)) x1t) 
@@ -454,7 +543,14 @@
                                 )
                               )
                               (if in-zone 
-                                (setq shifr-found (if (or (= etype "MTEXT") (= etype "ATTDEF")) (clear-mtext txt) txt))
+                                (setq shifr-found (if 
+                                                    (or (= etype "MTEXT") 
+                                                        (= etype "ATTDEF")
+                                                    )
+                                                    (clear-mtext txt)
+                                                    txt
+                                                  )
+                                )
                               )
                             )
                           )
@@ -616,7 +712,7 @@
       (if (not sx) (setq sx 1.0))
       (if (not sy) (setq sy 1.0))
       (if (not rot) (setq rot 0.0))
-      
+
       (setq blk-defname (tblobjname "BLOCK" (cdr (assoc 2 edata))))
       (if blk-defname 
         (progn 
@@ -630,7 +726,7 @@
                 (if (not (and (assoc 60 cur-data) (= (cdr (assoc 60 cur-data)) 1))) 
                   (progn 
                     (setq vla-obj (vlax-ename->vla-object cur-ent))
-                    (if (= etype "ATTDEF")
+                    (if (= etype "ATTDEF") 
                       (setq txt (cdr (assoc 1 cur-data)))
                       (setq txt (vla-get-TextString vla-obj))
                     )
@@ -639,9 +735,13 @@
                     ; пересчёт в мировые
                     (setq wx (+ ins-x (* sx lx (cos rot)) (- (* sy ly (sin rot)))))
                     (setq wy (+ ins-y (* sx lx (sin rot)) (* sy ly (cos rot))))
-                    (setq x1temp wx y1temp wy)
-                    (setq x2temp (nth 0 x2) y2temp (nth 1 x2))
-                    
+                    (setq x1temp wx
+                          y1temp wy
+                    )
+                    (setq x2temp (nth 0 x2)
+                          y2temp (nth 1 x2)
+                    )
+
                     (cond 
                       ((and (= numa nil) 
                             (< (- x2temp (* mash 40)) x1temp)
@@ -649,7 +749,11 @@
                             (> y1temp (+ (* mash 20) y2temp))
                             (< y1temp (+ (* mash 30) y2temp))
                        )
-                       (setq numa (if (or (= etype "MTEXT") (= etype "ATTDEF")) (clear-mtext txt) txt))
+                       (setq numa (if (or (= etype "MTEXT") (= etype "ATTDEF")) 
+                                    (clear-mtext txt)
+                                    txt
+                                  )
+                       )
                       )
                       ((and (= numa nil) 
                             (< (- x2temp (* mash 15)) x1temp)
@@ -657,7 +761,11 @@
                             (> y1temp (+ (* mash 5) y2temp))
                             (< y1temp (+ (* mash 13) y2temp))
                        )
-                       (setq numa (if (or (= etype "MTEXT") (= etype "ATTDEF")) (clear-mtext txt) txt))
+                       (setq numa (if (or (= etype "MTEXT") (= etype "ATTDEF")) 
+                                    (clear-mtext txt)
+                                    txt
+                                  )
+                       )
                       )
                       ((and (= nameris nil) 
                             (< (- x2temp (* mash 125)) x1temp)
@@ -768,76 +876,59 @@
 
 
 ;;---------------------вызначэнне № старонки----------------------
-(defun numar_s (/ x_temp1 x_temp2 nabor_s xtemp temp_lm) 
-  (setq temp_lm (getvar "ctab")) ;атрыманне ліста або мадэлі дзе знаходзіца карыстальнік
-
+(defun numar_s (/ x_temp1 x_temp2 text) 
   (setq zapret_nomer nil)
 
   (setq x_temp1 (list (- (car x2) (/ 40 mash)) (+ (last x2) (/ 30 mash))))
   (setq x_temp2 (list (- (car x2) (/ 25 mash)) (+ (last x2) (/ 20 mash))))
-  (if (and model (/= model temp_lm)) 
-    (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
-  )
-  (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
-  (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
-  ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-  (if (and model (/= model temp_lm)) 
-    (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+
+  (setq text (get-texts-in-box 
+               (car x_temp1)
+               (cadr x_temp1)
+               (car x_temp2)
+               (cadr x_temp2)
+             )
   )
 
-  (if (and (/= nabor_s nil) (= (sslength nabor_s) 1)) 
-    (norma_n)
+  (if (and text (/= text "")) 
+    (norma_n2 text)
     (progn 
       ;праверка наяунасти "листов"----------------------------
-      (setq x_temp1 (list (- (car x2) (/ 25 mash)) 
-                          (+ (last x2) (/ 30 mash))
-                    )
-      )
+      (setq x_temp1 (list (- (car x2) (/ 25 mash)) (+ (last x2) (/ 30 mash))))
       (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 20 mash))))
-      (if (and model (/= model temp_lm)) 
-        (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
+      (setq text (get-texts-in-box 
+                   (car x_temp1)
+                   (cadr x_temp1)
+                   (car x_temp2)
+                   (cadr x_temp2)
+                 )
       )
-      (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
-      (setq nabor_s (ssget "_C" x_temp1 x_temp2 '((0 . "*EXT"))))
-      ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-      (if (and model (/= model temp_lm)) 
-        (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+      (if (and text (/= text "")) 
+        (setq zapret_nomer (norma_n2 text))
       )
 
-      (if (and (/= nabor_s nil) (= (sslength nabor_s) 1)) 
-        (setq zapret_nomer (norma_n))
-      )
-      ;---------------сканчэнне листов-------------------------
+      ;калі малы штамп
       (if (= nil zapret_nomer) 
         (progn 
-          ;калі малы штамп
           (setq zapret_name T)
-
-          (setq x_temp1 (list (- (car x2) (/ 15 mash)) 
-                              (+ (last x2) (/ 13 mash))
-                        )
-          )
+          (setq x_temp1 (list (- (car x2) (/ 15 mash)) (+ (last x2) (/ 13 mash))))
           (setq x_temp2 (list (- (car x2) (/ 5 mash)) (+ (last x2) (/ 5 mash))))
-
-          (if (and model (/= model temp_lm)) 
-            (setvar "ctab" model) ;пераход на патрэбны ліст або мадель
+          (setq text (get-texts-in-box 
+                       (car x_temp1)
+                       (cadr x_temp1)
+                       (car x_temp2)
+                       (cadr x_temp2)
+                     )
           )
-          (vl-cmdf "_zoom" "_W" x_temp1 x_temp2) ;зумаванне акна нумара
-          (setq nabor_s (ssget "_W" x_temp1 x_temp2 '((0 . "*ext"))))
-          ;(vl-cmdf "_zoom" "_p" x_temp1 x_temp2) ;вяртанне зумавання
-          (if (and model (/= model temp_lm)) 
-            (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
+          (if (and text (/= text "")) 
+            (setq zapret_nomer (norma_n2 text))
           )
-
-          (if (and (/= nabor_s nil) (= (sslength nabor_s) 1)) 
-            (setq zapret_nomer (norma_n))
-          ) ;end if
         )
-        (princ zapret_nomer)
-      ) ;end if с запретом zapret_nomer-номер листов
-    ) ;end progn
-  ) ;end if
-)					;канец вызначэнне старонки
+      )
+      (if zapret_nomer (princ zapret_nomer))
+    )
+  )
+)
 
 ;;---------------------праверка супадзенне нумароу----------------------
 (defun prin_numar (/ nov_spis druk_v1 nomer_s nlist xt1 xt2 xt11 xt22) 
@@ -2063,7 +2154,7 @@
 
       (vl-bb-set 
         'file_all
-        (strcat (vl-bb-ref 'file_all) "&" f_temp "<")
+        (strcat (vl-bb-ref 'file_all) "&" f_temp)
       )
     )
   )
@@ -2133,7 +2224,8 @@
 
 ;------------------------выклік діалогу---------------------------------
 (defun c:dil_spds (/ dcl_id pdf rys ddi druk_n druk_v done file_all sfile_all sfile 
-                   lik_open data stor data1 nameris acad_color old_ctab old_viewctr old_viewsize
+                   lik_open data stor data1 nameris acad_color old_ctab old_viewctr 
+                   old_viewsize
                   )  ;numar
   (setq acad_color 0)
   (PRINC "\n---------------------------------------------------------------------------\n")
@@ -2222,16 +2314,18 @@
               )
               (if (> count_pdf 1) 
                 (progn 
+                  ; Добавляем маркер нового формата в конец всей строки!
+                  (setq final_str (strcat (vl-bb-ref 'file_all) "<"))
                   (princ 
                     (strcat "\n___________________________________________________________\n[ОТЛАДКА] Сформированная строка file_all:\n" 
-                            (vl-bb-ref 'file_all)
+                            final_str
                             "\n"
                     )
                   )
                   ;(startapp
                   ;  ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
                   ;  "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
-                  ;  (strcat "\"" (vl-bb-ref 'file_all) "\"")
+                  ;  (strcat "\"" final_str "\"")
                   ;)
                   ;(command)
                   (princ "\n[ОТЛАДКА] Вызов WPFMergeExe отключен.\n")
@@ -2244,8 +2338,8 @@
     )
   ) ;end if
   (if old_ctab (setvar "ctab" old_ctab))
-  (if (and old_viewctr old_viewsize)
-      (vl-cmdf "_zoom" "_C" old_viewctr old_viewsize)
+  (if (and old_viewctr old_viewsize) 
+    (vl-cmdf "_zoom" "_C" old_viewctr old_viewsize)
   )
   (vl-bb-set 'lik_open nil)
   (princ)
