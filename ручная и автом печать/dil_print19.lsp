@@ -1720,7 +1720,6 @@
           (vl-file-delete fileuser)
           (setq cmd (GETVAR "cmdecho"))
           (SETVAR "cmdecho" 0)
-          (progn
             (if (/= model "Model") 
               (command "_plot" ;Сама команда
                        "_y" ;Выполнить детальное задание конфигурации?:
@@ -1800,7 +1799,6 @@
                        ;;Перейти к печати [Да/Нет]
               )
             )
-          )
           (SETVAR "cmdecho" cmd)
 
           ; Запись диагностики для вывода в консоль
