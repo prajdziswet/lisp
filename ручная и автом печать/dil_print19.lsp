@@ -1597,6 +1597,34 @@
   ;;конец if
 )
 
+;; Замена ВСЕХ вхождений подстроки (без зацикливания)
+(defun vl-string-subst-all (str old new / pos)
+  (setq pos 0)
+  (while (setq pos (vl-string-search old str pos))
+    (setq str (vl-string-subst new old str pos))
+    (setq pos (+ pos (strlen new)))
+  )
+  str
+)
+
+;; Экранирование спецсимволов для строки file_all
+(defun escape-delimiters (str / result)
+  (if (or (= str nil) (= str "")) 
+    ""
+    (progn
+      (setq result str)
+      ;; Сначала экранируем сам escape-символ
+      (setq result (vl-string-subst-all result "*" "*s"))
+      ;; Потом остальные разделители
+      (setq result (vl-string-subst-all result "&" "*a"))
+      (setq result (vl-string-subst-all result "?" "*q"))
+      (setq result (vl-string-subst-all result ">" "*g"))
+      (setq result (vl-string-subst-all result "<" "*l"))
+      result
+    )
+  )
+)
+
 ;---------------------print_s-------------------
 (defun print_s (spis / x1 x2 format mash poloz model temp_lm list_n fileuser fi0 cmd 
                 nameris ctb_file shifr entry
@@ -1665,11 +1693,11 @@
       (setq entry (strcat current_fileuser 
                           ".pdf"
                           ">"
-                          shifr
+                          (escape-delimiters shifr)
                           ">"
-                          (if nameris nameris "")
+                          (escape-delimiters (if nameris nameris ""))
                           ">"
-                          (if list_n1 list_n1 "")
+                          (escape-delimiters (if list_n1 list_n1 ""))
                   )
       )
       (if (equal f_temp "") 
@@ -1692,7 +1720,7 @@
           (vl-file-delete fileuser)
           (setq cmd (GETVAR "cmdecho"))
           (SETVAR "cmdecho" 0)
-          (if nil  ; [ОТЛАДКА] Отключено реальное печатание
+          (progn
             (if (/= model "Model") 
               (command "_plot" ;Сама команда
                        "_y" ;Выполнить детальное задание конфигурации?:
@@ -1772,7 +1800,6 @@
                        ;;Перейти к печати [Да/Нет]
               )
             )
-            (princ "\n[ОТЛАДКА] Функция _plot отключена.\n")
           )
           (SETVAR "cmdecho" cmd)
 
@@ -2320,13 +2347,12 @@
                             "\n"
                     )
                   )
-                  ;(startapp
-                  ;  ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-                  ;  "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
-                  ;  (strcat "\"" final_str "\"")
-                  ;)
-                  ;(command)
-                  (princ "\n[ОТЛАДКА] Вызов WPFMergeExe отключен.\n")
+                  (startapp
+                    ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
+                    "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+                    (strcat "\"" final_str "\"")
+                  )
+                  (command)
                 )
               )
             )
