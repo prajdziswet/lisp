@@ -839,13 +839,6 @@
 ;-------------------------------
 
 
-;выхад з пдф
-(defun exit_pdf () 
-  (startapp "__prog\\exe\\pdf_exit.exe")
-  (command)
-);выхад з пдф
-
-
 
 
 ;;---------------------нормализация № старонки----------------------
@@ -1332,8 +1325,6 @@
                             )
                      )
   )
-  (print nabor_blocks)
-  (princ)
   (if (null nabor_blocks) 
 
     (progn 
@@ -1542,19 +1533,6 @@
         )
       )
 
-      (princ 
-        (strcat "\n--- ДИАГНОСТИКА СПДС ШТАМПА ---" 
-                "\nШтамп: "
-                (if is-big "Большой" "Малый")
-                "\nНазвание (nameris): "
-                (if nameris nameris "nil")
-                "\nШифр (shifr): "
-                (if shifr shifr "nil")
-                "\nНомер (numa): "
-                (if numa (vl-princ-to-string numa) "nil")
-                "\n--------------------------\n"
-        )
-      )
 
       (if (or (= numa nil) (= numa 0) (= numa "") (= numa "0")) 
         (if (/= druk_n nil) 
@@ -1667,8 +1645,24 @@
       )
       (setq shifr (nth 8 spis))
       (if (= shifr nil) (setq shifr ""))
-      ; Формируем: имяфайла.pdf>шифр>название>номер
-      (setq entry (strcat fileuser 
+      (setq orig_fileuser fileuser)
+      (setq current_fileuser orig_fileuser)
+      (setq fileuser_path (strcat (getvar "dwgprefix") current_fileuser ".pdf"))
+
+      ; --- Цикл проверки блокировки файла ---
+      (setq counter -1)
+      (setq fi0 (open fileuser_path "w"))
+      (while (and (= fi0 nil) (< counter 9)) 
+        (setq counter (1+ counter))
+        (setq current_fileuser (strcat orig_fileuser "-" (itoa counter)))
+        (setq fileuser_path (strcat (getvar "dwgprefix") current_fileuser ".pdf"))
+        (setq fi0 (open fileuser_path "w"))
+      )
+
+      (setq fileuser fileuser_path) ; Полный путь для дальнейшей работы
+
+      ; --- Формируем строку для слияния с актуальным (возможно измененным) именем ---
+      (setq entry (strcat current_fileuser 
                           ".pdf"
                           ">"
                           shifr
@@ -1682,19 +1676,11 @@
         (setq f_temp entry)
         (setq f_temp (strcat f_temp "?" entry))
       )
-      ;утварэнне пути с файлом
-      (SETQ fileuser (STRCAT (GETVAR "dwgprefix") fileuser ".pdf"))
 
-      ;закрытие файла если он открыт тут (на этом компе
-      (if (= (setq fi0 (open fileuser "w")) nil) 
-        (exit_pdf)
-        (close fi0)
-      )
-
-      (if (= (setq fi0 (open fileuser "w")) nil) 
+      (if (= fi0 nil) 
         (progn 
           (print 
-            "Файл ужо адчыненны іншай праграмай,\nабо немагчыма запісаць у гэты каталог (няма праў)"
+            "Файл ужо адчыненны іншай праграмай (даже с суффиксами 0-9),\nабо немагчыма запісаць у гэты каталог"
           )
           (princ) ; тихий выход
         ) ;канец прогона
@@ -1789,16 +1775,24 @@
             (princ "\n[ОТЛАДКА] Функция _plot отключена.\n")
           )
           (SETVAR "cmdecho" cmd)
-          (princ (STRCAT "\nФайл захаваны: " fileuser "\n"))
+
+          ; Запись диагностики для вывода в консоль
+          (setq cur_diag (vl-bb-ref 'current_file_diagnostics))
+          (setq diag_item (list (strcat (vl-filename-base fileuser) ".pdf") 
+                                nameris
+                                shifr
+                                list_n1
+                                (if (= ctb_file "acad.ctb") "Цвет" "Ч/Б")
+                                format
+                          )
+          )
+          (vl-bb-set 'current_file_diagnostics (cons diag_item cur_diag))
         )
       )
     )
   ) ;канец ифа
 
   (setvar "ctab" temp_lm) ;пераход на папярэдні ліст дзе знаходзіуся карыстальнік
-
-  ;закрытие пдф
-  (exit_pdf)
 );канец принта
 
 
@@ -2233,11 +2227,11 @@
                    old_viewsize
                   )  ;numar
   (setq acad_color 0)
-  (PRINC "\n---------------------------------------------------------------------------\n")
-  ; (PRINC "Праграмма распрацавана на lisp, prajdziswet-ам (Косау Уладзимир) у 2014 годзе\n")
-  (PRINC "-----------------------------------------------------------------------------\n")
-  (PRINC "\n")
-
+  (PRINC "\n-------------------------------------------------------------------------------------\n")
+  (PRINC "Праграмма распрацавана на lisp, prajdziswet-ам (Косавам Уладзімірам) у 2014(ред.2026) годзе\n")
+  (PRINC "Праграма прызначана для аўтаматычнай PDF файлаў, а таксама для друку\n")
+  (PRINC "Праграма працуе з файламі СПДС, блоками, полірыскамі\n")
+  (PRINC "-------------------------------------------------------------------------------------\n")
   ;----------------------------------------------------------------------
   ;вызначэнне версии акада-трошки недакладна
   (setq vers (substr (vl-bb-ref 'dirpol) 
@@ -2284,21 +2278,20 @@
         'file_all
         (strcat (GETVAR "dwgprefix") 
                 "&"
-                (if (equal sfile 1) 
-                  (princ "true")
-                  (princ "false")
-                )
+                (if (equal sfile 1) "true" "false")
                 "&"
-                (if (equal sfile_all 1) 
-                  (princ "true")
-                  (princ "false")
-                )
+                (if (equal sfile_all 1) "true" "false")
         )
       )
       (vl-bb-set 'file_ris nil) ;обнуление
       (if (or (/= rys 0) (peshat-spds-file-prepare)) 
         (progn 
+          (vl-bb-set 'current_file_diagnostics nil) ; обнуляем перед началом печати активного
           (zapusk_druk)
+
+          (princ (strcat "\nТэчка файлаў: " (getvar "dwgprefix")))
+          (print_diagnostics_to_console (GETVAR "dwgname"))
+
           (if (= rys 0) 
             (peshat-spds-file-run)
           )
@@ -2353,6 +2346,34 @@
 (print "загружена автоматичская печать")
 (princ)
 
+(defun print_diagnostics_to_console (filename / diag_list) 
+  (setq diag_list (vl-bb-ref 'current_file_diagnostics))
+  (if diag_list 
+    (progn 
+      (princ (strcat "\n=== Обработан файл: " filename " ==="))
+      (foreach diag (reverse diag_list) 
+        (princ 
+          (strcat "\n  PDF: " 
+                  (nth 0 diag)
+                  "\n  Назв: "
+                  (if (nth 1 diag) (nth 1 diag) "nil")
+                  " | Шифр: "
+                  (if (nth 2 diag) (nth 2 diag) "nil")
+                  " | Лист: "
+                  (if (nth 3 diag) (vl-princ-to-string (nth 3 diag)) "nil")
+                  " | "
+                  (if (nth 4 diag) (nth 4 diag) "")
+                  " | "
+                  (if (nth 5 diag) (nth 5 diag) "")
+          )
+        )
+      )
+      (vl-bb-set 'current_file_diagnostics nil)
+    )
+  )
+  (princ)
+)
+
 (defun peshat-spds-file-prepare (/ peshat-files result selected_files color_mode) 
   ;перадача аргументау дыялогу
   (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;выбар файлау
@@ -2387,6 +2408,7 @@
 (defun peshat-spds-file-run (/ peshat-files peshat-file selected_files color_mode 
                              current_color
                             ) 
+  (vl-bb-set 'current_file_diagnostics nil) ; Обнуляем перед запуском пакета
   (setq peshat-files (vl-directory-files (GETVAR "dwgprefix") "*.dwg" 1)) ;выбар файлау
   (setq selected_files (vl-bb-ref 'folder_color_files))
   (setq color_mode (vl-bb-ref 'folder_color_mode))
@@ -2403,7 +2425,8 @@
             )
             (vl-bb-set 'acad_color current_color)
             (vl-bb-set 'directory-p 1) ;запуск у іншых адчыняем дакумент
-            (setq peshat-file (strcat (GETVAR "dwgprefix") (car peshat-files))) ;адчыняемы файл
+            (setq current_dwg_name (car peshat-files))
+            (setq peshat-file (strcat (GETVAR "dwgprefix") current_dwg_name)) ;адчыняемы файл
             (setq peshat-files (cdr peshat-files)) ;обрезка
             (setq peshat-file (vla-Open 
                                 (vla-get-Documents (vlax-get-acad-object))
@@ -2413,6 +2436,8 @@
                               )
             ) ;адчыненне
             (vla-Close peshat-file :vlax-false) ;зачыненне
+
+            (print_diagnostics_to_console current_dwg_name)
           ) ;end progn
           (setq peshat-files (cdr peshat-files)) ;обрезка
         )
