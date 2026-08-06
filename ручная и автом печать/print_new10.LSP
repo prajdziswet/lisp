@@ -287,6 +287,8 @@
   )
 )
 
+
+
 ;-------------------надрукаванне уручную--------------------------------------------------
 (DEFUN c:pri (/ formatfalse cmd dis1 dis2 mashrus point1 point2 color struser fi0 
               list1 data data1 filename2 file2
@@ -309,10 +311,15 @@
   ;;;;;;     )
   ;;;;;;  )
   ;;;  ;енд
-  (PRINC "\n---------------------------------------------------------------------------\n")
-  (PRINC "Праграмма распрацавана на lisp, prajdziswet-ам (Косаў Уладзімір) у 2014 годзе\n")
-  (PRINC "-----------------------------------------------------------------------------\n")
-  (PRINC "\n")
+  (if (not *pri-banner-shown*)
+    (progn
+      (PRINC "\n---------------------------------------------------------------------------\n")
+      (PRINC "Праграма распрацавана на lisp, prajdziswet-ам (Косаў Уладзімір) у 2014 годзе\n")
+      (PRINC "-----------------------------------------------------------------------------\n")
+      (PRINC "\n")
+      (setq *pri-banner-shown* T)
+    )
+  )
   (SETQ cmd (GETVAR "cmdecho"))
   (SETVAR "cmdecho" 1)
   (SETQ point1 (GETPOINT "Першая кропка рамкі: "))
@@ -372,33 +379,134 @@
       ;; Но функции поиска штампа (в dil_print19) ожидают mash = 100.
       (setq mash (if (= mashrus 0.01) 100 mashrus))
       
-      (princ (strcat "\n[DEBUG] wcs-x2=" (vl-princ-to-string x2) ", mash=" (vl-princ-to-string mash)))
       (if (boundp 'find-stamp-blocks) 
         (progn 
+          ;; 1. Определяем большой/малый штамп
           (if (boundp 'is-big-stamp-p) 
             (setq is-big (is-big-stamp-p))
           )
+          
           ;; Зумируем к выбранной рамке, чтобы ssget "_C" смог найти текст на экране
           (vl-cmdf "_zoom" "_W" point1 point2)
 
-          (find-stamp-blocks)
+          ;; 2. Поиск в блоках (стандартный)
+          (if (boundp 'find-stamp-blocks) 
+            (find-stamp-blocks)
+          )
 
-          (if (and is-big (= nameris nil) (boundp 'namelist)) 
+          ;; 3. СПДС fallback — если поля пустые, ищем SPDSFORMAT в выделенной области
+          (if (or (= shifr nil) (= shifr "")
+                  (= nameris nil) (= nameris "")
+                  (= numa nil) (= numa 0) (= numa ""))
+            (progn
+              (setq spds-nabor (ssget "_X"
+                                 (list (cons 0 "SPDSFORMAT")
+                                       (cons 410 (getvar "ctab"))
+                                 )
+                               )
+              )
+              (if spds-nabor
+                (progn
+                  (setq spds-i 0)
+                  (while (and (< spds-i (sslength spds-nabor))
+                              (or (= shifr nil) (= shifr "")
+                                  (= nameris nil) (= nameris "")
+                                  (= numa nil) (= numa 0) (= numa ""))
+                         )
+                    (setq spds-ename (ssname spds-nabor spds-i))
+                    (setq spds-vla (vlax-ename->vla-object spds-ename))
+                    (setq spds-catch (vl-catch-all-apply 'vla-GetBoundingBox
+                                       (list spds-vla 'spds-minpt 'spds-maxpt)
+                                     )
+                    )
+                    (if (not (vl-catch-all-error-p spds-catch))
+                      (progn
+                        (setq spds-min (vlax-safearray->list spds-minpt))
+                        (setq spds-max (vlax-safearray->list spds-maxpt))
+                        ;; Проверка пересечения BoundingBox СПДС с выделенной областью
+                        (if (not (or (< (car spds-max) (min (car wcs-pt1) (car wcs-pt2)))
+                                     (> (car spds-min) (max (car wcs-pt1) (car wcs-pt2)))
+                                     (< (cadr spds-max) (min (cadr wcs-pt1) (cadr wcs-pt2)))
+                                     (> (cadr spds-min) (max (cadr wcs-pt1) (cadr wcs-pt2)))
+                                )
+                            )
+                          (progn
+                            ;; Извлечение xdata из СПДС рамки
+                            (setq spds-list1 (entget spds-ename))
+                            
+                            ;; Номер листа
+                            (if (or (= numa nil) (= numa 0) (= numa ""))
+                              (progn
+                                (setq spds-numa (cdr (assoc 300 (member '(301 . "Sheet") spds-list1))))
+                                (if (and spds-numa (boundp 'norma_n2))
+                                  (setq numa (norma_n2 spds-numa))
+                                )
+                              )
+                            )
+                            
+                            ;; Шифр
+                            (if (or (= shifr nil) (= shifr ""))
+                              (progn
+                                (setq spds-shifr (cdr (assoc 300 (member '(301 . "Designation") spds-list1))))
+                                (if (not spds-shifr)
+                                  (setq spds-shifr (cdr (assoc 300 (member '(301 . "Name") spds-list1))))
+                                )
+                                (if spds-shifr
+                                  (setq shifr (vl-string-trim " " spds-shifr))
+                                )
+                              )
+                            )
+                            
+                            ;; Название (только если штамп большой)
+                            (if (and is-big (or (= nameris nil) (= nameris "")))
+                              (progn
+                                (setq spds-name1 (cdr (assoc 300 (member '(301 . "Drawing type") spds-list1))))
+                                (setq spds-name2 (cdr (assoc 300 (member '(301 . "Drawing type1") spds-list1))))
+                                (setq spds-name3 (cdr (assoc 300 (member '(301 . "Drawing type2") spds-list1))))
+                                (setq spds-nameris "")
+                                (if spds-name1 (setq spds-nameris (strcat spds-nameris spds-name1)))
+                                (if spds-name2 (setq spds-nameris (strcat spds-nameris spds-name2)))
+                                (if spds-name3 (setq spds-nameris (strcat spds-nameris spds-name3)))
+                                (setq spds-nameris (vl-string-trim " " spds-nameris))
+                                (if (/= spds-nameris "")
+                                  (setq nameris spds-nameris)
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                    (setq spds-i (1+ spds-i))
+                  )
+                )
+              )
+            )
+          )
+
+          ;; 4. Поиск в тексте (если всё ещё есть пустые поля)
+          (if (and is-big (or (= nameris nil) (= nameris "")) (boundp 'namelist)) 
             (setq nameris (namelist))
           )
           (if (not is-big) (setq nameris nil))
-          (if (and (= numa nil) (boundp 'numar_s)) 
-            (setq numa (numar_s))
+          (if (and (or (= numa nil) (= numa 0) (= numa "")) (boundp 'numar_s)) 
+            (progn
+              (setq tmp-num (numar_s))
+              (if (and tmp-num (/= tmp-num "") (/= tmp-num 0)) (setq numa tmp-num))
+            )
           )
-          (setq shifr "")
-          (if (boundp 'nameshifr) 
-            (setq shifr (nameshifr is-big))
+          (if (or (= shifr nil) (= shifr ""))
+            (progn
+              (if (boundp 'nameshifr) 
+                (setq shifr (nameshifr is-big))
+              )
+              (if (= shifr nil) (setq shifr ""))
+              (if (and (= shifr "") (boundp 'get-shifr-from-blocks)) 
+                (setq shifr (get-shifr-from-blocks is-big))
+              )
+              (if (= shifr nil) (setq shifr ""))
+            )
           )
-          (if (= shifr nil) (setq shifr ""))
-          (if (and (= shifr "") (boundp 'get-shifr-from-blocks)) 
-            (setq shifr (get-shifr-from-blocks is-big))
-          )
-          (if (= shifr nil) (setq shifr ""))
 
           ; Очистка текста от форматирования MTEXT (если функция доступна)
           (if (boundp 'clear-mtext)
@@ -409,139 +517,14 @@
             )
           )
 
-          ; [ОТЛАДКА] Вывод диагностики
+          ; Вывод итоговой диагностики штампа для рамки
           (princ 
             (strcat "\n  Назв: "
                     (if nameris nameris "nil")
                     " | Шифр: "
-                    (if shifr shifr "nil")
+                    (if shifr (if (= shifr "") "nil" shifr) "nil")
                     " | Номер: "
                     (if numa (vl-princ-to-string numa) "nil")
-            )
-          )
-        )
-      )
-
-      ;; СПДС fallback — если штамп не нашёлся в блоках, ищем SPDSFORMAT в выделенной области
-      (if (and (or (= shifr nil) (= shifr ""))
-               (or (= nameris nil) (= nameris ""))
-               (or (= numa nil) (= numa 0))
-          )
-        (progn
-          ;; Поиск SPDSFORMAT в выделенной области wcs-pt1..wcs-pt2
-          (setq spds-nabor (ssget "_X"
-                             (list (cons 0 "SPDSFORMAT")
-                                   (cons 410 (getvar "ctab"))
-                             )
-                           )
-          )
-          (if spds-nabor
-            (progn
-              (setq spds-i 0)
-              (while (and (< spds-i (sslength spds-nabor))
-                          (or (= shifr nil) (= shifr ""))
-                     )
-                (setq spds-ename (ssname spds-nabor spds-i))
-                (setq spds-vla (vlax-ename->vla-object spds-ename))
-                (setq spds-catch (vl-catch-all-apply 'vla-GetBoundingBox
-                                   (list spds-vla 'spds-minpt 'spds-maxpt)
-                                 )
-                )
-                (if (not (vl-catch-all-error-p spds-catch))
-                  (progn
-                    (setq spds-min (vlax-safearray->list spds-minpt))
-                    (setq spds-max (vlax-safearray->list spds-maxpt))
-                    ;; Проверка пересечения BoundingBox СПДС с выделенной областью
-                    (if (not (or (< (car spds-max) (min (car wcs-pt1) (car wcs-pt2)))
-                                 (> (car spds-min) (max (car wcs-pt1) (car wcs-pt2)))
-                                 (< (cadr spds-max) (min (cadr wcs-pt1) (cadr wcs-pt2)))
-                                 (> (cadr spds-min) (max (cadr wcs-pt1) (cadr wcs-pt2)))
-                            )
-                        )
-                      (progn
-                        ;; Извлечение xdata из СПДС рамки
-                        (setq spds-list1 (entget spds-ename))
-                        
-                        ;; Номер листа
-                        (if (or (= numa nil) (= numa 0) (= numa ""))
-                          (progn
-                            (setq spds-numa (cdr (assoc 300 (member '(301 . "Sheet") spds-list1))))
-                            (if (and spds-numa (boundp 'norma_n2))
-                              (setq numa (norma_n2 spds-numa))
-                            )
-                          )
-                        )
-                        
-                        ;; Шифр
-                        (if (or (= shifr nil) (= shifr ""))
-                          (progn
-                            (setq shifr (cdr (assoc 300 (member '(301 . "Designation") spds-list1))))
-                            (if (not shifr)
-                              (setq shifr (cdr (assoc 300 (member '(301 . "Name") spds-list1))))
-                            )
-                            (if shifr
-                              (setq shifr (vl-string-trim " " shifr))
-                              (setq shifr "")
-                            )
-                            (if (and shifr (= (type shifr) 'STR) (boundp 'clear-mtext))
-                              (setq shifr (clear-mtext shifr))
-                            )
-                          )
-                        )
-                        
-                        ;; Большой/малый штамп (из СПДС)
-                        (setq spds-is-big (= 1 (cdr (assoc 290 (member '(301 . "First sheet") spds-list1)))))
-                        
-                        ;; Название (только для большого штампа)
-                        (if (and spds-is-big (or (= nameris nil) (= nameris "")))
-                          (progn
-                            (setq spds-name1 (cdr (assoc 300 (member '(301 . "Drawing type") spds-list1))))
-                            (setq spds-name2 (cdr (assoc 300 (member '(301 . "Drawing type1") spds-list1))))
-                            (setq spds-name3 (cdr (assoc 300 (member '(301 . "Drawing type2") spds-list1))))
-                            (setq nameris "")
-                            (if spds-name1 (setq nameris (strcat nameris spds-name1)))
-                            (if spds-name2 (setq nameris (strcat nameris spds-name2)))
-                            (if spds-name3 (setq nameris (strcat nameris spds-name3)))
-                            (setq nameris (vl-string-trim " " nameris))
-                            (if (and nameris (= (type nameris) 'STR) (boundp 'clear-mtext))
-                              (setq nameris (clear-mtext nameris))
-                            )
-                          )
-                        )
-                        
-                        ;; Fallback если шифр не найден в xdata СПДС
-                        (if (and (or (= shifr nil) (= shifr "")) (boundp 'nameshifr))
-                          (progn
-                            (setq spds-x2-bak x2)
-                            (setq x2 spds-max)
-                            (if (boundp 'normal_points)
-                              (progn
-                                (setq x1 spds-min)
-                                (normal_points)
-                              )
-                            )
-                            (setq shifr (nameshifr spds-is-big))
-                            (if (and (= shifr "") (boundp 'get-shifr-from-blocks))
-                              (setq shifr (get-shifr-from-blocks spds-is-big))
-                            )
-                            (setq x2 spds-x2-bak)
-                          )
-                        )
-                        
-                        (princ (strcat "\n  [СПДС] Назв: "
-                                       (if nameris nameris "nil")
-                                       " | Шифр: "
-                                       (if shifr shifr "nil")
-                                       " | Номер: "
-                                       (if numa (vl-princ-to-string numa) "nil")
-                               )
-                        )
-                      )
-                    )
-                  )
-                )
-                (setq spds-i (1+ spds-i))
-              )
             )
           )
         )

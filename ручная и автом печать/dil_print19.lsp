@@ -857,13 +857,13 @@
 
 ;;---------------------нормализация № старонки(спдс)----------------------
 (defun norma_n2 (str) 
-  (setq str (vl-string-trim " " str))
+  (setq str (vl-string-trim " " (vl-princ-to-string str)))
   (if 
     (wcmatch str 
              "#,##,###,#`.#,##`.#,###`.#,#`.##,##`.##,###`.##,#`.###,##`.###,###`.###"
     )
-    (princ str)
-    (princ nil)
+    str
+    nil
   ) ;end if
 )
 
