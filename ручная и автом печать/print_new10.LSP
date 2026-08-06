@@ -62,15 +62,31 @@
 )
 
 
-(defun ask_dialog (zapros btn1 btn2 / dcl_file file_handle dcl_id result) 
+(defun ask_dialog (zapros1 zapros2 zapros3 btn1 btn2 / dcl_file file_handle dcl_id result) 
   (setq dcl_file (vl-filename-mktemp "ask_dialog.dcl"))
   (setq file_handle (open dcl_file "w"))
   (write-line "ask_dcl : dialog {" file_handle)
   (write-line "  label = \"Запрос\";" file_handle)
   (write-line "  : text {" file_handle)
-  (write-line (strcat "    label = \"" zapros "\";") file_handle)
+  (write-line (strcat "    label = \"" zapros1 "\";") file_handle)
   (write-line "    alignment = centered;" file_handle)
   (write-line "  }" file_handle)
+  (if (and zapros2 (/= zapros2 ""))
+    (progn
+      (write-line "  : text {" file_handle)
+      (write-line (strcat "    label = \"" zapros2 "\";") file_handle)
+      (write-line "    alignment = centered;" file_handle)
+      (write-line "  }" file_handle)
+    )
+  )
+  (if (and zapros3 (/= zapros3 ""))
+    (progn
+      (write-line "  : text {" file_handle)
+      (write-line (strcat "    label = \"" zapros3 "\";") file_handle)
+      (write-line "    alignment = centered;" file_handle)
+      (write-line "  }" file_handle)
+    )
+  )
   (write-line "  : spacer { height = 1; }" file_handle)
   (write-line "  : row {" file_handle)
   (write-line "    fixed_width = true;" file_handle)
@@ -84,6 +100,11 @@
   (write-line "    : button {" file_handle)
   (write-line "      key = \"btn2\";" file_handle)
   (write-line (strcat "      label = \"" btn2 "\";") file_handle)
+  (write-line "      width = 12;" file_handle)
+  (write-line "    }" file_handle)
+  (write-line "    : button {" file_handle)
+  (write-line "      key = \"cancel\";" file_handle)
+  (write-line "      label = \"Выход\";" file_handle)
   (write-line "      is_cancel = true;" file_handle)
   (write-line "      width = 12;" file_handle)
   (write-line "    }" file_handle)
@@ -114,7 +135,7 @@
   (if (boundp 'add_edit) 
     (command "add_dwg")
     (progn 
-      (setq kword (ask_dialog "Ручны (або аутаматычны-не) друк?" "Да" "Не"))
+      (setq kword (ask_dialog "Нажмите 'Да' - для ручного выбора" "или 'Нет' - для автоматического," "или закройте окно" "Да" "Не"))
       (cond 
         ((= kword "Yes") (pri_new 1))
         ((= kword "No") (dil_spds_new 1 T))
@@ -381,13 +402,13 @@
       
       (if (boundp 'find-stamp-blocks) 
         (progn 
+          ;; Зумируем к выбранной рамке, чтобы ssget "_C" смог найти текст на экране
+          (vl-cmdf "_zoom" "_W" point1 point2)
+          
           ;; 1. Определяем большой/малый штамп
           (if (boundp 'is-big-stamp-p) 
             (setq is-big (is-big-stamp-p))
           )
-          
-          ;; Зумируем к выбранной рамке, чтобы ssget "_C" смог найти текст на экране
-          (vl-cmdf "_zoom" "_W" point1 point2)
 
           ;; 2. Поиск в блоках (стандартный)
           (if (boundp 'find-stamp-blocks) 
@@ -457,6 +478,9 @@
                               )
                             )
                             
+                            ;; Большой/малый штамп (из СПДС)
+                            (setq is-big (= 1 (cdr (assoc 290 (member '(301 . "First sheet") spds-list1)))))
+                            
                             ;; Название (только если штамп большой)
                             (if (and is-big (or (= nameris nil) (= nameris "")))
                               (progn
@@ -517,15 +541,16 @@
             )
           )
 
-          ; Вывод итоговой диагностики штампа для рамки
-          (princ 
-            (strcat "\n  Назв: "
-                    (if nameris nameris "nil")
-                    " | Шифр: "
-                    (if shifr (if (= shifr "") "nil" shifr) "nil")
-                    " | Номер: "
-                    (if numa (vl-princ-to-string numa) "nil")
-            )
+          ; Сбор диагностики для вывода в конце
+          (if (not (boundp '*pri-final-diagnostics*)) (setq *pri-final-diagnostics* nil))
+          (setq *pri-final-diagnostics* 
+                (append *pri-final-diagnostics* 
+                        (list (strcat "  Назв: " (if nameris nameris "nil")
+                                      " | Шифр: " (if shifr (if (= shifr "") "nil" shifr) "nil")
+                                      " | Номер: " (if numa (vl-princ-to-string numa) "nil")
+                              )
+                        )
+                )
           )
         )
       )
@@ -676,8 +701,10 @@
           ;)
           (SETVAR "cmdecho" cmd)
           (setq printtrue T)
-          (princ (STRCAT "Файл захаваны:" fileuser))
-          (PRINC "\n-----------------------------------------------------------\n")
+          (if (findfile fileuser)
+            (setq *pri-final-diagnostics* (append *pri-final-diagnostics* (list (STRCAT "  Файл захаваны: " fileuser))))
+            (setq *pri-final-diagnostics* (append *pri-final-diagnostics* (list (STRCAT "  Файл не быў захаваны (магчыма, адключана печать): " fileuser))))
+          )
           (princ)
         )
       )
@@ -786,6 +813,7 @@
   (setq mod (getvar "ctab"))
   (setq spislist (append '("Model") (layoutlist)))
   (setq listpp (vl-position mod spislist)) ;
+  (setq *pri-final-diagnostics* nil) ; Очистка перед новым запуском
   ;while
   (while temp_start 
     ;dialog  d:\\Косов\\prog\\_Програм\\_acad\\для панельки\\
@@ -879,6 +907,17 @@
 
   (if (/= filereturn nil) 
     (progn 
+      (if (and (boundp '*pri-final-diagnostics*) *pri-final-diagnostics*)
+        (progn
+          (princ "\n\n=== ИТОГИ ПЕЧАТИ ===")
+          (foreach diag *pri-final-diagnostics*
+            (princ (strcat "\n" diag))
+          )
+          (princ "\n====================\n")
+          (setq *pri-final-diagnostics* nil)
+        )
+      )
+      
       (SETQ filereturn (STRCAT (GETVAR "dwgprefix") "&false&true&" filereturn "<"))
 
       (alert "пдф-надрукаваны, праверце тэчку")
