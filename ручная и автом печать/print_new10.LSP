@@ -411,16 +411,12 @@
 
           ; [ОТЛАДКА] Вывод диагностики
           (princ 
-            (strcat "\n--- ДИАГНОСТИКА ШТАМПА ---" 
-                    "\nШтамп: "
-                    (if is-big "Большой" "Малый")
-                    "\nНазвание (nameris): "
+            (strcat "\n  Назв: "
                     (if nameris nameris "nil")
-                    "\nШифр (shifr): "
+                    " | Шифр: "
                     (if shifr shifr "nil")
-                    "\nНомер (numa): "
+                    " | Номер: "
                     (if numa (vl-princ-to-string numa) "nil")
-                    "\n--------------------------\n"
             )
           )
         )
@@ -532,9 +528,12 @@
                           )
                         )
                         
-                        (princ (strcat "\n[СПДС] Найдена СПДС рамка. Шифр: " (if shifr shifr "nil")
-                                       " Назв: " (if nameris nameris "nil")
-                                       " Лист: " (if numa (vl-princ-to-string numa) "nil")
+                        (princ (strcat "\n  [СПДС] Назв: "
+                                       (if nameris nameris "nil")
+                                       " | Шифр: "
+                                       (if shifr shifr "nil")
+                                       " | Номер: "
+                                       (if numa (vl-princ-to-string numa) "nil")
                                )
                         )
                       )
