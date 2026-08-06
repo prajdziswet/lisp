@@ -397,8 +397,8 @@
       )
       
       ;; В ручной печати mashrus равен 0.01 для масштаба 1:100.
-      ;; Но функции поиска штампа (в dil_print19) ожидают mash = 100.
-      (setq mash (if (= mashrus 0.01) 100 mashrus))
+      ;; В функциях поиска штампа (из dil_print19) mash должен совпадать с mashrus
+      (setq mash mashrus)
       
       (if (boundp 'find-stamp-blocks) 
         (progn 
@@ -455,6 +455,10 @@
                             ;; Извлечение xdata из СПДС рамки
                             (setq spds-list1 (entget spds-ename))
                             
+                            ;; Обновляем координату x2 (правый нижний угол) точно по рамке СПДС,
+                            ;; чтобы функции поиска текста (nameshifr, namelist) искали в правильном месте
+                            (setq x2 (list (car spds-max) (cadr spds-min)))
+                            
                             ;; Номер листа
                             (if (or (= numa nil) (= numa 0) (= numa ""))
                               (progn
@@ -508,24 +512,32 @@
             )
           )
 
-          ;; 4. Поиск в тексте (если всё ещё есть пустые поля)
-          (if (and is-big (or (= nameris nil) (= nameris "")) (boundp 'namelist)) 
-            (setq nameris (namelist))
+          ;; 4. Поиск в тексте (наложенный текст имеет приоритет над атрибутами СПДС)
+          (if (and is-big (boundp 'namelist)) 
+            (progn
+              (setq tmp-nameris (namelist))
+              (if (and tmp-nameris (/= tmp-nameris "")) (setq nameris tmp-nameris))
+            )
           )
           (if (not is-big) (setq nameris nil))
-          (if (and (or (= numa nil) (= numa 0) (= numa "")) (boundp 'numar_s)) 
+          
+          (if (boundp 'numar_s) 
             (progn
               (setq tmp-num (numar_s))
               (if (and tmp-num (/= tmp-num "") (/= tmp-num 0)) (setq numa tmp-num))
             )
           )
+          
+          (if (boundp 'nameshifr) 
+            (progn
+              (setq tmp-shifr (nameshifr is-big))
+              (if (and tmp-shifr (/= tmp-shifr "")) (setq shifr tmp-shifr))
+            )
+          )
+          
           (if (or (= shifr nil) (= shifr ""))
             (progn
-              (if (boundp 'nameshifr) 
-                (setq shifr (nameshifr is-big))
-              )
-              (if (= shifr nil) (setq shifr ""))
-              (if (and (= shifr "") (boundp 'get-shifr-from-blocks)) 
+              (if (boundp 'get-shifr-from-blocks) 
                 (setq shifr (get-shifr-from-blocks is-big))
               )
               (if (= shifr nil) (setq shifr ""))
@@ -651,54 +663,53 @@
           )
           (vl-file-delete fileuser)
           (SETVAR "cmdecho" 0)
-          (princ "\n--- ПЕЧАТЬ В PDF ВРЕМЕННО ОТКЛЮЧЕНА (DEBUG) ---\n")
-          ;(if (= (GETVAR "tilemode") 0)
-          ;  (command "_plot" ;Сама команда
-          ;           "_y" ;Выполнить детальное задание конфигурации?:
-          ;           "" ;Имя листа или <печать>:
-          ;           "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
-          ;           format ;Формат листа бумаги
-          ;           "_Millimeters" ;;Единицы измерения размеров листа :
-          ;           list1 ;;Ориентация чертежа [Книжная/Альбомная]:
-          ;           "_N" ;;Перевернуть чертеж? :
-          ;           "Рамка" ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
-          ;           point1 ;;першая коордыната
-          ;           point2 ;;другая коордяната
-          ;           mashrus ;;Масштаб печати :
-          ;           "_center" ;;Смещение от начала(x,y)или[Центрировать]:
-          ;           "_y" ;;Учитывать стили печати? [Да/Нет]:
-          ;           color ;;Имя таблицы стилей печати:
-          ;           "_y" ;;Учитывать веса линий? [Да/Нет]:
-          ;           "_N" ;;Масштабировать веса линий?:
-          ;           "_N" ;;Печатать объекты листа первыми?:
-          ;           "_N" ;;Скрывать объекты листа?:
-          ;           fileuser ;;Введите имя файла :
-          ;           "_n" ;;Сохранить изменения параметров листа
-          ;           "_y" ;;Перейти к печати [Да/Нет]
-          ;  )
-          ;  ;;калі модель
-          ;  (command "_plot" ;Сама команда
-          ;           "_y" ;Выполнить детальное задание конфигурации?:
-          ;           "" ;Имя листа или <печать>:
-          ;           "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
-          ;           format ;Формат листа бумаги
-          ;           "_Millimeters" ;;Единицы измерения размеров листа :
-          ;           list1 ;;Ориентация чертежа [Книжная/Альбомная]:
-          ;           "_N" ;;Перевернуть чертеж? :
-          ;           "Рамка" ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
-          ;           point1 ;;першая коордыната
-          ;           point2 ;;другая коордяната
-          ;           mashrus ;;Масштаб печати :
-          ;           "_center" ;;Смещение от начала(x,y)или[Центрировать]:
-          ;           "_y" ;;Учитывать стили печати? [Да/Нет]:
-          ;           color ;;Имя таблицы стилей печати:
-          ;           "_y" ;;Учитывать веса линий? [Да/Нет]:
-          ;           "_N" ;;Режим вывода тонированных ВЭ:
-          ;           fileuser ;;Введите имя файла :
-          ;           "_n" ;;Сохранить изменения параметров листа
-          ;           "_y" ;;Перейти к печати [Да/Нет]
-          ;  )
-          ;)
+          (if (= (GETVAR "tilemode") 0)
+            (command "_plot" ;Сама команда
+                     "_y" ;Выполнить детальное задание конфигурации?:
+                     "" ;Имя листа или <печать>:
+                     "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
+                     format ;Формат листа бумаги
+                     "_Millimeters" ;;Единицы измерения размеров листа :
+                     list1 ;;Ориентация чертежа [Книжная/Альбомная]:
+                     "_N" ;;Перевернуть чертеж? :
+                     "Рамка" ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
+                     point1 ;;першая коордыната
+                     point2 ;;другая коордяната
+                     mashrus ;;Масштаб печати :
+                     "_center" ;;Смещение от начала(x,y)или[Центрировать]:
+                     "_y" ;;Учитывать стили печати? [Да/Нет]:
+                     color ;;Имя таблицы стилей печати:
+                     "_y" ;;Учитывать веса линий? [Да/Нет]:
+                     "_N" ;;Масштабировать веса линий?:
+                     "_N" ;;Печатать объекты листа первыми?:
+                     "_N" ;;Скрывать объекты листа?:
+                     fileuser ;;Введите имя файла :
+                     "_n" ;;Сохранить изменения параметров листа
+                     "_y" ;;Перейти к печати [Да/Нет]
+            )
+            ;;калі модель
+            (command "_plot" ;Сама команда
+                     "_y" ;Выполнить детальное задание конфигурации?:
+                     "" ;Имя листа или <печать>:
+                     "_DWG в PDF ЭТО(Silent).pc3" ;Имя устройства вывода:
+                     format ;Формат листа бумаги
+                     "_Millimeters" ;;Единицы измерения размеров листа :
+                     list1 ;;Ориентация чертежа [Книжная/Альбомная]:
+                     "_N" ;;Перевернуть чертеж? :
+                     "Рамка" ;;Печатаемая область [Экран/Границы/Лист/Вид/Рамка]:
+                     point1 ;;першая коордыната
+                     point2 ;;другая коордяната
+                     mashrus ;;Масштаб печати :
+                     "_center" ;;Смещение от начала(x,y)или[Центрировать]:
+                     "_y" ;;Учитывать стили печати? [Да/Нет]:
+                     color ;;Имя таблицы стилей печати:
+                     "_y" ;;Учитывать веса линий? [Да/Нет]:
+                     "_N" ;;Режим вывода тонированных ВЭ:
+                     fileuser ;;Введите имя файла :
+                     "_n" ;;Сохранить изменения параметров листа
+                     "_y" ;;Перейти к печати [Да/Нет]
+            )
+          )
           (SETVAR "cmdecho" cmd)
           (setq printtrue T)
           (if (findfile fileuser)
@@ -756,10 +767,10 @@
                         "\n--------------------------\n"
                 )
               )
-              ;(startapp
-              ;  "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
-              ;  (strcat "\"" single-ret "\"")
-              ;)
+              (startapp
+                "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+                (strcat "\"" single-ret "\"")
+              )
             )
           )
         )
@@ -920,7 +931,6 @@
       
       (SETQ filereturn (STRCAT (GETVAR "dwgprefix") "&false&true&" filereturn "<"))
 
-      (alert "пдф-надрукаваны, праверце тэчку")
       ;адпраука файлау у редактор
       (if (boundp 'add_edit) 
         (add_edit AddDwgBool filereturn)
@@ -931,12 +941,10 @@
                     "\n--------------------------\n"
             )
           )
-          ;(startapp
-          ;  ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-          ;  ;"__prog\\exe\\WPFMergeExe\\WPFMergeExe.exe"
-          ;  "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
-          ;  (strcat "\"" filereturn "\"")
-          ;)
+          (startapp
+            "e:\\praca-proect\\_program\\_Програм\\__скончаные\\__скончаные\\_Autocad\\WPFMergeExe\\WPFMergeExe\\bin\\Debug\\net48\\WPFMergeExe.exe"
+            (strcat "\"" filereturn "\"")
+          )
           (command)
         )
       ) ;vers

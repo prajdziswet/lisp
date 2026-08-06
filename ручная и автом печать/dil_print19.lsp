@@ -1490,11 +1490,14 @@
       (if shifr (setq shifr (vl-string-trim " " shifr)) (setq shifr ""))
       (if (and shifr (= (type shifr) 'STR)) (setq shifr (clear-mtext shifr)))
 
-      ;; Fallback Шифр
+      ;; Поиск наложенного текста (Шифр) - имеет приоритет над атрибутами СПДС
+      (normal_points)
+      (setq tmp-shifr (nameshifr is-big))
+      (if (and tmp-shifr (/= tmp-shifr "")) (setq shifr tmp-shifr))
+
+      ;; Fallback Шифр из других блоков (если все еще пусто)
       (if (or (= shifr "") (= shifr nil)) 
         (progn 
-          (normal_points)
-          (setq shifr (nameshifr is-big))
           (if (= shifr "") (setq shifr (get-shifr-from-blocks is-big)))
         )
       )
@@ -1514,24 +1517,18 @@
             (setq nameris (clear-mtext nameris))
           )
 
-          ;; Fallback Название
-          (if (or (= nameris "") (= nameris nil)) 
-            (progn 
-              (normal_points)
-              (setq nameris (namelist))
-            )
-          )
+          ;; Поиск наложенного текста (Название) - имеет приоритет
+          (normal_points)
+          (setq tmp-nameris (namelist))
+          (if (and tmp-nameris (/= tmp-nameris "")) (setq nameris tmp-nameris))
         )
         (setq nameris "")
       )
 
-      ;; Fallback Номер (numa)
-      (if (or (= numa nil) (= numa 0) (= numa "") (= numa "0")) 
-        (progn 
-          (normal_points)
-          (setq numa (numar_s))
-        )
-      )
+      ;; Поиск наложенного текста (Номер листа) - имеет приоритет
+      (normal_points)
+      (setq tmp-num (numar_s))
+      (if (and tmp-num (/= tmp-num "") (/= tmp-num 0)) (setq numa tmp-num))
 
 
       (if (or (= numa nil) (= numa 0) (= numa "") (= numa "0")) 
