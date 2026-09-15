@@ -574,7 +574,7 @@
   shifr-found
 )
 
-; для выбранного многострочного текста очищает форматирование.=============================================================================|;
+; для выбранного многострочного текста очищает форматирование.=============================================================================
 (defun clear-mtext (str / pos temp end) 
   (if (and str (= (type str) 'STR)) 
     (progn 
@@ -2669,4 +2669,608 @@
 					;запуск в открываемых файлах
 (if (/= (vl-bb-ref 'directory-p) nil) 
   (open-p)
+)
+
+;;============================================================================
+;; ФУНКЦИОНАЛ ИНТЕРАКТИВНОГО ПРОСМОТРА, ОЧИСТКИ И УДАЛЕНИЯ ДУБЛИКАТОВ РАМОК
+;; Команда для запуска из командной строки AutoCAD:
+;;   dil_viewclean
+;;============================================================================
+
+;; Вспомогательная функция: безопасное удаление N-го элемента списка (0-indexed)
+(defun dil_remove_nth (n lst / res i)
+  (setq res nil i 0)
+  (foreach x lst
+    (if (/= i n)
+      (setq res (cons x res))
+    )
+    (setq i (1+ i))
+  )
+  (reverse res)
+)
+
+;; Безопасное удаление примитива с поддержкой заблокированных слоев
+(defun dil_safe_entdel (ent / lay lay_obj was_locked)
+  (if (and ent (entget ent))
+    (progn
+      (setq lay (cdr (assoc 8 (entget ent))))
+      (if lay
+        (vl-catch-all-apply
+          '(lambda ()
+             (setq lay_obj (vla-item (vla-get-Layers (vla-get-ActiveDocument (vlax-get-acad-object))) lay))
+             (if (= (vla-get-Lock lay_obj) :vlax-true)
+               (progn
+                 (vla-put-Lock lay_obj :vlax-false)
+                 (setq was_locked T)
+               )
+             )
+           )
+        )
+      )
+      (entdel ent)
+      (if was_locked
+        (vl-catch-all-apply
+          '(lambda ()
+             (vla-put-Lock lay_obj :vlax-true)
+           )
+        )
+      )
+    )
+  )
+)
+
+;; Безопасное расчленение примитива с поддержкой заблокированных слоев
+(defun dil_safe_explode (ent / lay lay_obj was_locked)
+  (if (and ent (entget ent))
+    (progn
+      (setq lay (cdr (assoc 8 (entget ent))))
+      (if lay
+        (vl-catch-all-apply
+          '(lambda ()
+             (setq lay_obj (vla-item (vla-get-Layers (vla-get-ActiveDocument (vlax-get-acad-object))) lay))
+             (if (= (vla-get-Lock lay_obj) :vlax-true)
+               (progn
+                 (vla-put-Lock lay_obj :vlax-false)
+                 (setq was_locked T)
+               )
+             )
+           )
+        )
+      )
+      (command "_.explode" ent)
+      (while (> (getvar "cmdactive") 0)
+        (command "")
+      )
+      (if was_locked
+        (vl-catch-all-apply
+          '(lambda ()
+             (vla-put-Lock lay_obj :vlax-true)
+           )
+        )
+      )
+    )
+  )
+)
+
+;; Оценка качества/полноты объекта рамки (для выбора лучшего при удалении дубликатов)
+(defun dil_frame_quality (f / score ent property)
+  (setq score 0
+        ent (nth 0 f)
+  )
+  ;; Наличие номера листа
+  (if (and (nth 1 f) (/= (nth 1 f) "") (/= (nth 1 f) "0"))
+    (setq score (+ score 10))
+  )
+  ;; Наличие названия листа
+  (if (and (nth 8 f) (/= (nth 8 f) ""))
+    (setq score (+ score 10))
+  )
+  ;; Наличие шифра
+  (if (and (nth 9 f) (/= (nth 9 f) ""))
+    (setq score (+ score 10))
+  )
+  ;; Предпочтение типа примитива: СПДС -> Блок (INSERT) -> Полилиния
+  (if (and ent (entget ent))
+    (progn
+      (setq property (cdr (assoc 0 (entget ent))))
+      (cond
+        ((= property "SPDSFORMAT") (setq score (+ score 5)))
+        ((= property "INSERT")     (setq score (+ score 4)))
+        ((= property "LWPOLYLINE") (setq score (+ score 1)))
+      )
+    )
+  )
+  score
+)
+
+;; Проверка, являются ли две рамки дубликатами (лежат в одном пространстве на одном месте)
+(defun dil_is_duplicate_frame (f1 f2 / x1_1 x2_1 x1_2 x2_2 m1 m2 minX1 maxX1 minY1 maxY1 minX2 maxX2 minY2 maxY2 dx dy tol is_dup)
+  (setq m1 (nth 7 f1)
+        m2 (nth 7 f2)
+        is_dup nil
+  )
+  (if (equal m1 m2)
+    (progn
+      (setq x1_1 (nth 2 f1)
+            x2_1 (nth 3 f1)
+            x1_2 (nth 2 f2)
+            x2_2 (nth 3 f2)
+      )
+      (if (and x1_1 x2_1 x1_2 x2_2)
+        (progn
+          ;; 1. Проверка через штатную функцию kordinat
+          (if (kordinat x1_1 x2_1 x1_2 x2_2)
+            (setq is_dup T)
+            (progn
+              ;; 2. Геометрическая проверка по габаритному прямоугольнику с допуском
+              (setq minX1 (min (car x1_1) (car x2_1))
+                    maxX1 (max (car x1_1) (car x2_1))
+                    minY1 (min (cadr x1_1) (cadr x2_1))
+                    maxY1 (max (cadr x1_1) (cadr x2_1))
+                    minX2 (min (car x1_2) (car x2_2))
+                    maxX2 (max (car x1_2) (car x2_2))
+                    minY2 (min (cadr x1_2) (cadr x2_2))
+                    maxY2 (max (cadr x1_2) (cadr x2_2))
+                    dx    (abs (- maxX1 minX1))
+                    dy    (abs (- maxY1 minY1))
+                    tol   (max 2.0 (* 0.005 (max dx dy)))
+              )
+              (if (and (<= (abs (- minX1 minX2)) tol)
+                       (<= (abs (- maxX1 maxX2)) tol)
+                       (<= (abs (- minY1 minY2)) tol)
+                       (<= (abs (- maxY1 maxY2)) tol)
+                  )
+                (setq is_dup T)
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+  is_dup
+)
+
+;; Поиск и физическое удаление дубликатов рамок из чертежа
+;; Возвращает точечную пару: (список_уникальных_рамок . количество_удаленных_дубликатов)
+(defun dil_purge_duplicate_frames (lst / unique_list duplicates_to_delete item remaining 
+                                       new_remaining best_item q_best q_r del_count ent)
+  (setq unique_list nil
+        duplicates_to_delete nil
+        del_count 0
+  )
+  (while lst
+    (setq item (car lst)
+          remaining (cdr lst)
+          best_item item
+          new_remaining nil
+    )
+    (foreach r remaining
+      (if (and (not (equal (nth 0 best_item) (nth 0 r)))
+               (dil_is_duplicate_frame best_item r)
+          )
+        ;; Дубликат найден! Сравниваем качество: сохраняем лучший, худший удаляем
+        (progn
+          (setq q_best (dil_frame_quality best_item)
+                q_r    (dil_frame_quality r)
+          )
+          (if (>= q_best q_r)
+            ;; best_item лучше: r помечаем на удаление
+            (setq duplicates_to_delete (cons r duplicates_to_delete))
+            ;; r лучше: старый best_item помечаем на удаление, r становится best_item
+            (progn
+              (setq duplicates_to_delete (cons best_item duplicates_to_delete))
+              (setq best_item r)
+            )
+          )
+        )
+        ;; Не дубликат - сохраняем для следующих итераций
+        (setq new_remaining (cons r new_remaining))
+      )
+    )
+    (setq unique_list (cons best_item unique_list))
+    (setq lst (reverse new_remaining))
+  )
+
+  ;; Физическое удаление дубликатов из чертежа через entdel
+  (foreach d duplicates_to_delete
+    (setq ent (nth 0 d))
+    (if (and ent (entget ent))
+      (progn
+        (dil_safe_entdel ent)
+        (setq del_count (1+ del_count))
+      )
+    )
+  )
+
+  (cons (reverse unique_list) del_count)
+)
+
+;; Сбор всех рамок в текущем чертеже с точным сохранением примитива рамки (ent)
+;; Возвращает список элементов: (ent numa x1 x2 format mash poloz model nameris shifr)
+(defun dil_collect_frames (/ raw_list ss len i ent property vla-obj x1 x2 format 
+                             mash poloz model nameris shifr is-big numa zapret_name 
+                             list1 list2
+                            )
+  (setq raw_list nil)
+  (vl-load-com)
+
+  ;; 1. Поиск замкнутых полилиний (LWPOLYLINE)
+  (setq ss (ssget "_X" '((0 . "LWPOLYLINE"))))
+  (if ss
+    (progn
+      (setq i 0 len (sslength ss))
+      (while (< i len)
+        (setq ent (ssname ss i)
+              x1 nil x2 nil format nil mash 1 zapret_name nil
+        )
+        (try 'polyline_format (list ent))
+        (if (null format)
+          (progn
+            (setq mash 100)
+            (try 'polyline_format (list ent))
+          )
+        )
+        (if format
+          (progn
+            (find-stamp-blocks)
+            (normal_points)
+            (setq numa (numar_s))
+            (if (and (or (null nameris) (= nameris "")) (/= zapret_name T))
+              (setq nameris (namelist))
+            )
+            (setq is-big (is-big-stamp-p))
+            (if (not is-big) (setq nameris ""))
+            (setq shifr (nameshifr is-big))
+            (if (or (null shifr) (= shifr ""))
+              (setq shifr (get-shifr-from-blocks is-big))
+            )
+            (if (and nameris (= (type nameris) 'STR)) (setq nameris (clear-mtext nameris)))
+            (if (and shifr (= (type shifr) 'STR)) (setq shifr (clear-mtext shifr)))
+            (if (and numa (= (type numa) 'STR)) (setq numa (clear-mtext numa)))
+            (if (or (null numa) (= numa 0) (= numa "0")) (setq numa ""))
+
+            (setq raw_list (cons (list ent 
+                                       (if numa (vl-princ-to-string numa) "") 
+                                       x1 x2 format mash poloz model 
+                                       (if nameris nameris "") 
+                                       (if shifr shifr "")
+                                 ) 
+                                 raw_list
+                           )
+            )
+            (setq nameris nil numa nil format nil)
+          )
+        )
+        (setq i (1+ i))
+      )
+    )
+  )
+
+  ;; 2. Поиск блоков оформления (INSERT)
+  (setq ss (ssget "_X" '((0 . "INSERT") (100 . "AcDbBlockReference"))))
+  (if ss
+    (progn
+      (setq i 0 len (sslength ss))
+      (while (< i len)
+        (setq ent (ssname ss i)
+              property (entget ent)
+        )
+        (if property
+          (progn
+            (setq mash (/ 1.0 (cdr (assoc 41 property)))
+                  x1 nil x2 nil format nil zapret_name nil
+            )
+            (try 'polyline_format (list ent))
+            (if format
+              (progn
+                (try 'get-block-att (list ent))
+                (find-stamp-blocks)
+                (normal_points)
+                (setq numa (numar_s))
+                (if (and (or (null nameris) (= nameris "")) (/= zapret_name T))
+                  (setq nameris (namelist))
+                )
+                (setq is-big (is-big-stamp-p))
+                (if (not is-big) (setq nameris ""))
+                (setq shifr (nameshifr is-big))
+                (if (or (null shifr) (= shifr ""))
+                  (setq shifr (get-shifr-from-blocks is-big))
+                )
+                (if (and nameris (= (type nameris) 'STR)) (setq nameris (clear-mtext nameris)))
+                (if (and shifr (= (type shifr) 'STR)) (setq shifr (clear-mtext shifr)))
+                (if (and numa (= (type numa) 'STR)) (setq numa (clear-mtext numa)))
+                (if (or (null numa) (= numa 0) (= numa "0")) (setq numa ""))
+
+                (setq raw_list (cons (list ent 
+                                           (if numa (vl-princ-to-string numa) "") 
+                                           x1 x2 format mash poloz model 
+                                           (if nameris nameris "") 
+                                           (if shifr shifr "")
+                                     ) 
+                                     raw_list
+                               )
+                )
+                (setq nameris nil numa nil format nil)
+              )
+            )
+          )
+        )
+        (setq i (1+ i))
+      )
+    )
+  )
+
+  ;; 3. Поиск объектов СПДС (SPDSFORMAT)
+  (setq ss (ssget "_X" '((0 . "SPDSFORMAT"))))
+  (if ss
+    (progn
+      (setq i 0 len (sslength ss))
+      (while (< i len)
+        (setq ent (ssname ss i)
+              list1 (entget ent)
+              list2 (vlax-ename->vla-object ent)
+        )
+        (vla-GetBoundingBox list2 'x1 'x2)
+        (setq x1 (vlax-safearray->list x1)
+              x2 (vlax-safearray->list x2)
+              model (cdr (assoc 410 list1))
+        )
+        (if (and x1 x2)
+          (progn
+            (v_format_spds)
+            (if format
+              (setq raw_list (cons (list ent 
+                                         (if numa (vl-princ-to-string numa) "") 
+                                         x1 x2 format mash poloz model 
+                                         (if nameris nameris "") 
+                                         (if shifr shifr "")
+                                   ) 
+                                   raw_list
+                             )
+              )
+            )
+          )
+        )
+        (setq i (1+ i))
+      )
+    )
+  )
+
+  (reverse raw_list)
+)
+
+;; Зумирование всей печатаемой области листа на экран
+(defun dil_zoom_to_frame (x1 x2 model / minX maxX minY maxY dx dy margin p1 p2)
+  ;; Переключение вкладки, если рамка находится на другом листе/модели
+  (if (/= (getvar "ctab") model)
+    (setvar "ctab" model)
+  )
+  ;; Если находимся на листе (Layout), выходим из плавающего видового экрана в пространство листа
+  (if (and (/= model "Model") (> (getvar "cvport") 1))
+    (vl-catch-all-apply 'vl-cmdf (list "_.pspace"))
+  )
+  (setq minX (min (car x1) (car x2))
+        maxX (max (car x1) (car x2))
+        minY (min (cadr x1) (cadr x2))
+        maxY (max (cadr x1) (cadr x2))
+        dx   (- maxX minX)
+        dy   (- maxY minY)
+        margin (* 0.03 (max dx dy)) ; 3% поля вокруг рамки
+        p1   (list (- minX margin) (- minY margin) 0.0)
+        p2   (list (+ maxX margin) (+ maxY margin) 0.0)
+  )
+  (command "_.zoom" "_w" p1 p2)
+)
+
+;; Главная функция просмотра и очистки рамок
+(defun c:dil_viewclean (/ old_cmdecho old_osmode old_ctab old_error doc undo_started 
+                        raw_frames purge_res frames_list dup_deleted_count total_count 
+                        idx item frame_ent numa x1 x2 format mash poloz model nameris 
+                        shifr kw deleted_count exploded_count scale_str
+                       )
+  (vl-load-com)
+  (setq old_cmdecho (getvar "cmdecho")
+        old_osmode  (getvar "osmode")
+        old_ctab    (getvar "ctab")
+        old_error   *error*
+        deleted_count 0
+        exploded_count 0
+        dup_deleted_count 0
+  )
+  (setvar "cmdecho" 0)
+
+  ;; Локальный обработчик ошибок
+  (defun *error* (msg)
+    (if frame_ent (vl-catch-all-apply 'redraw (list frame_ent 4)))
+    (if undo_started 
+      (vl-catch-all-apply 'vla-EndUndoMark (list (vla-get-ActiveDocument (vlax-get-acad-object))))
+    )
+    (setvar "cmdecho" old_cmdecho)
+    (setvar "osmode" old_osmode)
+    (setq *error* old_error)
+    (if (and msg (not (wcmatch (strcase msg) "*CANCEL*,*QUIT*,*ПРЕРВАТЬ*")))
+      (princ (strcat "\n[dil_viewclean] Сообщение: " msg))
+      (princ "\n[dil_viewclean] Просмотр завершен пользователем.")
+    )
+    (princ)
+  )
+
+  ;; Маркер Undo, чтобы ВСЕ действия (включая удаление дубликатов) можно было отменить одним Ctrl+Z
+  (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+  (vla-StartUndoMark doc)
+  (setq undo_started T)
+
+  (princ "\n[dil_viewclean] Поиск и анализ рамок в текущем чертеже...")
+  (setq raw_frames (dil_collect_frames))
+
+  ;; Поиск и физическое удаление дубликатов из чертежа
+  (setq purge_res (dil_purge_duplicate_frames raw_frames)
+        frames_list (car purge_res)
+        dup_deleted_count (cdr purge_res)
+  )
+
+  (if (> dup_deleted_count 0)
+    (princ (strcat "\n[dil_viewclean] Найдено и удалено дубликатов рамок из чертежа: " (itoa dup_deleted_count)))
+    (princ "\n[dil_viewclean] Дубликатов рамок не обнаружено.")
+  )
+
+  (if (or (null frames_list) (= (length frames_list) 0))
+    (progn
+      (princ "\n[dil_viewclean] Рамки для печати в текущем чертеже не найдены.\n")
+      (if undo_started
+        (progn
+          (vla-EndUndoMark doc)
+          (setq undo_started nil)
+        )
+      )
+      (setvar "cmdecho" old_cmdecho)
+      (setvar "osmode" old_osmode)
+      (setq *error* old_error)
+    )
+    (progn
+      (princ (strcat "\n[dil_viewclean] Уникальных рамок подготовлено к просмотру: " (itoa (length frames_list))))
+
+      (setq idx 0)
+      (while (and (< idx (length frames_list)) 
+                  (not (member kw '("Exit" "eXit" "Выход" "X" "x" "В" "в")))
+             )
+        (setq item        (nth idx frames_list)
+              total_count (length frames_list)
+              frame_ent   (nth 0 item)
+              numa        (nth 1 item)
+              x1          (nth 2 item)
+              x2          (nth 3 item)
+              format      (nth 4 item)
+              mash        (nth 5 item)
+              poloz       (nth 6 item)
+              model       (nth 7 item)
+              nameris     (nth 8 item)
+              shifr       (nth 9 item)
+        )
+
+        ;; 1. Зумирование на ВСЮ печатаемую область (полный лист)
+        (dil_zoom_to_frame x1 x2 model)
+
+        ;; 2. Подсветка точного примитива рамки
+        (if (and frame_ent (entget frame_ent)) (redraw frame_ent 3))
+
+        ;; Расчет масштаба для вывода
+        (setq scale_str (if (and mash (numberp mash) (> mash 0))
+                          (rtos (/ 1.0 mash) 2 0)
+                          "1"
+                        )
+        )
+
+        ;; 3. Вывод карточки листа
+        (princ "\n================================================================================")
+        (princ (strcat "\nРамка [" (itoa (1+ idx)) " из " (itoa total_count) "]"
+                       " | Формат: " (if format format "не определен")
+                       " (" (if poloz poloz "") ", М 1:" scale_str ")"
+                       " | Пространство: " (if model model "")
+               )
+        )
+        (princ (strcat "\nЛист: " (vl-princ-to-string numa) " | Шифр: " shifr))
+        (if (/= nameris "")
+          (princ (strcat "\nНазвание: " nameris))
+        )
+        (princ "\n================================================================================")
+
+        ;; 4. Запрос действия пользователя (Далее, Удалить, Расчленить, Назад, Выход)
+        (initget "Далее Удалить Расчленить Назад Выход _Next Delete Explode Back eXit")
+        (setq kw (getkword "\n[Далее/Удалить/Расчленить/Назад/Выход] <Далее>: "))
+
+        ;; 5. Снятие подсветки
+        (if (and frame_ent (entget frame_ent)) (redraw frame_ent 4))
+
+        (cond
+          ;; --- УДАЛИТЬ (D / Delete / У / Удалить) ---
+          ((or (= kw "Delete") (= kw "Удалить") (= kw "УДалить") (= kw "D") (= kw "d") (= kw "У") (= kw "у"))
+           (if (and frame_ent (entget frame_ent))
+             (dil_safe_entdel frame_ent)
+           )
+           (princ "\n>>> Рамка удалена!")
+           (setq deleted_count (1+ deleted_count))
+           ;; Удаление из рабочего списка
+           (setq frames_list (dil_remove_nth idx frames_list))
+           (if (= (length frames_list) 0)
+             (progn
+               (princ "\n>>> Все найденные рамки обработаны!\n")
+             )
+             (if (>= idx (length frames_list))
+               (setq idx (1- (length frames_list)))
+             )
+           )
+          )
+
+          ;; --- РАСЧЛЕНИТЬ (E / Explode / Р / Расчленить) ---
+          ((or (= kw "Explode") (= kw "Расчленить") (= kw "E") (= kw "e") (= kw "Р") (= kw "р") (= kw "R") (= kw "r"))
+           (if (and frame_ent (entget frame_ent))
+             (progn
+               (dil_safe_explode frame_ent)
+               (princ "\n>>> Рамка расчленена!")
+               (setq exploded_count (1+ exploded_count))
+               ;; Удаление из рабочего списка (так как примитив рамки расчленен)
+               (setq frames_list (dil_remove_nth idx frames_list))
+               (if (= (length frames_list) 0)
+                 (progn
+                   (princ "\n>>> Все найденные рамки обработаны!\n")
+                 )
+                 (if (>= idx (length frames_list))
+                   (setq idx (1- (length frames_list)))
+                 )
+               )
+             )
+             (princ "\n>>> Объект рамки не найден для расчленения.\n")
+           )
+          )
+
+          ;; --- НАЗАД (B / Back / Н / Назад) ---
+          ((or (= kw "Back") (= kw "Назад") (= kw "B") (= kw "b") (= kw "Н") (= kw "н"))
+           (if (> idx 0)
+             (setq idx (1- idx))
+             (princ "\n>>> Это первая рамка в списке.\n")
+           )
+          )
+
+          ;; --- ВЫХОД (X / Exit / В / Выход) ---
+          ((or (= kw "eXit") (= kw "Exit") (= kw "Выход") (= kw "X") (= kw "x") (= kw "В") (= kw "в"))
+           (princ "\n>>> Просмотр завершен пользователем.\n")
+          )
+
+          ;; --- ДАЛЕЕ (Enter / Пробел / nil / Далее / Next) ---
+          (T
+           (if (< (1+ idx) (length frames_list))
+             (setq idx (1+ idx))
+             (progn
+               (princ "\n>>> Достигнута последняя рамка в списке.\n")
+               (setq idx (1+ idx)) ; завершение цикла
+             )
+           )
+          )
+        )
+      ) ; end while
+
+      (if undo_started
+        (progn
+          (vla-EndUndoMark doc)
+          (setq undo_started nil)
+        )
+      )
+
+      (princ "\n================================================================================")
+      (princ (strcat "\n[dil_viewclean] Завершено. Удалено дубликатов: " (itoa dup_deleted_count)
+                     ", удалено рамок: " (itoa deleted_count) 
+                     ", расчленено: " (itoa exploded_count) 
+                     ", осталось рамок: " (itoa (length frames_list)) "."
+             )
+      )
+      (princ "\n================================================================================\n")
+
+      (setvar "cmdecho" old_cmdecho)
+      (setvar "osmode" old_osmode)
+      (setq *error* old_error)
+    )
+  )
+  (princ)
 )
