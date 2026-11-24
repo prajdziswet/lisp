@@ -2452,7 +2452,7 @@
             (setq peshat-file (vla-Open 
                                 (vla-get-Documents (vlax-get-acad-object))
                                 peshat-file
-                                :flax-true
+                                :vlax-true
                                 ""
                               )
             ) ;адчыненне
@@ -2652,7 +2652,7 @@
             (setq peshat-file (vla-Open 
                                 (vla-get-Documents (vlax-get-acad-object))
                                 peshat-file
-                                :flax-true
+                                :vlax-true
                                 ""
                               )
             ) ;адчыненне
